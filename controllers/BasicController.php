@@ -49,12 +49,12 @@ class BasicController extends Controller
     public function getParam($key, $is_need = true, $default_value = NULL)
     {
         
-        $val = self::$request->get($key);
+        $val = self::replace_specialChar(self::$request->get($key));
         if ($val === NULL)
         {
-            $val = self::$request->post($key);
+            $val = self::replace_specialChar(self::$request->post($key));
         }
-        if ($is_need && $val === NULL)
+        if ( ($is_need && $val === NULL) || ($is_need && empty($val)) )
         {
             $this->Error(Constants::GLOBAL_INVALID_PARAM, 'required param: ' . $key);
         }
@@ -104,8 +104,38 @@ class BasicController extends Controller
         echo(json_encode($_arr));
         \Yii::$app->end();
     }
-  
 
-  
+
+    /**
+     *判断是否为POST 请求
+     */
+    public function isPost (){
+
+        if ( !self::$request->isPost ) {
+            $this->Error(Constants::REQUSET_NO_POST, Constants::$error_message[Constants::REQUSET_NO_POST]);
+        }
+
+
+    }
+
+    /**
+     * 判断是否为GET 请求
+     */
+    public function isGet() {
+
+        if ( !self::$request->isGet ) {
+            $this->Error(Constants::REQUSET_NO_GET, Constants::$error_message[Constants::REQUSET_NO_GET]);
+        }
+    }
+
+    /**
+     * @param $strParam
+     * @return mixed
+     * 完美过滤特殊字符串
+     */
+    public static function replace_specialChar($strParam){
+        $regex = "/\/|\～|\，|\。|\！|\？|\“|\”|\【|\】|\『|\』|\：|\；|\《|\》|\’|\‘|\ |\·|\~|\!|\@|\#|\\$|\%|\^|\&|\*|\(|\)|\_|\+|\{|\}|\:|\<|\>|\?|\[|\]|\,|\.|\/|\;|\'|\`|\-|\=|\\\|\|/";
+        return preg_replace($regex,"",$strParam);
+    }
 
 }

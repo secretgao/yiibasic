@@ -14,6 +14,7 @@ class IndexController extends BasicController
     }
     
     public function actionIndex(){
+        phpinfo();
             echo 'aaaa';exit();
     }
 }
