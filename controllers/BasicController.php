@@ -14,6 +14,7 @@ class BasicController extends Controller
     public static $request;
     
     public function init(){
+        $this->enableCsrfValidation = false;
         parent::init();
         //   self::$request = \Yii::$app->request;
         
