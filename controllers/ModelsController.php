@@ -41,9 +41,9 @@ class ModelsController extends BasicController
      */
     public function actionAdd(){
        // $this->isPost();
-       // $data = $this->getParam('data',true);
+        $data = $this->getParam('data',true);
 
-        echo '<pre>';print_r($_POST);exit();
+
 
 
         $Obj = new AModel();
