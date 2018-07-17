@@ -55,16 +55,7 @@ class ProjectController extends BasicController
      */
     
     public function actionAdd(){
-        /**
-         * `name` varchar(50) DEFAULT NULL COMMENT '项目名称',
-  `start_time` int(11) DEFAULT '0' COMMENT '项目开始时间',
-  `end_time` int(11) DEFAULT '0',
-  `update_time` int(11) DEFAULT NULL,
-  `is_add_catalog` tinyint(2) DEFAULT '0' COMMENT '是否允许增加目录 0 不允许    1 允许',
-  `status` tinyint(3) DEFAULT NULL COMMENT '项目状态   0 未开始  1 进行中  2 已结束  3 暂停',
-  `description` text COMMENT '项目描述',
-  `number` int(11) DEFAULT NULL COMMENT '成员数量',
-         */
+      
           $name         = $this->getParam('name',true);
           $startTime    = $this->getParam('start_time',true); 
           $allowAdd     = $this->getParam('allow_add',false,0);
