@@ -76,63 +76,40 @@ class ProjectController extends BasicController
           $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
     
+  
+
+
+
     /**
-     * 编辑
+     * 设置排序
      */
-    public function actionEdit(){
-        $this->isPost();
-        $id      = $this->getParam('id',true);
-        $content = $this->getParam('data',true);
+    public function actionSettingSort(){
+        
+        $this->ispost();
+        $uid = $this->getParam('uid',true);
+        $ids = $this->getParam('ids',true);
 
-        $Obj = AModel::findOne($id);
-
-        if (!$Obj){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-
-        }
-
-        $Obj->content = $content;
-        $Obj->update_time = time();
-        if ($Obj->save(false)) {
+        $idArr = explode(',', $ids);
+        $trans = Yii::$app->db->beginTransaction();
+        try {
+            foreach ($idArr as $key=>$projectId){
+                $data = AProject::findOne($projectId);
+                if ($data){
+                    $data->sort = $key+1;
+                    $data->save(false);
+                }
+            }
+            $trans->commit();
             $this->Success();
-        }
-
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-    }
-
-
-    /**
-     * 删除
-     */
-    public function actionDel(){
-        $this->isPost();
-        $id          = $this->getParam('id',true);
-        $Obj = AModel::findOne($id);
-
-        if (!$Obj){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-        }
-
-        $Obj->status =-1;
-        if ($Obj->save(false)) {
-            $this->Success();
-        }
-
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        } catch (\Exception $e){
+            $trans->rollBack();
+            $this->Error($e);
+          
+        }    
     }
 
 
 
-
-    /**
-     * 多维数组转成二位数组
-     */
-    public function arrayToTweArr($data){
-
-        echo '<pre>';print_r($data);
-
-    }
-    
     /**
      * 获取部门人数
      */

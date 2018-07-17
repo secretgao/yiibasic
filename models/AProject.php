@@ -18,6 +18,8 @@ use Yii;
  * @property string $description 项目描述
  * @property int $members 成员数量
  * @property int $create_uid 创建人
+ * @property string $year 年份
+ * @property int $sort 排序
  */
 class AProject extends \yii\db\ActiveRecord
 {
@@ -39,7 +41,8 @@ class AProject extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['name'], 'string', 'max' => 50],
             [['allow_add'], 'string', 'max' => 2],
-            [['status'], 'string', 'max' => 3],
+            [['status', 'sort'], 'string', 'max' => 3],
+            [['year'], 'string', 'max' => 20],
         ];
     }
 
@@ -60,6 +63,8 @@ class AProject extends \yii\db\ActiveRecord
             'description' => 'Description',
             'members' => 'Members',
             'create_uid' => 'Create Uid',
+            'year' => 'Year',
+            'sort' => 'Sort',
         ];
     }
 }
