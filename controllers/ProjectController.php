@@ -27,8 +27,6 @@ class ProjectController extends BasicController
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
         
-        
-        
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->asArray()->all(); 
         
         if (empty($data)){

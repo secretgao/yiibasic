@@ -8,10 +8,11 @@ use Yii;
  * This is the model class for table "a_model".
  *
  * @property int $id
- * @property string $content
+ * @property string $name
  * @property int $status 状态   0 正常  -1 删除
  * @property int $create_time
  * @property int $update_time
+ * @property int $pid
  */
 class AModel extends \yii\db\ActiveRecord
 {
@@ -29,8 +30,8 @@ class AModel extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['content'], 'string'],
-            [['create_time', 'update_time'], 'integer'],
+            [['create_time', 'update_time', 'pid'], 'integer'],
+            [['name'], 'string', 'max' => 20],
             [['status'], 'string', 'max' => 2],
         ];
     }
@@ -42,10 +43,11 @@ class AModel extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'content' => 'Content',
+            'name' => 'Name',
             'status' => 'Status',
             'create_time' => 'Create Time',
             'update_time' => 'Update Time',
+            'pid' => 'Pid',
         ];
     }
 }
