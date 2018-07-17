@@ -1,0 +1,26 @@
+<?php
+namespace app\commond;
+
+class helps {
+    
+   static function make_tree($arr){
+        $refer = array();
+        $tree = array();
+        foreach($arr as $k => $v){
+            $refer[$v['id']] = & $arr[$k]; //创建主键的数组引用
+        }
+        foreach($arr as $k => $v){
+            $pid = $v['pid'];  //获取当前分类的父级id
+            if($pid == 0){
+                $tree[] = & $arr[$k];  //顶级栏目
+            }else{
+                if(isset($refer[$pid])){
+                    $refer[$pid]['nodeList'][] = & $arr[$k]; //如果存在父级栏目，则添加进父级栏目的子栏目数组中
+                }
+            }
+        }
+        return $tree;
+    }
+    
+    
+}

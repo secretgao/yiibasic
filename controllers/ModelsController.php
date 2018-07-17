@@ -3,8 +3,7 @@
 namespace app\controllers;
 
 use app\commond\Constants;
-use app\models\APosition;
-use app\models\AUser;
+use app\commond\helps;
 use Yii;
 use app\models\AModel;
 
@@ -22,15 +21,17 @@ class ModelsController extends BasicController
      * 获取
      */
     public function actionIndex(){
-
-        $id   = $this->getParam('id',true);
-        $Obj = AModel::findOne($id);
-
-        if (!$Obj){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);          
+       // $this->isPost();
+        $data = AModel::find()->select('id,name,pid')->where(['status'=>0])->asArray()->all();
+        
+        if (empty($data)){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+            
         }
-                
-        $this->Success(['data'=>$Obj->content]);
+     
+        $result = Helps::make_tree($data);
+    
+        $this->Success(['data'=>$result]);
     }
 
     /**
