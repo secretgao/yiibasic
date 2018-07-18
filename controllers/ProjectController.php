@@ -24,7 +24,10 @@ class ProjectController extends BasicController
      */
     public function actionGetlist(){
 
+       
         $uid = $this->getParam('userId',true);
+        
+      
         $time = $this->getParam('time',true);
         
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->asArray()->all(); 
@@ -40,8 +43,9 @@ class ProjectController extends BasicController
                 $usedTime = self::timediff(time(),$item['start_time']);
             }
             $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
-            
-           
+            $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
+            $item['status'] = intval($item['status']);
+            $item['members'] = intval($item['members']);
             $item['used_time']  = $usedTime;
         }      
         $this->Success(['data'=>$data]);
