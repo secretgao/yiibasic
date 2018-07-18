@@ -22,5 +22,20 @@ class helps {
         return $tree;
     }
     
+    static function getson($arr,$pid=0,$level){
+        static $res;//静态变量 只会被初始化一次
+        foreach($arr as $k=>$v){
+            $ctid = intval($v['pid']);
+            $cid = intval($v['id']);
+            if($ctid === $pid){
+                $tmp = $v;
+                $tmp['level'] = $level;
+                $res[] = $tmp;
+                self::getson($arr,$cid,$level+1);
+            }
+        }
+        return $res;
+    }
+    
     
 }

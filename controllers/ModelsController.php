@@ -29,7 +29,9 @@ class ModelsController extends BasicController
             
         }
      
-        $result = Helps::make_tree($data);
+       
+        $new = Helps::getson($data,0,1);
+        $result = Helps::make_tree($new);
     
         $this->Success(['data'=>$result]);
     }
