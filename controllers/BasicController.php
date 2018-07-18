@@ -51,10 +51,12 @@ class BasicController extends Controller
     {
         
         $val = self::replace_specialChar(self::$request->get($key));
-        if ($val === NULL)
+        if ($val === NULL || empty($val))
         {
             $val = self::replace_specialChar(self::$request->post($key));
         }
+        
+      
         if ( ($is_need && $val === NULL) || ($is_need && empty($val)) )
         {
             $this->Error(Constants::GLOBAL_INVALID_PARAM, 'required param: ' . $key);
