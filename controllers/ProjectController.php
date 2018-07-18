@@ -55,24 +55,25 @@ class ProjectController extends BasicController
      * 创建项目
      */
     
-    public function actionAdd(){
+    public function actionCreate(){
       
           $name         = $this->getParam('name',true);
           $startTime    = $this->getParam('start_time',true); 
           $allowAdd     = $this->getParam('allow_add',false,0);
           $description  = $this->getParam('description',false);
           $number       = $this->getParam('number',true);
-          
+          $uid          = $this->getParam('userId',true);
           $projectObj = new AProject();
           
           $projectObj->name = $name;
           $projectObj->start_time = strtotime($startTime);
           $projectObj->description = $description;
-          $projectObj->allow_add = $allowAdd;
+          $projectObj->allow_add = $allowAdd == 0 ? 0 : 1;
           $projectObj->members = $number;
           $projectObj->create_time = time();
           $projectObj->status = 0;
           $projectObj->year = date('Y',time());
+          $projectObj->create_uid = $uid;
           if ($projectObj->insert()){
               $this->Success();
           }

@@ -22,7 +22,9 @@ class ModelsController extends BasicController
      */
     public function actionIndex(){
        // $this->isPost();
-        $data = AModel::find()->select('id,name,pid')->where(['status'=>0])->asArray()->all();
+        $uid = $this->getParam('userId');
+        $data = AModel::find()->select('id,name,pid')
+            ->where(['status'=>0,'project_id'=>0,'create_uid'=>$uid])->asArray()->all();
         
         if (empty($data)){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
@@ -45,10 +47,13 @@ class ModelsController extends BasicController
         $this->isPost();
         $name = $this->getParam('name',true);
         $pid  = $this->getParam('pid',false,0);
-  
+        $projectId = $this->getParam('project_id',false,0);
+        $createUid = $this->getParam('userId',true);
         $Obj = new AModel();
         $Obj->name = $name;
         $Obj->create_time = time();
+        $Obj->project_id = $projectId;
+        $Obj->create_uid = $createUid;
         $Obj->pid = $pid;
         
         if ($Obj->insert()) {
