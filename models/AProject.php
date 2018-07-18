@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "a_project".
+ * This is the model class for table "{{%a_project}}".
  *
  * @property int $id
  * @property string $name 项目名称
@@ -20,6 +20,8 @@ use Yii;
  * @property int $create_uid 创建人
  * @property string $year 年份
  * @property int $sort 排序
+ * @property string $join_uid 参与人id串
+ * @property string $model_id 选中模版id
  */
 class AProject extends \yii\db\ActiveRecord
 {
@@ -28,7 +30,7 @@ class AProject extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'a_project';
+        return '{{%a_project}}';
     }
 
     /**
@@ -43,6 +45,7 @@ class AProject extends \yii\db\ActiveRecord
             [['allow_add'], 'string', 'max' => 2],
             [['status', 'sort'], 'string', 'max' => 3],
             [['year'], 'string', 'max' => 20],
+            [['join_uid', 'model_id'], 'string', 'max' => 200],
         ];
     }
 
@@ -65,6 +68,8 @@ class AProject extends \yii\db\ActiveRecord
             'create_uid' => 'Create Uid',
             'year' => 'Year',
             'sort' => 'Sort',
+            'join_uid' => 'Join Uid',
+            'model_id' => 'Model ID',
         ];
     }
 }

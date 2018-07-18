@@ -56,27 +56,37 @@ class ProjectController extends BasicController
      */
     
     public function actionCreate(){
-      
+
           $name         = $this->getParam('name',true);
           $startTime    = $this->getParam('start_time',true); 
           $allowAdd     = $this->getParam('allow_add',false,0);
-          $description  = $this->getParam('description',false);
-          $number       = $this->getParam('number',true);
+          $description  = $this->getParam('describe',false);
+          $selectModuleIds  = $this->getParam('selectModuleIds',true);
+          $selectUserIds  = $this->getParam('selectUserIds',true);
+
+
+          $members = count(explode(',',$selectUserIds));
+
+
           $uid          = $this->getParam('userId',true);
           $projectObj = new AProject();
           
           $projectObj->name = $name;
           $projectObj->start_time = strtotime($startTime);
           $projectObj->description = $description;
-          $projectObj->allow_add = $allowAdd == 0 ? 0 : 1;
-          $projectObj->members = $number;
+          $projectObj->allow_add = $allowAdd == 0 ? '0' : '1';
+          $projectObj->members = $members;
           $projectObj->create_time = time();
-          $projectObj->status = 0;
+          $projectObj->status = '0';
           $projectObj->year = date('Y',time());
           $projectObj->create_uid = $uid;
+          $projectObj->model_id = $selectModuleIds;
+          $projectObj->join_uid = $selectUserIds;
           if ($projectObj->insert()){
-              $this->Success();
+              $projectObjId = $projectObj->getAttribute('id');
+              $this->Success(['projectId'=>$projectObjId]);
           }
+         
           $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
     
