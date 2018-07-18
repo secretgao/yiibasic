@@ -44,6 +44,7 @@ class ProjectController extends BasicController
             $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
             $item['status'] = intval($item['status']);
             $item['members'] = intval($item['members']);
+            $item['describe'] = $item['description'];
             $item['used_time']  = $usedTime;
         }      
         $this->Success(['data'=>$data]);

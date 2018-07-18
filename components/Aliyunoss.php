@@ -29,10 +29,11 @@ class Aliyunoss extends Component
     {
         $res = false;
         $bucket = Yii::$app->params['oss']['bucket'];               //获取阿里云oss的bucket
-        if (self::$oss->uploadFile($bucket, $object, $filepath)) {  //调用uploadFile方法把服务器文件上传到阿里云oss
+        $res = self::$oss->uploadFile($bucket, $object, $filepath);
+       /* if () {  //调用uploadFile方法把服务器文件上传到阿里云oss
             $res = true;
         }
-        
+        */
         return $res;
     }
     
@@ -52,9 +53,60 @@ class Aliyunoss extends Component
         return $res;
     }
     
-    public function test(){
-        echo 123;
-        echo "success";
+    /**
+     * 上传大文件
+     * @param unknown $object
+     * @param unknown $file
+     * @param unknown $options
+     * @return NULL|boolean
+     */
+    
+    public function multiuploadFile($object, $file, $options = null){
+        $res = false;
+        $bucket = Yii::$app->params['oss']['bucket'];    //获取阿里云oss的bucket
+        $r = self::$oss->multiuploadFile($bucket, $object, $file, $options = null);
+        
+        return $r;
+        if (self::$oss->multiuploadFile($bucket, $object, $file, $options = null)){ 
+            $res = true;
+        }
+        
+        return $res;
     }
+    
+    /**
+     * 创建目录
+     * @param unknown $object
+     * @param unknown $options
+     * @return NULL
+     */
+    public  function  createObjectDir( $object, $options = NULL){
+        $bucket = Yii::$app->params['oss']['bucket'];    //获取阿里云oss的bucket
+        $r = self::$oss->createObjectDir($bucket, $object,  $options = null);        
+        return $r;     
+    }
+    /**
+     * 获取bucket下的object列表
+     *
+     * @param string $bucket
+     * @param array $options
+     * 其中options中的参数如下
+     * $options = array(
+     *      'max-keys'  => max-keys用于限定此次返回object的最大数，如果不设定，默认为100，max-keys取值不能大于1000。
+     *      'prefix'    => 限定返回的object key必须以prefix作为前缀。注意使用prefix查询时，返回的key中仍会包含prefix。
+     *      'delimiter' => 是一个用于对Object名字进行分组的字符。所有名字包含指定的前缀且第一次出现delimiter字符之间的object作为一组元素
+     *      'marker'    => 用户设定结果从marker之后按字母排序的第一个开始返回。
+     *)
+     * 其中 prefix，marker用来实现分页显示效果，参数的长度必须小于256字节。
+     * @throws OssException
+     * @return ObjectListInfo
+     */
+    public function listObjects( $options = null){
+        $bucket = Yii::$app->params['oss']['bucket'];    //获取阿里云oss的bucket
+        $r = self::$oss->listObjects($bucket, $options = null);
+        return $r;
+    }
+
+  
 }
 ?>

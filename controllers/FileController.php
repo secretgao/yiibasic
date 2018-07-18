@@ -28,9 +28,16 @@ class FileController extends BasicController
      */
     public function actionIndex(){
         
+      /*   $r=  \YII::$app->Aliyunoss->listObjects();//\YII::$app->Aliyunoss->createObjectDir('testaa');
+        echo '<pre>';print_r($r);
+        exit(); */
+        $re = \YII::$app->Aliyunoss->upload('gggggg.log','C:\offline_FtnInfo.txt');
+       // $re = \YII::$app->Aliyunoss->multiuploadFile('gggggg.mp4','C:\Users\Administrator\Documents\Tencent Files\891841626\FileRecv\1531814365942920_1531817438125471.mp4');
        
-        \YII::$app->Aliyunoss->test();
-        
+       
+        echo '<pre>';print_r($re);
+        echo '<hr>';
+        echo $re['oss-stringtosign'];
         exit();
         $accessKeyId = "LTAI529J1kb66aY2";
         $accessKeySecret = "TveIiq6hkO24UGWymYZ50aVR8MMj16";
@@ -73,12 +80,10 @@ class FileController extends BasicController
     }
 
 
-    /**
-     * 删除
-     */
-    public function actionDel(){
-       
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    
+    public function actionLookFileList(){
+        
+        
     }
 
 
