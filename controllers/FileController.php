@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\commond\Aliyunoss;
+use app\components\Aliyunoss;
 
 use Yii;
 
@@ -29,7 +29,7 @@ class FileController extends BasicController
     public function actionIndex(){
         
        
-        YII::$app->Aliyunoss->test();
+        \YII::$app->Aliyunoss->test();
         
         exit();
         $accessKeyId = "LTAI529J1kb66aY2";
