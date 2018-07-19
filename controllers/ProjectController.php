@@ -8,6 +8,7 @@ use app\models\AUser;
 use Yii;
 use app\models\AModel;
 use app\models\AProject;
+use app\commond\helps;
 
 
 class ProjectController extends BasicController
@@ -51,6 +52,16 @@ class ProjectController extends BasicController
     }
 
 
+    public function actionGetModels(){
+        $id = 21;
+        $res = helps::getParents($id); 
+        $new = helps::getson($res,0,1);
+        
+       // echo '<pre>';print_r($new);
+        $result = helps::make_tree($new);
+        echo '<pre>';print_r($result);
+    }
+    
     /**
      * 创建项目
      */
@@ -84,7 +95,16 @@ class ProjectController extends BasicController
           $projectObj->join_uid = $selectUserIds;
           if ($projectObj->insert()){
               $projectObjId = $projectObj->getAttribute('id');
-              $this->Success(['projectId'=>$projectObjId]);
+              
+              $getParents = helps::getParents($selectModuleIds);  //获取子目录对应的 父级直到顶级
+              $level = helps::getson($getParents,0,1);              //给所有的目录加上level 层级
+              $info = helps::make_tree($level);
+              $result = [
+                  'projectId'=>$projectObjId,
+                  'info'=>$info,
+              ];
+              
+              $this->Success($result);
           }
          
           $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);

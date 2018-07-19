@@ -1,6 +1,8 @@
 <?php
 namespace app\commond;
 
+use app\models\AModel;
+
 class helps {
     
    static function make_tree($arr){
@@ -36,6 +38,55 @@ class helps {
         }
         return $res;
     }
+    
+    /**
+     * 根据子目录查找 父级
+     * @param unknown $id
+     */
+    public static  function getParents($id,$arr = []){           
+        if (empty($id)){
+            return $arr;
+        }
+ 
+        $data = AModel::find()->select('id,name,pid')
+        ->where(['id'=>$id,'status'=>0])->asArray()->one();
+     
+        $arr[] = $data;    
+        if ($data['pid'] == 0){          
+            return  $arr;       
+        }       
+        return self::getParents($data['pid'],$arr);
+    } 
+   
+    /**
+     * 根据子目录查找 父级
+     * @param unknown $id
+     */
+    public static  function getParentss($cate,$id){
+        
+        $arr=array();
+        foreach($cate as $v){
+            if($v['id']==$id){
+                $arr[]=$v;// $arr[$v['id']]=$v['name'];
+                $arr=array_merge(self::getParentss($cate,$v['pid']),$arr);
+            }
+        }
+        return $arr;
+        
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 }
