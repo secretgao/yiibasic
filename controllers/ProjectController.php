@@ -53,13 +53,37 @@ class ProjectController extends BasicController
 
 
     public function actionGetModels(){
-        $id = 21;
-        $res = helps::getParents($id); 
-        $new = helps::getson($res,0,1);
+        //$id = 21;
+       // $arr = [18,21];
+        $arr = [25,26];
+       // $res = helps::getParents($id); 
+       // $new = helps::getson($res,0,1);
         
        // echo '<pre>';print_r($new);
+        ///$result = helps::make_tree($new);
+       // echo '<pre>';print_r($result);
+        $test= [];
+        $idArr = [];
+        foreach ($arr as $id){
+            $a = helps::getParents($id);
+            foreach ($a as $item){
+                //去除重复
+                if (!in_array($item['id'], $idArr)) {
+                    $test[] = $item;
+                    $idArr[]= $item['id'];
+                }
+                
+            }
+        }
+        
+        echo '<pre>';print_r($test);
+        exit();
+        $new = helps::getson($test,0,1);
+       // echo '<pre>';print_r($new);
         $result = helps::make_tree($new);
-        echo '<pre>';print_r($result);
+       //  echo '<pre>';print_r($result);
+         $this->Success($result);
+        exit();
     }
     
     /**
@@ -95,13 +119,10 @@ class ProjectController extends BasicController
           $projectObj->join_uid = $selectUserIds;
           if ($projectObj->insert()){
               $projectObjId = $projectObj->getAttribute('id');
-              
-              $getParents = helps::getParents($selectModuleIds);  //获取子目录对应的 父级直到顶级
-              $level = helps::getson($getParents,0,1);              //给所有的目录加上level 层级
-              $info = helps::make_tree($level);
+                       
               $result = [
                   'projectId'=>$projectObjId,
-                  'info'=>$info,
+                  'info'=>helps::accordingCatalogToAllHierarchy($selectModuleIds),
               ];
               
               $this->Success($result);
@@ -111,7 +132,8 @@ class ProjectController extends BasicController
     }
     
   
-
+   
+   
 
 
     /**
