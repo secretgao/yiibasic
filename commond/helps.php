@@ -91,7 +91,16 @@ class helps {
     
     
     
-    
+    /**
+     * @param $strParam
+     * @return mixed
+     * 完美过滤特殊字符串
+     */
+    public static function replace_specialChar($strParam){
+        
+        $regex = "/\/|\～|\，|\。|\！|\？|\“|\”|\【|\】|\『|\』|\：|\；|\《|\》|\’|\‘|\ |\·|\~|\!|\@|\#|\\$|\%|\^|\&|\*|\(|\)|\_|\+|\{|\}|\:|\<|\>|\?|\[|\]|\.|\/|\;|\'|\`|\-|\=|\\\|\|/";
+        return preg_replace($regex,"",$strParam);
+    }
     
     
     

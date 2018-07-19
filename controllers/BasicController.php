@@ -7,6 +7,7 @@ use Yii;
 use yii\web\Controller;
 use yii\web\Response;
 use app\commond\Constants;
+use app\commond\helps;
 
 class BasicController extends Controller
 {
@@ -33,13 +34,7 @@ class BasicController extends Controller
         $result = parent::afterAction($action, $result);
         return $result;
     }
-    
-    public function actionCheckLogin()
-    {
-        
-    }
-    
-    
+ 
     /**
      * 获取页面传参
      * @param type $key
@@ -137,8 +132,10 @@ class BasicController extends Controller
      * 完美过滤特殊字符串
      */
     public static function replace_specialChar($strParam){
-        $regex = "/\/|\～|\，|\。|\！|\？|\“|\”|\【|\】|\『|\』|\：|\；|\《|\》|\’|\‘|\ |\·|\~|\!|\@|\#|\\$|\%|\^|\&|\*|\(|\)|\_|\+|\{|\}|\:|\<|\>|\?|\[|\]|\.|\/|\;|\'|\`|\-|\=|\\\|\|/";
-        return preg_replace($regex,"",$strParam);
+     
+        return helps::replace_specialChar($strParam);
+      //  $regex = "/\/|\～|\，|\。|\！|\？|\“|\”|\【|\】|\『|\』|\：|\；|\《|\》|\’|\‘|\ |\·|\~|\!|\@|\#|\\$|\%|\^|\&|\*|\(|\)|\_|\+|\{|\}|\:|\<|\>|\?|\[|\]|\.|\/|\;|\'|\`|\-|\=|\\\|\|/";
+      //  return preg_replace($regex,"",$strParam);
     }
 
 }
