@@ -24,10 +24,11 @@ class ProjectController extends BasicController
      */
     public function actionGetlist(){
 
-       
+
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
-      
+
+       // exit();
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->asArray()->all(); 
         
         if (empty($data)){
@@ -46,8 +47,10 @@ class ProjectController extends BasicController
             $item['members'] = intval($item['members']);
             $item['describe'] = $item['description'];
             $item['used_time']  = $usedTime;
-        }      
+        }
+
         $this->Success(['data'=>$data]);
+    
     }
 
 
@@ -86,7 +89,7 @@ class ProjectController extends BasicController
               $projectObjId = $projectObj->getAttribute('id');
               $this->Success(['projectId'=>$projectObjId]);
           }
-         
+
           $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
     
