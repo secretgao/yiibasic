@@ -1,6 +1,8 @@
 <?php
 namespace app\commond;
 
+use app\models\AModel;
+
 class helps {
     
    static function make_tree($arr){
@@ -36,6 +38,75 @@ class helps {
         }
         return $res;
     }
+    
+    /**
+     * 根据子目录查找 父级
+     * @param unknown $id
+     */
+    public static  function getParents($id,$arr = []){           
+        if (empty($id)){
+            return $arr;
+        }
+ 
+        $data = AModel::find()->select('id,name,pid')
+        ->where(['id'=>$id,'status'=>0])->asArray()->one();
+     
+        $arr[] = $data;    
+        if ($data['pid'] == 0){          
+            return  $arr;       
+        }       
+        return self::getParents($data['pid'],$arr);
+    } 
+   
+
+    
+    /**
+     * 根据多个底层目录id 返回整个目录结构
+     */
+    public static function accordingCatalogToAllHierarchy($selectModuleIds){
+        
+        $result = $temp = [];
+        if (empty($selectModuleIds)){
+            return  $result;
+        }
+        //目录id 切割成数组
+        $catalogIdArr = explode(',', $selectModuleIds);
+        
+        $catalogArr = [];  //去除重复目录用
+        foreach ($catalogIdArr as $id){
+            $catalog = self::getParents($id);
+            foreach ($catalog as $item){
+                //去除重复
+                if (!in_array($item['id'], $catalogArr)) {
+                    $temp[] = $item;
+                    $catalogArr[]= $item['id'];
+                }
+            }
+        }
+        
+        $level = self::getson($temp,0,1);  //附上层级
+        $result = self::make_tree($level);
+        return  $result;
+    }
+    
+    
+    
+    /**
+     * @param $strParam
+     * @return mixed
+     * 完美过滤特殊字符串
+     */
+    public static function replace_specialChar($strParam){
+        
+        $regex = "/\/|\～|\，|\。|\！|\？|\“|\”|\【|\】|\『|\』|\：|\；|\《|\》|\’|\‘|\ |\·|\~|\!|\@|\#|\\$|\%|\^|\&|\*|\(|\)|\_|\+|\{|\}|\:|\<|\>|\?|\[|\]|\.|\/|\;|\'|\`|\-|\=|\\\|\|/";
+        return preg_replace($regex,"",$strParam);
+    }
+    
+    
+    
+    
+    
+    
     
     
 }

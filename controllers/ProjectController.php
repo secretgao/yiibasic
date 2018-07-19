@@ -8,6 +8,7 @@ use app\models\AUser;
 use Yii;
 use app\models\AModel;
 use app\models\AProject;
+use app\commond\helps;
 
 
 class ProjectController extends BasicController
@@ -54,6 +55,39 @@ class ProjectController extends BasicController
     }
 
 
+    public function actionGetModels(){
+        //$id = 21;
+       // $arr = [18,21];
+        $arr = [21,26];
+       // $res = helps::getParents($id); 
+       // $new = helps::getson($res,0,1);
+        
+       // echo '<pre>';print_r($new);
+        ///$result = helps::make_tree($new);
+       // echo '<pre>';print_r($result);
+        $test= [];
+        $idArr = [];
+        foreach ($arr as $id){
+            $a = helps::getParents($id);
+            foreach ($a as $item){
+                //去除重复
+                if (!in_array($item['id'], $idArr)) {
+                    $test[] = $item;
+                    $idArr[]= $item['id'];
+                }
+                
+            }
+        }
+        
+       
+        $new = helps::getson($test,0,1);
+       // echo '<pre>';print_r($new);
+        $result = helps::make_tree($new);
+       //  echo '<pre>';print_r($result);
+         $this->Success($result);
+        exit();
+    }
+    
     /**
      * 创建项目
      */
@@ -87,14 +121,21 @@ class ProjectController extends BasicController
           $projectObj->join_uid = $selectUserIds;
           if ($projectObj->insert()){
               $projectObjId = $projectObj->getAttribute('id');
-              $this->Success(['projectId'=>$projectObjId]);
+                       
+              $result = [
+                  'projectId'=>(string) $projectObjId,
+                  'info'=>helps::accordingCatalogToAllHierarchy($selectModuleIds),
+              ];
+              
+              $this->Success($result);
           }
 
           $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
     
   
-
+   
+   
 
 
     /**
