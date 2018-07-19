@@ -55,7 +55,7 @@ class ProjectController extends BasicController
     public function actionGetModels(){
         //$id = 21;
        // $arr = [18,21];
-        $arr = [25,26];
+        $arr = [21,26];
        // $res = helps::getParents($id); 
        // $new = helps::getson($res,0,1);
         
@@ -76,8 +76,7 @@ class ProjectController extends BasicController
             }
         }
         
-        echo '<pre>';print_r($test);
-        exit();
+       
         $new = helps::getson($test,0,1);
        // echo '<pre>';print_r($new);
         $result = helps::make_tree($new);
@@ -121,7 +120,7 @@ class ProjectController extends BasicController
               $projectObjId = $projectObj->getAttribute('id');
                        
               $result = [
-                  'projectId'=>$projectObjId,
+                  'projectId'=>(string) $projectObjId,
                   'info'=>helps::accordingCatalogToAllHierarchy($selectModuleIds),
               ];
               
