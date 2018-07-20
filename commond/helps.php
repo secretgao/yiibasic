@@ -102,7 +102,47 @@ class helps {
         return preg_replace($regex,"",$strParam);
     }
     
+    /**
+     * 计算2个时间差 
+     * @param unknown $begin_time
+     * @param unknown $end_time
+     * @return string
+     */
     
+    public static function  timediff( $begin_time, $end_time )
+    {
+        if ( $begin_time < $end_time ) {
+            $starttime = $begin_time;
+            $endtime = $end_time;
+        } else {
+            $starttime = $end_time;
+            $endtime = $begin_time;
+        }
+        $timediff = $endtime - $starttime;
+        $days = intval( $timediff / 86400 );
+        $remain = $timediff % 86400;
+        $hours = intval( $remain / 3600 );
+        $remain = $remain % 3600;
+        $mins = intval( $remain / 60 );
+        $secs = $remain % 60;
+        
+        $str = '';
+        if ($days){
+            $str.= $days.'天';
+        }
+        if ($hours){
+            $str.= $hours.'小时';
+        }
+        if ($mins){
+            $str.= $mins.'分';
+        }
+        if ($secs){
+            $str.= $secs.'秒';
+        }
+        
+        // $res = array( "day" => $days, "hour" => $hours, "min" => $mins, "sec" => $secs );
+        return $str;
+    }
     
     
     

@@ -33,14 +33,13 @@ class ProjectController extends BasicController
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->asArray()->all(); 
         
         if (empty($data)){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-            
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);            
         }
         
         foreach ($data as &$item){
             $usedTime = '';
             if (time() > $item['start_time']) {
-                $usedTime = self::timediff(time(),$item['start_time']);
+                $usedTime = helps::timediff(time(),$item['start_time']);
             }
             $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
             $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
@@ -124,7 +123,7 @@ class ProjectController extends BasicController
                        
               $result = [
                   'projectId'=>(string) $projectObjId,
-                 // 'info'=>helps::accordingCatalogToAllHierarchy($selectModuleIds),
+                 //
               ];
               
               $this->Success($result);
@@ -175,7 +174,7 @@ class ProjectController extends BasicController
         
         $parent = APosition::getAll();
         if (! $parent) {
-            $this->Error();
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
         foreach ($parent as $k=>$item){
             $children = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
@@ -188,42 +187,30 @@ class ProjectController extends BasicController
             $parent[$k]['children'] = $children;
         }
         
-        $this->Success(['data'=>$parent]);
-        
+        $this->Success(['data'=>$parent]);       
     }
     
-    public static function  timediff( $begin_time, $end_time )
-    {
-        if ( $begin_time < $end_time ) {
-            $starttime = $begin_time;
-            $endtime = $end_time;
-        } else {
-            $starttime = $end_time;
-            $endtime = $begin_time;
-        }
-        $timediff = $endtime - $starttime;
-        $days = intval( $timediff / 86400 );
-        $remain = $timediff % 86400;
-        $hours = intval( $remain / 3600 );
-        $remain = $remain % 3600;
-        $mins = intval( $remain / 60 );
-        $secs = $remain % 60;
+  
+    /**
+     * 获取项目详情
+     */
+    public function actionGetProjectDetail(){
         
-        $str = '';
-        if ($days){
-            $str.= $days.'天';
+        $userId = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+        
+        $columns = '*';
+        $project = AProject::find()->select($columns)
+        ->where(['id'=>$projectId,'create_uid'=>$userId])->asArray()->one();
+        
+        if (!$project){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        if ($hours){
-            $str.= $hours.'小时';
-        }
-        if ($mins){
-            $str.= $mins.'分';
-        }
-        if ($secs){
-            $str.= $secs.'秒';
-        }
+        
+       // echo '<pre>';print_r($project);
       
-       // $res = array( "day" => $days, "hour" => $hours, "min" => $mins, "sec" => $secs );
-        return $str;
+        $project['cata_log'] = helps::accordingCatalogToAllHierarchy($project['model_id']);
+        
+        $this->Success(['data'=>$project]);
     }
 }
