@@ -121,7 +121,7 @@ class ProjectController extends BasicController
                        
               $result = [
                   'projectId'=>(string) $projectObjId,
-                  'info'=>helps::accordingCatalogToAllHierarchy($selectModuleIds),
+                 // 'info'=>helps::accordingCatalogToAllHierarchy($selectModuleIds),
               ];
               
               $this->Success($result);
