@@ -99,7 +99,7 @@ class BasicController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         header('Content-Type:application/json; charset=utf-8;');
         header('Access-Control-Allow-Origin:*');
-        echo(json_encode($_arr));
+        echo(json_encode($_arr));exit();
         \Yii::$app->end();
     }
 
