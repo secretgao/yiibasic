@@ -143,7 +143,7 @@ class ProjectController extends BasicController
     public function actionSettingSort(){
         
         $this->ispost();
-        $uid = $this->getParam('uid',true);
+        $uid = $this->getParam('userId',true);
         $ids = $this->getParam('ids',true);
 
         $idArr = explode(',', $ids);
@@ -212,5 +212,81 @@ class ProjectController extends BasicController
         $project['cata_log'] = helps::accordingCatalogToAllHierarchy($project['model_id']);
         
         $this->Success(['data'=>$project]);
+    }
+
+
+
+
+    /**
+     * 设置项目状态和编辑人员
+     */
+    public function actionSetStatusUser()
+    {
+        $userId = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+        $projectStatus = $this->getParam('status',true);
+        $selectUserIds  = $this->getParam('selectUserIds',true);
+// `status` tinyint(3) DEFAULT '0' COMMENT '项目状态   0 未开始  1 进行中  2 已结束  3 暂停',
+        $project = AProject::findOne(['id'=>$projectId,'create_uid'=>$userId]);
+
+        if (!$project){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $members = count(explode(',',$selectUserIds));
+        $project->status = $projectStatus;
+        $project->join_uid = $selectUserIds;
+        $project->members = $members;
+
+        if ($project->save(false)){
+            $this->Success();
+        }
+
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        //var_dump($project);
+
+
+    }
+
+    /**
+     * 获取项目状态和参与人员用户
+     */
+    public function actionGetProjectStatusUser()
+    {
+        $createUid = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+
+// `status` tinyint(3) DEFAULT '0' COMMENT '项目状态   0 未开始  1 进行中  2 已结束  3 暂停',
+        $project = AProject::find()->select('status,join_uid')
+            ->where(['id'=>$projectId,'create_uid'=>$createUid])
+            ->asArray()->one();
+        if (!$project){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $userArr = explode(',',$project['join_uid']);
+
+        $user = [];
+        foreach ($userArr as $uid){
+           // echo 'uid';print_r($uid);
+            $userInfo = AUser::find()->select('true_name,position_id')
+                ->where(['id'=>$uid])->asArray()->one();
+           $user[$userInfo['position_id']][] =[
+                'userId'=>$uid,
+                'trueName'=>$userInfo['true_name'],
+            ];
+        }
+
+        $result = [];
+        foreach ($user as $positionId=>$value){
+             $position = APosition::find()->select('name')
+                 ->where(['id'=>$positionId])->asArray()->scalar();
+             $result[]=[
+                 'positionId'=>(string)$positionId,
+                 'positionName'=>$position,
+                 'positionUser'=>$user[$positionId]
+             ];
+        }
+      //  echo '<pre>';print_r($result);
+       // echo '<pre>';print_r($project);
+        $this->Success(['projectStatus'=>$project['status'],'data'=>$result]);
     }
 }
