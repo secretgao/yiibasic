@@ -83,7 +83,6 @@ class FileController extends BasicController
           $this->Error(Constants::FILES_ALREADY_EXIST,Constants::$error_message[Constants::FILES_ALREADY_EXIST]);
         }
 
-
         $uploadRes = \YII::$app->Aliyunoss->upload($fileName.$ext,$filePath);
 
         if ($uploadRes['info'] && $uploadRes['info']['http_code'] == 200) {
@@ -112,9 +111,19 @@ class FileController extends BasicController
 
 
     
-    public function actionLookFileList(){
-        
-        
+    public function actionFileList(){
+        $uid = $this->getParam('userId',true);
+
+        $columns = '*';
+        $file = AFile::find()->select($columns)->where(['uid'=>$uid])->asArray()->all();
+
+        if (!$file){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+
+        }
+
+        $this->Success(['data'=>$file]);
+
     }
 
     public function actionDelFile()
