@@ -77,7 +77,6 @@ class ModelsController extends BasicController
 
         if (!$Obj){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-
         }
 
         $Obj->name = $name;
