@@ -7,13 +7,14 @@ use Yii;
 /**
  * This is the model class for table "{{%a_user}}".
  *
- * @property int $id ä¸»é”®
- * @property string $nick_name æ˜µç§°
- * @property string $true_name çœŸå®žå§“å
- * @property string $img å¤´åƒ
- * @property int $status çŠ¶æ€:0 æ­£å¸¸  -1 åˆ é™¤
- * @property int $create_time åˆ›å»ºæ—¶é—´
- * @property int $position_id èŒä½id
+ * @property int $id 主键
+ * @property string $nick_name 昵称
+ * @property string $true_name 真实姓名
+ * @property string $img 头像
+ * @property int $status 状态:0 正常  -1 删除
+ * @property int $create_time 创建时间
+ * @property int $position_id 职位id
+ * @property int $sex 状态:0 男  1女
  */
 class AUser extends \yii\db\ActiveRecord
 {
@@ -36,7 +37,7 @@ class AUser extends \yii\db\ActiveRecord
             [['nick_name'], 'string', 'max' => 50],
             [['true_name'], 'string', 'max' => 20],
             [['img'], 'string', 'max' => 255],
-            [['status'], 'string', 'max' => 3],
+            [['status', 'sex'], 'string', 'max' => 3],
         ];
     }
 
@@ -53,6 +54,7 @@ class AUser extends \yii\db\ActiveRecord
             'status' => 'Status',
             'create_time' => 'Create Time',
             'position_id' => 'Position ID',
+            'sex' => 'Sex',
         ];
     }
 }
