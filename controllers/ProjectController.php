@@ -207,7 +207,7 @@ class ProjectController extends BasicController
         
        // echo '<pre>';print_r($project);
       
-        $project['cata_log'] = helps::accordingCatalogToAllHierarchy($project['model_id']);
+    //    $project['cata_log'] = helps::accordingCatalogToAllHierarchy($project['model_id']);
         
         $this->Success(['data'=>$project]);
     }
