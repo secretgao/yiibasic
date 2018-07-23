@@ -133,9 +133,6 @@ class ProjectController extends BasicController
           $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
     
-  
-   
-   
 
 
     /**
@@ -217,6 +214,49 @@ class ProjectController extends BasicController
 
 
 
+    /**
+     * 获取项目目录
+     */
+    public function actionGetProjectCatalog(){
+        $userId = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+        $parentId = $this->getParam('parentId',true);
+        
+        $project = AProject::find()->select('model_id')
+        ->where(['id'=>$projectId,'create_uid'=>$userId])->asArray()->one();
+        
+        if (!$project){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+   
+        //目录id 切割成数组
+        $catalogIdArr = explode(',', $project['model_id']);
+        
+        $catalogArr = [];  //去除重复目录用
+        foreach ($catalogIdArr as $id){
+            $catalog = helps::getParents($id);
+            foreach ($catalog as $item){
+                //去除重复
+                if (!in_array($item['id'], $catalogArr)) {
+                    $temp[] = $item;
+                    $catalogArr[]= $item['id'];
+                }
+            }
+        }
+        
+        $data = helps::getson($temp,0,1);  //附上层级
+           
+        $result = [];
+        foreach ($data as $value) {
+            if ($value['pid'] == $parentId){
+                $result[] = $value;
+            }
+           
+        }
+        
+        $this->Success(['data'=>$result]);
+       
+    }
 
     /**
      * 设置项目状态和编辑人员
