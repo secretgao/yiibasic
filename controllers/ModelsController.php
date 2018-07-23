@@ -41,7 +41,7 @@ class ModelsController extends BasicController
      */
     public function actionAdd(){
     
-        //$this->isPost();
+        $this->isPost();
         $name = $this->getParam('name',true);
         $pid  = $this->getParam('pid',false,0);       
      

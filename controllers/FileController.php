@@ -4,8 +4,9 @@ namespace app\controllers;
 
 use app\components\Aliyunoss;
 
+use app\models\AFile;
 use Yii;
-
+use app\commond\Constants;
 use OSS\OssClient;
 use OSS\Core\OssException;
 /**
@@ -16,12 +17,27 @@ use OSS\Core\OssException;
 
 class FileController extends BasicController
 {
-        
+
+    public $mainPath = '';
+    public $typePath = '';
     
     public function init(){
        parent::init();
     }
 
+    /**
+     * 根据uid  type 类型
+     * 返回主目录路径和子目录
+     * @param $uid
+     * @param $type
+     */
+    public function getPath($uid,$type){
+
+        return $result = [
+             'main'=>md5($uid),
+             'type'=>md5($uid.$type)
+        ];
+    }
     /**
      * http://www.api.com/position/index
      * 获取
@@ -31,49 +47,63 @@ class FileController extends BasicController
       /*   $r=  \YII::$app->Aliyunoss->listObjects();//\YII::$app->Aliyunoss->createObjectDir('testaa');
         echo '<pre>';print_r($r);
         exit(); */
-        $re = \YII::$app->Aliyunoss->upload('gggggg.log','C:\offline_FtnInfo.txt');
+       // $file = '/Users/gaoxinyu/Downloads/52317.jpg';
+        $file = '/usr/local/var/www/basic/README.md';
+
+        $re = \YII::$app->Aliyunoss->upload('gggggg.log',$file);
        // $re = \YII::$app->Aliyunoss->multiuploadFile('gggggg.mp4','C:\Users\Administrator\Documents\Tencent Files\891841626\FileRecv\1531814365942920_1531817438125471.mp4');
-       
+
        
         echo '<pre>';print_r($re);
         echo '<hr>';
         echo $re['oss-stringtosign'];
         exit();
-        $accessKeyId = "LTAI529J1kb66aY2";
-        $accessKeySecret = "TveIiq6hkO24UGWymYZ50aVR8MMj16";
-        // Endpoint以杭州为例，其它Region请按实际情况填写。
-        $endpoint = "http://oss-cn-hangzhou.aliyuncs.com";
-        // 存储空间名称
-        $bucket= "sycalcs";
-        // 文件名称
-        $object = "test.log";
-        // 文件内容
-        $content = "Hello OSS";
-        try{
-            $ossClient = new OssClient($accessKeyId, $accessKeySecret, $endpoint);
-            $ossClient->putObject($bucket, $object, $content);
-        } catch(OssException $e) {
-            printf(__FUNCTION__ . ": FAILED\n");
-            printf($e->getMessage() . "\n");
-            return;
-        }
-        print(__FUNCTION__ . ": OK" . "\n");
-     
+
 
     }
 
 
     /**
-     * 创建项目
+     * 上传
+     * /usr/local/var/www/basic/README.md
      */
     
-    public function actionAdd(){
-     
-        
+    public function actionUpload(){
+//`type` tinyint(3) DEFAULT NULL COMMENT '文件类型 1图片 2视频 3附件 4 笔记'
+        $uid = $this->getParam('userId',true);
+        $type = $this->getParam('type',true);
+        $filePath = $this->getParam('filePath',true);
+        $ext = $this->getParam('ext',true);
+        $fileName = $this->getParam('fileName',true);
+        $mainPath  = md5($uid);
+        $typePath = '/'.md5($uid.$type);
+        $fileNameExist = AFile::find()->select('id')->where(['name'=>$fileName,'status'=>0])->scalar();
+
+        if ($fileNameExist){
+          $this->Error(Constants::FILES_ALREADY_EXIST,Constants::$error_message[Constants::FILES_ALREADY_EXIST]);
+        }
+
+        $uploadRes = \YII::$app->Aliyunoss->upload($fileName.$ext,$filePath);
+
+        if ($uploadRes['info'] && $uploadRes['info']['http_code'] == 200) {
+            $file = new AFile();
+            $file->uid = $uid;
+            $file->type = $type;
+            $file->name = $fileName;
+            $file->ext = $ext;
+            $file->path = $filePath;
+            $file->create_time = time();
+
+            if ($file->insert()) {
+                $this->Success();
+            }
+        }
+
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
     
     /**
-     * 编辑
+     * 下载
      */
     public function actionEdit(){
    
@@ -81,9 +111,39 @@ class FileController extends BasicController
 
 
     
-    public function actionLookFileList(){
-        
-        
+    public function actionFileList(){
+        $uid = $this->getParam('userId',true);
+
+        $columns = '*';
+        $file = AFile::find()->select($columns)->where(['uid'=>$uid])->asArray()->all();
+
+        if (!$file){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+
+        }
+
+        $this->Success(['data'=>$file]);
+
+    }
+
+    public function actionDelFile()
+    {
+        $uid = $this->getParam('userId',true);
+        $fileId = $this->getParam('fileId',true);
+
+        $file = AFile::findOne(['id'=>$fileId,'uid'=>$uid,'status'=>0]);
+
+        if (!$file){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $delRes = \YII::$app->Aliyunoss->delete($file->name.$file->ext);
+
+        $file->status = 1;
+        if ($file->save(false)){
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
     }
 
 
