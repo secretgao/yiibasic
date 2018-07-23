@@ -22,21 +22,16 @@ class ModelsController extends BasicController
      */
     public function actionIndex(){
        // $this->isPost();
-        $uid = $this->getParam('userId');
+        $uid = $this->getParam('userId',true);
         $data = AModel::find()->select('id,name,pid')
-            ->where(['status'=>0,'project_id'=>0,'create_uid'=>$uid])->asArray()->all();
+            ->where(['status'=>0,'create_uid'=>$uid])->asArray()->all();
         
         if (empty($data)){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-            
-        }
-     
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);    
+        }     
        
-        $new = Helps::getson($data,0,1);
-        
-      
-        $result = Helps::make_tree($new);
-    
+        $new = Helps::getson($data,0,1);             
+        $result = Helps::make_tree($new);   
         $this->Success(['data'=>$result]);
     }
 
@@ -46,18 +41,20 @@ class ModelsController extends BasicController
      */
     public function actionAdd(){
     
-        $this->isPost();
+        //$this->isPost();
         $name = $this->getParam('name',true);
-        $pid  = $this->getParam('pid',false,0);
-        $projectId = $this->getParam('project_id',false,0);
+        $pid  = $this->getParam('pid',false,0);       
+     
+       // $projectId = $this->getParam('project_id',false,0);
         $createUid = $this->getParam('userId',true);
         $Obj = new AModel();
         $Obj->name = $name;
         $Obj->create_time = time();
-        $Obj->project_id = $projectId;
+      //  $Obj->project_id = $projectId;
         $Obj->create_uid = $createUid;
-        $Obj->pid = $pid;
+        $Obj->pid = empty($pid) ? 0 : $pid;
         
+       
         if ($Obj->insert()) {
             $this->Success(['id'=>$Obj->attributes['id']]);
         }
