@@ -73,6 +73,8 @@ class FileController extends BasicController
         $uid = $this->getParam('userId',true);
         $type = $this->getParam('type',true);
         $filePath = $this->getParam('filePath',true);
+        $catalogId = $this->getParam('catalogId',true);
+        $projectId = $this->getParam('projectId',true);
         $ext = $this->getParam('ext',true);
         $fileName = $this->getParam('fileName',true);
         $mainPath  = md5($uid);
@@ -93,6 +95,7 @@ class FileController extends BasicController
             $file->ext = $ext;
             $file->path = $filePath;
             $file->create_time = time();
+            $file->project_id = $projectId;
 
             if ($file->insert()) {
                 $this->Success();
@@ -119,9 +122,7 @@ class FileController extends BasicController
 
         if (!$file){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-
         }
-
         $this->Success(['data'=>$file]);
 
     }

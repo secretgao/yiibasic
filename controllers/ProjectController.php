@@ -95,7 +95,7 @@ class ProjectController extends BasicController
 
           $name         = $this->getParam('name',true);
           $startTime    = $this->getParam('start_time',true); 
-          $allowAdd     = $this->getParam('allow_add',false,0);
+          $allowAdd     = $this->getParam('allow_add',true);
           $description  = $this->getParam('describe',false);
           $selectModuleIds  = $this->getParam('selectModuleIds',true);
           $selectUserIds  = $this->getParam('selectUserIds',true);
@@ -108,7 +108,7 @@ class ProjectController extends BasicController
           $projectObj = new AProject();
           
           $projectObj->name = $name;
-          $projectObj->start_time = strtotime($startTime);
+          $projectObj->start_time = intval(strtotime($startTime));
           $projectObj->description = $description;
           $projectObj->allow_add = $allowAdd == 0 ? '0' : '1';
           $projectObj->members = $members;
@@ -128,6 +128,7 @@ class ProjectController extends BasicController
               
               $this->Success($result);
           }
+       
 
           $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
