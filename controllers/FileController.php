@@ -169,10 +169,10 @@ class FileController extends BasicController
         if (empty($_FILES)){
             $this->Error();
         }
-        $image = $_FILES["tmp_name"];
+        $image = $_FILES['file']["tmp_name"];
         $fp = fopen($image, "r");
 
-        $file = fread($fp, $_FILES["size"]); //二进制数据流
+        $file = fread($fp, $_FILES['file']["size"]); //二进制数据流
          error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
          error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
         //保存地址
