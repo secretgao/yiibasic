@@ -28,7 +28,6 @@ class HelloController extends Controller
     public function actionIndex()
     {
        // echo $message . "\n";
-        echo 1;exit();
-        return ExitCode::OK;
+        error_log('contab----'.PHP_EOL,3,'/tmp/crontab.log');
     }
 }
