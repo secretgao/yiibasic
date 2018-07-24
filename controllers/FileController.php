@@ -148,4 +148,10 @@ class FileController extends BasicController
     }
 
 
+    public function actionTest()
+    {
+        echo '<pre>';print_r($_POST);exit();
+
+    }
+
 }
