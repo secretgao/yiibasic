@@ -256,7 +256,7 @@ class ProjectController extends BasicController
                 }
             }
         }
-        
+
         $parent = AModel::find()->where(['id'=>$parentId,'status'=>0])->asArray()->one();
 
         //说明是顶级返回子集
