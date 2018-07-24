@@ -232,7 +232,7 @@ class ProjectController extends BasicController
         //目录id 切割成数组
         $catalogIdArr = explode(',', $project['model_id']);
         
-        $catalogArr = [];  //去除重复目录用
+        $catalogArr =  $temp =  [];  //去除重复目录用
         foreach ($catalogIdArr as $id){
             $catalog = helps::getParents($id);
             foreach ($catalog as $item){
@@ -247,12 +247,14 @@ class ProjectController extends BasicController
         $data = helps::getson($temp,0,1);  //附上层级
            
         $result = [];
-        foreach ($data as $value) {
-            if ($value['pid'] == $parentId){
-                $result[] = $value;
+        if ($data) {
+            foreach ($data as $value) {
+                if ($value['pid'] == $parentId){
+                    $result[] = $value;
+                }
             }
-           
         }
+
         
         $this->Success(['data'=>$result]);
        
