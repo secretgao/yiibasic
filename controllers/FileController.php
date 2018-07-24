@@ -153,8 +153,51 @@ class FileController extends BasicController
     //    echo 'post<pre>';print_r($_POST);
        // echo 'file<pre>';print_r($_FILES);exit();
 
-        error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
-        error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
+       // error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
+       // error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
+       // $this->Success();
+        return $this->render('test');
+    }
+
+    public function actionUploads()
+    {
+
+       // echo '<pre>';print_r($_FILES);
+
+        $ext  = $this->getParam('ext',true);
+        if (empty($_FILES)){
+            $this->Error();
+        }
+        $image = $_FILES["tmp_name"];
+        $fp = fopen($image, "r");
+
+        $file = fread($fp, $_FILES["size"]); //二进制数据流
+         error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
+         error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
+        //保存地址
+
+        $content = $GLOBALS['HTTP_RAW_POST_DATA'];  // 需要php.ini设置
+        if(empty($content)){
+            $content = file_get_contents('php://input');    // 不需要php.ini设置，内存压力小
+        }
+        error_log('test--cont'.json_encode($content).PHP_EOL,3,'/tmp/test.log');
+
+        $imgDir = './Uploads/';
+
+        //要生成的图片名字
+
+        $filename = md5(time().mt_rand(10, 99)).$ext; //新图片名称
+
+        $newFilePath = $imgDir.$filename;
+
+        $data = $file;
+
+        $newFile = fopen($newFilePath,"w"); //打开文件准备写入
+
+        fwrite($newFile,$data); //写入二进制流到文件
+
+        fclose($newFile); //关闭文件
+
         $this->Success();
     }
 
