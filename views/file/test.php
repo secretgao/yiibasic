@@ -10,7 +10,7 @@
 <body>
 <form action="/file/uploads" method="post" enctype="multipart/form-data">
     <input type="file" name="file" />
-    <input type="hidden" name="ext" value=".png" />
+    <input type="hidden" name="userId" value="11" />
     <input type="submit" value="上传文件" />
 </form>
 </body>

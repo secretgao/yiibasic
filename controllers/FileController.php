@@ -7,8 +7,7 @@ use app\components\Aliyunoss;
 use app\models\AFile;
 use Yii;
 use app\commond\Constants;
-use OSS\OssClient;
-use OSS\Core\OssException;
+use app\commond\fileupload;
 /**
  * 文件操作
  * @author Administrator
@@ -158,7 +157,7 @@ class FileController extends BasicController
        // $this->Success();
         return $this->render('test');
     }
-
+/*
     public function actionUploads()
     {
 
@@ -173,9 +172,7 @@ class FileController extends BasicController
             $this->Error();
         }
        // $a = '{"file":{"name":".txt","type":"multipart\/form-data","tmp_name":"\/tmp\/phpFGIWWm","error":0,"size":165199}';
-      /*  echo '<pre>';print_r(json_decode($a,true));
-        echo '<pre>';print_r($_FILES);
-        exit();*/
+
         $image = $_FILES['file']["tmp_name"];
         $fp = fopen($image, "r");
 
@@ -213,5 +210,19 @@ class FileController extends BasicController
 
         $this->Success();
     }
+*/
+    public function actionUploads()
+    {
 
+
+        $userId = $this->getParam('userId',true,1);
+        $fileUpload = new fileupload();
+        $fileInfo = $fileUpload->getFileInfo($userId);
+
+        if (isset($fileInfo['status'])){
+            $this->Success(['data'=>$fileInfo]);
+        }
+        $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
+
+    }
 }
