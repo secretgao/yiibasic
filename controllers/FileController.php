@@ -163,7 +163,7 @@ class FileController extends BasicController
     {
 
        // echo '<pre>';print_r($_FILES);
-        if (PHP_OS == 'linux'){
+        if (PHP_OS == 'Linux'){
             error_log('test--start_Time'.date('Y-m-d H:i:s').PHP_EOL,3,'/tmp/test.log');
         }
 
@@ -184,13 +184,13 @@ class FileController extends BasicController
         // error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
        //  error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
         //保存地址
-        if (PHP_OS == 'linux'){
+        if (PHP_OS == 'Linux'){
             error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
             error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
         }
 
             $content = file_get_contents('php://input');    // 不需要php.ini设置，内存压力小
-        if (PHP_OS == 'linux'){
+        if (PHP_OS == 'Linux'){
             error_log('test--cont'.json_encode($content).PHP_EOL,3,'/tmp/test.log');
         }
 
