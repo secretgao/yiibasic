@@ -9,7 +9,8 @@
 <html>
 <body>
 <form action="/file/uploads" method="post" enctype="multipart/form-data">
-    <input type="file" name="fileUpload" />
+    <input type="file" name="file" />
+    <input type="hidden" name="ext" value=".png" />
     <input type="submit" value="上传文件" />
 </form>
 </body>
