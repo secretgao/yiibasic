@@ -298,10 +298,7 @@ class ProjectController extends BasicController
         if ($project->save(false)){
             $this->Success();
         }
-
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-        //var_dump($project);
-
 
     }
 
@@ -346,5 +343,53 @@ class ProjectController extends BasicController
       //  echo '<pre>';print_r($result);
        // echo '<pre>';print_r($project);
         $this->Success(['projectStatus'=>$project['status'],'data'=>$result]);
+    }
+
+
+
+    /**
+     * 删除项目参与人员
+     */
+    public function actionDelProjectMember()
+    {
+        $uid = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+        $memberId = $this->getParam('memberId',true);
+
+        $project = AProject::find()
+            ->where(['id'=>$projectId,'create_uid'=>$uid])
+            ->one();
+        if (!$project){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+
+
+        $memberArr = explode(',',$project['join_uid']);
+
+        if (!in_array($memberId,$memberArr)){
+            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
+        }
+
+        $num = 0; //从新计算参与人数
+        foreach ($memberArr as $key=>$mid){
+            if ($mid == $memberId){
+                unset($memberArr[$key]);
+            } else {
+                $num++;
+            }
+        }
+
+        $joinUid = implode(',',$memberArr);
+
+        $project->join_uid = $joinUid;
+        $project->members = $num;
+
+        if ($project->save(false)){
+            $this->Success();
+        }
+
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
     }
 }

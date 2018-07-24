@@ -14,6 +14,7 @@ final class Constants
 
     const DATA_NOT_FOUND             = 1004;
     const FILES_ALREADY_EXIST       = 1005;
+    const MEMBER_NO_EXITS           = 1006;
 
 
     const REQUSET_NO_POST           = 2000;
@@ -27,7 +28,8 @@ final class Constants
         self::RET_ERROR => '操作失败',
         self::RET_SUCCESS => '操作成功',
         self::DATA_NOT_FOUND =>'数据不存在',
-        self::FILES_ALREADY_EXIST =>'文件已经存在'
+        self::FILES_ALREADY_EXIST =>'文件已经存在',
+        self::MEMBER_NO_EXITS =>'要删除的人员不在此项目里',
     ];
 
 }
