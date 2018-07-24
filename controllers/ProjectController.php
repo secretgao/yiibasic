@@ -317,32 +317,37 @@ class ProjectController extends BasicController
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
+
+        if (empty($project['join_uid'])){
+            $this->Success(['projectStatus'=>intval($project['status']),'data'=>[]]);
+        }
         $userArr = explode(',',$project['join_uid']);
 
         $user = [];
-        foreach ($userArr as $uid){
-           // echo 'uid';print_r($uid);
-            $userInfo = AUser::find()->select('true_name,position_id')
-                ->where(['id'=>$uid])->asArray()->one();
-           $user[$userInfo['position_id']][] =[
-                'userId'=>$uid,
-                'trueName'=>$userInfo['true_name'],
-            ];
+        if ($userArr) {
+            foreach ($userArr as $uid){
+
+                $userInfo = AUser::find()->select('true_name,position_id')
+                    ->where(['id'=>$uid])->asArray()->one();
+                $user[$userInfo['position_id']][] =[
+                    'userId'=>$uid,
+                    'trueName'=>$userInfo['true_name'],
+                ];
+            }
+            $result = [];
+            foreach ($user as $positionId=>$value){
+                $position = APosition::find()->select('name')
+                    ->where(['id'=>$positionId])->asArray()->scalar();
+                $result[]=[
+                    'positionId'=>(string)$positionId,
+                    'positionName'=>$position,
+                    'positionUser'=>$user[$positionId]
+                ];
+            }
         }
 
-        $result = [];
-        foreach ($user as $positionId=>$value){
-             $position = APosition::find()->select('name')
-                 ->where(['id'=>$positionId])->asArray()->scalar();
-             $result[]=[
-                 'positionId'=>(string)$positionId,
-                 'positionName'=>$position,
-                 'positionUser'=>$user[$positionId]
-             ];
-        }
-      //  echo '<pre>';print_r($result);
-       // echo '<pre>';print_r($project);
-        $this->Success(['projectStatus'=>$project['status'],'data'=>$result]);
+
+        $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result]);
     }
 
 
