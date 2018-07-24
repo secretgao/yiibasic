@@ -243,9 +243,11 @@ class ProjectController extends BasicController
                 }
             }
         }
-        
+
+       // echo '<pre>';print_r($catalogArr);exit();
         $data = helps::getson($temp,0,1);  //附上层级
-           
+
+       // echo '<pre>';print_r($data);exit();
         $result = [];
         if ($data) {
             foreach ($data as $value) {
@@ -254,8 +256,21 @@ class ProjectController extends BasicController
                 }
             }
         }
-
         
+        $parent = AModel::find()->where(['id'=>$parentId,'status'=>0])->asArray()->one();
+
+        //说明是顶级返回子集
+        if ($parent && $parent['pid'] == 0){
+            $result = AModel::find()->select('id,name,pid')
+                ->where(['pid'=>$parentId,'status'=>0])->asArray()->all();
+
+            foreach ($result as &$value){
+                $value['level'] = 2;
+            }
+        }
+
+
+
         $this->Success(['data'=>$result]);
        
     }
