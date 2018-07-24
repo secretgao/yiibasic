@@ -150,9 +150,12 @@ class FileController extends BasicController
 
     public function actionTest()
     {
-        echo 'post<pre>';print_r($_POST);
-        echo 'file<pre>';print_r($_FILES);exit();
-   
+    //    echo 'post<pre>';print_r($_POST);
+       // echo 'file<pre>';print_r($_FILES);exit();
+
+        error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
+        error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
+        $this->Success();
     }
 
 }
