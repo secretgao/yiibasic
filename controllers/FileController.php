@@ -163,6 +163,7 @@ class FileController extends BasicController
     {
 
        // echo '<pre>';print_r($_FILES);
+        error_log('test--start_Time'.date('Y-m-d H:i:s').PHP_EOL,3,'/tmp/test.log');
 
         $ext  = $this->getParam('ext',true);
         if (empty($_FILES)){
