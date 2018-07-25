@@ -30,8 +30,17 @@ class UserController extends BasicController
 
     public function actionIndex()
     {
-        $data = APosition::find()->where()->asArray()->all();
-
+        $data = APosition::find()->select('id as positionId,name as positionName')->where(['status'=>0])->asArray()->all();
+        if (!$data){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        
+        foreach ($data as &$item){
+            $user = AUser::find()->select('id as userId,true_name as trueName')
+                ->where(['position_id'=>$item['positionId'],'status'=>0])->asArray()->all();
+            $item['positionUser'] = $user;
+        }
+        $this->Success(['data'=>$data]);
 
     }
 
