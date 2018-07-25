@@ -99,15 +99,9 @@ class fileupload
         $fileInfoArr = array();//多维数组
         $fileNewArr = array();
         if (!empty($userId)) {
-            $post_arr = $_POST;
-            $title = !empty($post_arr['title']) ? $post_arr['title'] : '';
-            $brief = !empty($post_arr['brief']) ? $post_arr['brief'] : '';
-            $source = !empty($post_arr['source']) && ($post_arr['source'] == 'pc') ? 0 : ((!empty($post_arr['source']) && ($post_arr['source']) == 'app') ? 1 : 0);
 
             $uploadSucc = 0;
             $uploadFail = 0;
-            $insertSycFile = array();
-            $insertSycFileInfo = array();
             $chinese = array();
 
             if (!empty($_FILES)) {
@@ -118,7 +112,7 @@ class fileupload
 
                     $fileInfoArr[$key] = $val;
                     $fileErrorMsg = self::getFileErrorMsg($fileInfoArr[$key]);
-                    //echo '<br>for_fileErrorMsg=';var_dump($fileErrorMsg);
+
                     if (!empty($fileErrorMsg) && empty($fileErrorMsg['errorMsg'])) {
                         $fileInfoArr[$key]['ok'] = true;
                     } else {
@@ -137,10 +131,7 @@ class fileupload
                         }
 
                         //判断指定上传文件存储目录是否存在
-                        $parentDirName = dirname(dirname(__FILE__));//当前文件的父目录
-
                         $uploadFileName = $this->uploadDir . "_{$fileInfoArr[$key]['name']}";//重新命名文件名称
-
 
                         $fileInfoArr[$key]['path'] = $uploadFileName;//文件存储路径
                         if (!empty($chinese)) {//包含有中文字符需要转码
@@ -162,23 +153,12 @@ class fileupload
                     }
                 }
 
-                $fileNewArr['file']['source'] = $source;
-                $fileNewArr['file']['title'] = $title;
-                $fileNewArr['file']['brief'] = $brief;
-                $fileNewArr['file']['author'] = $userId;
-              //  $fileNewArr['file']['tag'] = $post_arr['tag'];
+                $fileNewArr['file']['userId'] = $userId;
+
                 $fileNewArr['file']['name'] = !empty($fileInfoArr['file']['name']) ? "." . pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION) : '';
                 $fileNewArr['file']['path'] = !empty($fileInfoArr['file']['path']) ? $fileInfoArr['file']['path'] : '';
-                $fileNewArr['file']['cover_image'] = !empty($fileInfoArr['cover_image']['path']) ? $fileInfoArr['cover_image']['path'] : '';
                 $fileNewArr['file']['type'] = !empty($fileInfoArr['file']['type']) ? $fileInfoArr['file']['type'] : '';
                 $fileNewArr['file']['size'] = !empty($fileInfoArr['file']['size']) ? $fileInfoArr['file']['size'] : '';
-                $fileNewArr['file']['isDone'] = isset($fileInfoArr['file']['isDone']) ? $fileInfoArr['file']['isDone'] : '';
-                $fileNewArr['file']['ok'] =  isset($fileInfoArr['file']['ok']) ? $fileInfoArr['file']['ok'] : false;
-                isset($fileInfoArr['file']['serverTime']) ? $fileNewArr['file']['serverTime'] = $fileInfoArr['file']['serverTime'] : '';
-                isset($fileInfoArr['file']['errorId']) ? $fileNewArr['file']['errorId'] = $fileInfoArr['file']['errorId'] : '';
-                $fileNewArr['file']['errorMsg'] = !empty($fileInfoArr['file']['errorMsg']) ? $fileInfoArr['file']['errorMsg'] : '';
-
-
 
                 return array('status'=>0, 'fileInfo' => $fileNewArr, 'uploadSucc' => $uploadSucc, 'uploadFail' => $uploadFail);
             } else {
