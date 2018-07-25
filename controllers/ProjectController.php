@@ -163,8 +163,6 @@ class ProjectController extends BasicController
         }    
     }
 
-
-
     /**
      * 获取部门人数
      */
@@ -211,7 +209,6 @@ class ProjectController extends BasicController
         
         $this->Success(['data'=>$project]);
     }
-
 
 
     /**
@@ -351,7 +348,6 @@ class ProjectController extends BasicController
             }
         }
 
-
         $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result]);
     }
 
@@ -372,8 +368,6 @@ class ProjectController extends BasicController
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-
-
 
         $memberArr = explode(',',$project['join_uid']);
 
@@ -398,8 +392,6 @@ class ProjectController extends BasicController
         if ($project->save(false)){
             $this->Success();
         }
-
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-
     }
 }

@@ -39,7 +39,7 @@ class PositionController extends BasicController
      * http://www.api.com/position/add
      */
     public function actionAdd(){
-       // $this->isPost();
+        $this->isPost();
         $positionName = $this->getParam('name',true);
         $pid          = $this->getParam('pid',false);
 
@@ -62,7 +62,7 @@ class PositionController extends BasicController
      * 部门编辑
      */
     public function actionEdit(){
-        // $this->isPost();
+        $this->isPost();
         $id          = $this->getParam('id',true);
         $positionName = $this->getParam('name',true);
 
@@ -86,14 +86,12 @@ class PositionController extends BasicController
      * 部门删除
      */
     public function actionDel(){
-        // $this->isPost();
+        $this->isPost();
         $id          = $this->getParam('id',true);
 
         $positionObj = APosition::findOne($id);
-
         if (!$positionObj){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-
         }
 
         $positionObj->status =-1;
@@ -101,6 +99,31 @@ class PositionController extends BasicController
             $this->Success();
         }
 
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
+
+    public function actionManageUser()
+    {
+
+        $id = $this->getParam('id',true);
+        $userId = $this->getParam('userId',true);
+        $isAdd = $this->getParam('isAdd',true);
+
+        $user = AUser::findOne(['id'=>$userId]);
+        $position = APosition::findOne(['id'=>$id]);
+        if (!$user || ! $position){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        if ($isAdd == 'true'){
+            $user->position_id = $id;
+        } else {
+            $user->position_id = 0;
+        }
+
+        if ($user->save(false)){
+            $this->Success();
+        }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 }
