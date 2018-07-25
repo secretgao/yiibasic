@@ -282,18 +282,23 @@ class ProjectController extends BasicController
     {
         $userId = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
-        $projectStatus = $this->getParam('status',true);
-        $selectUserIds  = $this->getParam('selectUserIds',true);
+        $projectStatus = $this->getParam('status',false);
+        $selectUserIds  = $this->getParam('selectUserIds',false);
 // `status` tinyint(3) DEFAULT '0' COMMENT '项目状态   0 未开始  1 进行中  2 已结束  3 暂停',
         $project = AProject::findOne(['id'=>$projectId,'create_uid'=>$userId]);
 
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        $members = count(explode(',',$selectUserIds));
-        $project->status = $projectStatus;
-        $project->join_uid = $selectUserIds;
-        $project->members = $members;
+        if ($selectUserIds){
+            $members = count(explode(',',$selectUserIds));
+            $project->join_uid = $selectUserIds;
+            $project->members = $members;
+        }
+        if ($projectStatus){
+            $project->status = $projectStatus;
+        }
+
 
         if ($project->save(false)){
             $this->Success();
