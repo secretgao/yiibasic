@@ -208,13 +208,12 @@ class FileController extends BasicController
     public function actionUploads()
     {
 
-
         $userId = $this->getParam('userId',true,1);
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId);
 
         if (isset($fileInfo['status'])){
-            $this->Success(['data'=>$fileInfo]);
+            $this->Success($fileInfo);
         }
         $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
 

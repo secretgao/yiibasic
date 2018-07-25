@@ -153,14 +153,13 @@ class fileupload
                     }
                 }
 
-                $fileNewArr['file']['userId'] = $userId;
+                $fileNewArr['userId'] = $userId;
+                $fileNewArr['name'] = !empty($fileInfoArr['file']['name']) ? "." . pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION) : '';
+                $fileNewArr['path'] = !empty($fileInfoArr['file']['path']) ? $fileInfoArr['file']['path'] : '';
+                $fileNewArr['type'] = !empty($fileInfoArr['file']['type']) ? $fileInfoArr['file']['type'] : '';
+                $fileNewArr['size'] = !empty($fileInfoArr['file']['size']) ? $fileInfoArr['file']['size'] : '';
 
-                $fileNewArr['file']['name'] = !empty($fileInfoArr['file']['name']) ? "." . pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION) : '';
-                $fileNewArr['file']['path'] = !empty($fileInfoArr['file']['path']) ? $fileInfoArr['file']['path'] : '';
-                $fileNewArr['file']['type'] = !empty($fileInfoArr['file']['type']) ? $fileInfoArr['file']['type'] : '';
-                $fileNewArr['file']['size'] = !empty($fileInfoArr['file']['size']) ? $fileInfoArr['file']['size'] : '';
-
-                return array('status'=>0, 'fileInfo' => $fileNewArr, 'uploadSucc' => $uploadSucc, 'uploadFail' => $uploadFail);
+                return array('status'=>0, 'fileInfo'=>$fileNewArr, 'uploadSucc' => $uploadSucc, 'uploadFail' => $uploadFail);
             } else {
                 return array('errorId'=>self::NO_FILE_UPLOAD_CODE, 'errorMsg'=>self::NO_FILE_UPLOAD_ERROR_MSG);
             }
