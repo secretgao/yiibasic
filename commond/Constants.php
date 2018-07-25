@@ -12,9 +12,11 @@ final class Constants
     const GLOBAL_INVALID_PARAM      = 1001;
 
 
-    const DATA_NOT_FOUND             = 1004;
+    const DATA_NOT_FOUND            = 1004;
     const FILES_ALREADY_EXIST       = 1005;
     const MEMBER_NO_EXITS           = 1006;
+    const USER_NOT_FOUND            = 1007;
+    const POSITIONS_NOT_FOUND       = 1008;
 
 
     const REQUSET_NO_POST           = 2000;
@@ -30,6 +32,8 @@ final class Constants
         self::DATA_NOT_FOUND =>'数据不存在',
         self::FILES_ALREADY_EXIST =>'文件已经存在',
         self::MEMBER_NO_EXITS =>'要删除的人员不在此项目里',
+        self::USER_NOT_FOUND =>'用户不存在',
+        self::POSITIONS_NOT_FOUND =>'部门不存在',
     ];
 
 }

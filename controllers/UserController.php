@@ -3,9 +3,12 @@
 namespace app\controllers;
 
 
+use app\models\APosition;
+use app\models\APositionApply;
 use app\models\AUser;
 use Yii;
 use app\commond\Constants;
+use yii\base\Exception;
 
 /**
  * 文件操作
@@ -72,7 +75,33 @@ class UserController extends BasicController
      */
     public function actionApplyDepartment()
     {
+        $userId = $this->getParam('userId',true);
+        $positionId = $this->getParam('positionId',true);
 
+
+        $user = AUser::find()->select('id')->where(['id'=>$userId,'status'=>0])->scalar();
+
+
+        if (!$user){
+            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
+        }
+
+        $position = APosition::find()->select('id')->where(['id'=>$positionId,'status'=>0])->scalar();
+
+        if (!$position){
+            $this->Error(Constants::POSITIONS_NOT_FOUND,Constants::$error_message[Constants::POSITIONS_NOT_FOUND]);
+        }
+
+        $apply = new APositionApply();
+        $apply->uid = $userId;
+        $apply->position_id = $positionId;
+        $apply->status = '0';
+        $apply->create_time = time();
+
+        if ($apply->save()){
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 
 }
