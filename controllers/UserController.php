@@ -30,6 +30,8 @@ class UserController extends BasicController
 
     public function actionIndex()
     {
+        $data = APosition::find()->where()->asArray()->all();
+
 
     }
 
@@ -39,7 +41,34 @@ class UserController extends BasicController
      */
     public function actionGetApplyList()
     {
+        $data = APositionApply::find()->where(['status'=>0])
+            ->orderBy('create_time DESC')->asArray()->all();
 
+        if (!$data){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $user = [];
+        foreach ($data as $item){
+            $userInfo = AUser::find()->select('true_name,position_id')
+                ->where(['id'=>$item['uid']])->asArray()->one();
+            $user[$item['position_id']][] =[
+                'userId'=>$item['uid'],
+                'trueName'=>$userInfo['true_name'],
+            ];
+        }
+
+        $result = [];
+        foreach ($user as $positionId=>$value){
+            $position = APosition::find()->select('name')
+                ->where(['id'=>$positionId])->asArray()->scalar();
+            $result[]=[
+                'positionId'=>(string)$positionId,
+                'positionName'=>$position,
+                'positionUser'=>$user[$positionId]
+            ];
+        }
+
+        $this->Success(['data'=>$result]);
     }
 
     /**用户修改个人资料接口
@@ -77,17 +106,11 @@ class UserController extends BasicController
     {
         $userId = $this->getParam('userId',true);
         $positionId = $this->getParam('positionId',true);
-
-
         $user = AUser::find()->select('id')->where(['id'=>$userId,'status'=>0])->scalar();
-
-
         if (!$user){
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
-
         $position = APosition::find()->select('id')->where(['id'=>$positionId,'status'=>0])->scalar();
-
         if (!$position){
             $this->Error(Constants::POSITIONS_NOT_FOUND,Constants::$error_message[Constants::POSITIONS_NOT_FOUND]);
         }
