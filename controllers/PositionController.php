@@ -102,6 +102,9 @@ class PositionController extends BasicController
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 
+    /**
+     * 部门增减人员
+     */
     public function actionManageUser()
     {
 
@@ -111,7 +114,7 @@ class PositionController extends BasicController
 
         $user = AUser::findOne(['id'=>$userId]);
         $position = APosition::findOne(['id'=>$id]);
-        if (!$user || ! $position){
+        if (!$user || !$position){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 

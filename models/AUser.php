@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%a_user}}".
+ * This is the model class for table "a_user".
  *
  * @property int $id 主键
  * @property string $nick_name 昵称
@@ -15,6 +15,7 @@ use Yii;
  * @property int $create_time 创建时间
  * @property int $position_id 职位id
  * @property int $sex 状态:0 男  1女
+ * @property string $phone 手机号
  */
 class AUser extends \yii\db\ActiveRecord
 {
@@ -23,7 +24,7 @@ class AUser extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%a_user}}';
+        return 'a_user';
     }
 
     /**
@@ -35,7 +36,7 @@ class AUser extends \yii\db\ActiveRecord
             [['create_time', 'position_id'], 'integer'],
             [['position_id'], 'required'],
             [['nick_name'], 'string', 'max' => 50],
-            [['true_name'], 'string', 'max' => 20],
+            [['true_name', 'phone'], 'string', 'max' => 20],
             [['img'], 'string', 'max' => 255],
             [['status', 'sex'], 'string', 'max' => 3],
         ];
@@ -55,6 +56,7 @@ class AUser extends \yii\db\ActiveRecord
             'create_time' => 'Create Time',
             'position_id' => 'Position ID',
             'sex' => 'Sex',
+            'phone' => 'Phone',
         ];
     }
 }

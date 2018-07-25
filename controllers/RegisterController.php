@@ -26,6 +26,7 @@ class RegisterController extends BasicController
         $trueName = $this->getParam('true_name',true);
         $img      = $this->getParam('url',true);
         $position_id= $this->getParam('position_id',true);
+        $phone= $this->getParam('phone',true);
 
         $userObj = new AUser();
 
@@ -34,6 +35,7 @@ class RegisterController extends BasicController
         $userObj->img       = $img;
         $userObj->create_time = time();
         $userObj->position_id = $position_id;
+        $userObj->phone = $phone;
 
         if ( $userObj->insert() ) {
             $this->Success();
