@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\commond\Constants;
+use app\models\AFile;
 use app\models\APosition;
 use app\models\AUser;
 use Yii;
@@ -253,7 +254,6 @@ class ProjectController extends BasicController
                 }
             }
         }
-
         $parent = AModel::find()->where(['id'=>$parentId,'status'=>0])->asArray()->one();
 
         //说明是顶级返回子集
@@ -266,7 +266,21 @@ class ProjectController extends BasicController
             }
         }
 
+        //根据最后返回信息 遍历 是否存在文件
 
+        foreach ($result as $k=>$cata){
+
+            $file = AFile::find()->select('id,name,path,type')
+                ->where([
+                    'uid'=>$userId,
+                    'project_id'=>$projectId,
+                    'status'=>0,
+                    'catalog_id'=>$cata['id']
+                ])->asArray()->all();
+            if ($file){
+                $result[$k]['file'] = $file;
+            }
+        }
 
         $this->Success(['data'=>$result]);
        
