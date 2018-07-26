@@ -41,19 +41,21 @@ class ModelsController extends BasicController
      */
     public function actionAdd(){
     
-        $this->isPost();
+       // $this->isPost();
         $name = $this->getParam('name',true);
-        $pid  = $this->getParam('pid',false,0);       
-     
-       // $projectId = $this->getParam('project_id',false,0);
+        $pid  = $this->getParam('pid',false);
+        $type  = $this->getParam('type',false);
+
+        $projectId = $this->getParam('projectId',false);
         $createUid = $this->getParam('userId',true);
         $Obj = new AModel();
         $Obj->name = $name;
         $Obj->create_time = time();
-      //  $Obj->project_id = $projectId;
+        $Obj->project_id = empty($projectId) ? 0 : $projectId;
         $Obj->create_uid = $createUid;
+        $Obj->type = empty($type) ? '0' : (string)$type;
         $Obj->pid = empty($pid) ? 0 : $pid;
-        
+
        
         if ($Obj->insert()) {
             $this->Success(['id'=>$Obj->attributes['id']]);

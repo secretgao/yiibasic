@@ -5,11 +5,12 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%a_model}}".
+ * This is the model class for table "a_model".
  *
  * @property int $id
  * @property string $name
  * @property int $status 状态   0 正常  -1 删除
+ * @property int $type 区分 0是 模版  1是目录 
  * @property int $create_time
  * @property int $update_time
  * @property int $pid
@@ -23,7 +24,7 @@ class AModel extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%a_model}}';
+        return 'a_model';
     }
 
     /**
@@ -34,7 +35,7 @@ class AModel extends \yii\db\ActiveRecord
         return [
             [['create_time', 'update_time', 'pid', 'project_id', 'create_uid'], 'integer'],
             [['name'], 'string', 'max' => 20],
-            [['status'], 'string', 'max' => 2],
+            [['status', 'type'], 'string', 'max' => 2],
         ];
     }
 
@@ -47,6 +48,7 @@ class AModel extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'status' => 'Status',
+            'type' => 'Type',
             'create_time' => 'Create Time',
             'update_time' => 'Update Time',
             'pid' => 'Pid',
