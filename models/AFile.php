@@ -5,9 +5,9 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "a_file".
+ * This is the model class for table "{{%a_file}}".
  *
- * @property string $id
+ * @property int $id
  * @property int $uid 用户id
  * @property int $type 文件类型 1图片 2视频 3附件 4 笔记
  * @property string $name 文件名
@@ -17,6 +17,7 @@ use Yii;
  * @property string $path 文件路径
  * @property int $project_id 项目id
  * @property int $catalog_id 目录id
+ * @property string $size 文件大小
  */
 class AFile extends \yii\db\ActiveRecord
 {
@@ -25,7 +26,7 @@ class AFile extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'a_file';
+        return '{{%a_file}}';
     }
 
     /**
@@ -39,7 +40,7 @@ class AFile extends \yii\db\ActiveRecord
             [['type', 'status'], 'string', 'max' => 3],
             [['name'], 'string', 'max' => 50],
             [['ext'], 'string', 'max' => 5],
-            [['path'], 'string', 'max' => 200],
+            [['path', 'size'], 'string', 'max' => 200],
         ];
     }
 
@@ -59,6 +60,7 @@ class AFile extends \yii\db\ActiveRecord
             'path' => 'Path',
             'project_id' => 'Project ID',
             'catalog_id' => 'Catalog ID',
+            'size' => 'Size',
         ];
     }
 }

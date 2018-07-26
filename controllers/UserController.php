@@ -34,7 +34,7 @@ class UserController extends BasicController
         if (!$data){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        
+
         foreach ($data as &$item){
             $user = AUser::find()->select('id as userId,true_name as trueName')
                 ->where(['position_id'=>$item['positionId'],'status'=>0])->asArray()->all();
