@@ -130,8 +130,14 @@ class fileupload
                             $fileInfoArr[$key] = array_merge($fileInfoArr[$key], $imageInfo);
                         }
 
-                        //判断指定上传文件存储目录是否存在
-                        $uploadFileName = $this->uploadDir . "_{$fileInfoArr[$key]['name']}";//重新命名文件名称
+                        //判断指定上传文件存储目录是否存在  /uploads/用户id/年/月/日/时
+                        $fileUploadDir = $this->uploadDir.DIRECTORY_SEPARATOR.$userId.DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
+
+                        if (!file_exists($fileUploadDir)){
+                            mkdir($fileUploadDir,0777,true);
+                        }
+
+                        $uploadFileName = $fileUploadDir .DIRECTORY_SEPARATOR. "_{$fileInfoArr[$key]['name']}";//重新命名文件名称
 
                         $fileInfoArr[$key]['path'] = $uploadFileName;//文件存储路径
                         if (!empty($chinese)) {//包含有中文字符需要转码
@@ -154,10 +160,11 @@ class fileupload
                 }
 
                 $fileNewArr['userId'] = $userId;
-                $fileNewArr['name'] = !empty($fileInfoArr['file']['name']) ? "." . pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION) : '';
+                $fileNewArr['name'] = !empty($fileInfoArr['file']['name']) ? $fileInfoArr['file']['name'] : '';
                 $fileNewArr['path'] = !empty($fileInfoArr['file']['path']) ? $fileInfoArr['file']['path'] : '';
                 $fileNewArr['type'] = !empty($fileInfoArr['file']['type']) ? $fileInfoArr['file']['type'] : '';
                 $fileNewArr['size'] = !empty($fileInfoArr['file']['size']) ? $fileInfoArr['file']['size'] : '';
+                $fileNewArr['ext']  =  pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION) ;
 
                 return array('status'=>0, 'fileInfo'=>$fileNewArr, 'uploadSucc' => $uploadSucc, 'uploadFail' => $uploadFail);
             } else {

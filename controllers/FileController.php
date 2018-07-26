@@ -208,12 +208,29 @@ class FileController extends BasicController
     public function actionUploads()
     {
 
-        $userId = $this->getParam('userId',true,1);
+        $userId = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+        $catalogId = $this->getParam('catalogId',true);
+        $type = $this->getParam('type',true);
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId);
 
         if (isset($fileInfo['status'])){
-            $this->Success($fileInfo);
+            $file = new AFile();
+            $file->uid = $userId;
+            $file->type = $type;
+            $file->name = $fileInfo['fileInfo']['name'];
+            $file->ext = $fileInfo['fileInfo']['ext'];
+            $file->create_time = time();
+            $file->path = $fileInfo['fileInfo']['path'];
+            $file->project_id = $projectId;
+            $file->catalog_id = $catalogId;
+
+            if ($file->save()){
+                $this->Success($fileInfo);
+            } else {
+                $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+            }
         }
         $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
 
