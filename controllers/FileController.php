@@ -242,6 +242,7 @@ class FileController extends BasicController
      */
     public function actionUserFileList()
     {
+        $this->isPost();
         $uid = $this->getParam('userId',true);
 
         $file = AFile::find()->select('id,type,name,create_time')->where(['uid'=>$uid,'status'=>0])
