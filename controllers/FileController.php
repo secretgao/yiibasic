@@ -235,4 +235,24 @@ class FileController extends BasicController
         $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
 
     }
+
+    /**
+     * 用户上传过的列表
+     * @return array
+     */
+    public function actionUserFileList()
+    {
+        $uid = $this->getParam('userId',true);
+
+        $file = AFile::find()->select('id,type,name,create_time')->where(['uid'=>$uid,'status'=>0])
+            ->asArray()->all();
+
+        if (!$file){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $this->Success(['data'=>$file]);
+
+
+    }
 }
