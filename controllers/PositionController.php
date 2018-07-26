@@ -39,7 +39,7 @@ class PositionController extends BasicController
      * http://www.api.com/position/add
      */
     public function actionAdd(){
-        $this->isPost();
+       // $this->isPost();
         $positionName = $this->getParam('name',true);
         $pid          = $this->getParam('pid',false);
 
@@ -52,7 +52,14 @@ class PositionController extends BasicController
         $positionObj->create_time = time();
 
         if ($positionObj->insert()) {
-            $this->Success();
+            $this->Success(
+                [
+                    'data'=>[
+                        'positionId'=> (string)$positionObj->attributes['id'],
+                        'positionName'=>$positionObj->attributes['name']
+                        ]
+                ]
+            );
         }
 
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
