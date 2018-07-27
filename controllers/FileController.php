@@ -152,60 +152,7 @@ class FileController extends BasicController
     {
         return $this->render('test');
     }
-/*
-    public function actionUploads()
-    {
 
-       // echo '<pre>';print_r($_FILES);
-        if (PHP_OS == 'Linux'){
-            error_log('test--start_Time'.date('Y-m-d H:i:s').PHP_EOL,3,'/tmp/test.log');
-        }
-
-
-        $ext  = $this->getParam('ext',true);
-        if (empty($_FILES)){
-            $this->Error();
-        }
-       // $a = '{"file":{"name":".txt","type":"multipart\/form-data","tmp_name":"\/tmp\/phpFGIWWm","error":0,"size":165199}';
-
-        $image = $_FILES['file']["tmp_name"];
-        $fp = fopen($image, "r");
-
-
-        $file = fread($fp, $_FILES['file']["size"]); //二进制数据流
-        // error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
-       //  error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
-        //保存地址
-        if (PHP_OS == 'Linux'){
-            error_log('test--post'.json_encode($_POST).PHP_EOL,3,'/tmp/test.log');
-            error_log('test--file'.json_encode($_FILES).PHP_EOL,3,'/tmp/test.log');
-        }
-
-            $content = file_get_contents('php://input');    // 不需要php.ini设置，内存压力小
-        if (PHP_OS == 'Linux'){
-            error_log('test--cont'.json_encode($content).PHP_EOL,3,'/tmp/test.log');
-        }
-
-
-        $imgDir = './Uploads/';
-
-        //要生成的图片名字
-
-        $filename = md5(time().mt_rand(10, 99)).$ext; //新图片名称
-
-        $newFilePath = $imgDir.$filename;
-
-        $data = $file;
-
-        $newFile = fopen($newFilePath,"w"); //打开文件准备写入
-
-        fwrite($newFile,$data); //写入二进制流到文件
-
-        fclose($newFile); //关闭文件
-
-        $this->Success();
-    }
-*/
     public function actionUploads()
     {
 
@@ -264,6 +211,38 @@ class FileController extends BasicController
 
         $this->Success(['data'=>$file]);
 
+
+    }
+
+
+    /**
+     * 文件下载
+     */
+
+    public function actionDownload(){
+
+        ob_clean();
+        $fileId = $this->getParam('fileId',true);
+        $userId = $this->getParam('userId',true);
+        $file = AFile::find()->select('*')->where(['id'=>$fileId,'status'=>0,'uid'=>$userId])->asArray()->one();
+
+        if (! $file){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        //用以解决中文不能显示出来的问题
+        $path = iconv("utf-8","gb2312",$file['path']);
+        $file_path = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$path;
+
+        //首先要判断给定的文件存在与否
+        if(!file_exists($file_path)){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        // 使用basename函数可以获得文件的名称而不是路径信息，保护了服务器的目录安全性
+        header("content-disposition:attachment;filename=".basename($file_path));
+        header("content-length:".filesize($file_path));
+        readfile($file_path);
+        exit();
 
     }
 }
