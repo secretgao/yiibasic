@@ -23,24 +23,30 @@ class RegisterController extends BasicController
 
         $this->isPost();
         $nickName = $this->getParam('nick_name',true);
-        $trueName = $this->getParam('true_name',true);
+        $id       = $this->getParam('id',true);
         $img      = $this->getParam('url',true);
-        $position_id= $this->getParam('position_id',true);
-        $phone= $this->getParam('phone',true);
+
+
+        $group = AUser::find()->where(['status'=>0,'group'=>1])->count();
 
         $userObj = new AUser();
-
         $userObj->nick_name = $nickName;
-        $userObj->true_name = $trueName;
-        $userObj->img       = $img;
+        $userObj->avatar   = $img;
         $userObj->create_time = time();
-        $userObj->position_id = $position_id;
-        $userObj->phone = $phone;
+        $userObj->weixin_id = $id;
+        $userObj->group = $group == 0 ? '1' : '2';
 
         if ( $userObj->insert() ) {
-            $this->Success();
+            $result = [
+                'userId'=> (string) $userObj->getAttribute('id'),
+                'avatar'=>$userObj->getAttribute('avatar'),
+                'phone' =>'',
+                'nickName'=>$userObj->getAttribute('nick_name'),
+                'realName'=> '',
+                'group' => $userObj->getAttribute('group'),
+            ];
+            $this->Success($result);
         }
-
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }

@@ -44,11 +44,20 @@ class BasicController extends Controller
      */
     public function getParam($key, $is_need = true, $default_value = NULL)
     {
-        
-        $val = self::replace_specialChar(self::$request->get($key));
+
+        if ($key == 'url'){
+            $val = self::$request->get($key);
+        } else {
+            $val = self::replace_specialChar(self::$request->get($key));
+        }
         if ($val === NULL || $val === '')
         {
-            $val = self::replace_specialChar(self::$request->post($key));
+            if ($key == 'url'){
+                $val = self::$request->post($key);
+            } else {
+                $val = self::replace_specialChar(self::$request->post($key));
+            }
+
         }
         
       

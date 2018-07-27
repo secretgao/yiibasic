@@ -7,6 +7,10 @@ namespace app\commond;
 final class Constants
 {
 
+    const ADMIN_USER                = 'admin';
+    const TEST_USER                 = 'test';
+    const PASSWORD_ERROR            = 999;
+
     const RET_SUCCESS               = 0;
     const RET_ERROR                 = 1000;
     const GLOBAL_INVALID_PARAM      = 1001;
@@ -34,6 +38,7 @@ final class Constants
         self::MEMBER_NO_EXITS =>'要删除的人员不在此项目里',
         self::USER_NOT_FOUND =>'用户不存在',
         self::POSITIONS_NOT_FOUND =>'部门不存在',
+        self::PASSWORD_ERROR  => '密码错误'
     ];
 
 }

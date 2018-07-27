@@ -23,6 +23,44 @@ class UserController extends BasicController
        parent::init();
     }
 
+
+    /**
+     * 登录
+     */
+    public function actionLogin(){
+
+        $username = $this->getParam('username',true);
+        $password = $this->getParam('password',true);
+
+        if ($username == Constants::ADMIN_USER){
+
+            if (md5($password) == md5(Constants::ADMIN_USER)){
+                $user = AUser::find()
+                    ->select('id as userId,avatar,phone,nick_name as nickName,true_name as  realName,group')
+                    ->where(['status'=>0,'group'=>1])->asArray()->one();
+
+                $this->Success($user);
+
+            } else{
+                $this->Error(Constants::PASSWORD_ERROR,Constants::$error_message[Constants::PASSWORD_ERROR]);
+            }
+
+
+        } else if ($username == Constants::TEST_USER){
+            if (md5($password) == md5(Constants::TEST_USER)){
+                $user = AUser::find()
+                    ->select('id as userId,avatar,phone,nick_name as nickName,true_name as  realName,group')
+                    ->where(['status'=>0,'group'=>2])->asArray()->one();
+                $this->Success($user);
+            } else{
+                $this->Error(Constants::PASSWORD_ERROR,Constants::$error_message[Constants::PASSWORD_ERROR]);
+
+            }
+        } else {
+            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
+        }
+
+    }
     /**
      * 获取成员列表
      * @return array

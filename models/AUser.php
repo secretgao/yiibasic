@@ -10,12 +10,14 @@ use Yii;
  * @property int $id 主键
  * @property string $nick_name 昵称
  * @property string $true_name 真实姓名
- * @property string $img 头像
+ * @property string $avatar 头像
  * @property int $status 状态:0 正常  -1 删除
  * @property int $create_time 创建时间
  * @property int $position_id 职位id
  * @property int $sex 状态:0 男  1女
  * @property string $phone 手机号
+ * @property int $group 是否是超级管理员
+ * @property string $weixin_id 微信id
  */
 class AUser extends \yii\db\ActiveRecord
 {
@@ -34,11 +36,11 @@ class AUser extends \yii\db\ActiveRecord
     {
         return [
             [['create_time', 'position_id'], 'integer'],
-            [['position_id'], 'required'],
             [['nick_name'], 'string', 'max' => 50],
             [['true_name', 'phone'], 'string', 'max' => 20],
-            [['img'], 'string', 'max' => 255],
-            [['status', 'sex'], 'string', 'max' => 3],
+            [['avatar'], 'string', 'max' => 255],
+            [['status', 'sex', 'group'], 'string', 'max' => 3],
+            [['weixin_id'], 'string', 'max' => 100],
         ];
     }
 
@@ -51,12 +53,14 @@ class AUser extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nick_name' => 'Nick Name',
             'true_name' => 'True Name',
-            'img' => 'Img',
+            'avatar' => 'Avatar',
             'status' => 'Status',
             'create_time' => 'Create Time',
             'position_id' => 'Position ID',
             'sex' => 'Sex',
             'phone' => 'Phone',
+            'group' => 'Group',
+            'weixin_id' => 'Weixin ID',
         ];
     }
 }
