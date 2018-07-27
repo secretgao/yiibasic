@@ -206,6 +206,7 @@ class FileController extends BasicController
             }
             $project = AProject::find()->select('name')->where(['id'=>$item['projectId']])->scalar();
             $file[$key]['projectName'] = empty($project) ? '' : $project;
+            $file[$key]['size'] = intval($item['size']);
 
         }
 
