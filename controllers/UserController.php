@@ -96,11 +96,12 @@ class UserController extends BasicController
         }
         $user = [];
         foreach ($data as $item){
-            $userInfo = AUser::find()->select('true_name,position_id')
+            $userInfo = AUser::find()->select('true_name,position_id,phone')
                 ->where(['id'=>$item['uid']])->asArray()->one();
             $user[$item['position_id']][] =[
                 'userId'=>$item['uid'],
                 'trueName'=>$userInfo['true_name'],
+                'phone' =>$userInfo['phone']
             ];
         }
 
