@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\commond\Constants;
 use app\models\APosition;
+use app\models\APositionApply;
 use app\models\AUser;
 use Yii;
 
@@ -135,5 +136,56 @@ class PositionController extends BasicController
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
+
+    /**
+     *
+     */
+
+    public function actionApply()
+    {
+
+        $applyId = $this->getParam('applyId',true);
+        $type = $this->getParam('type',true);
+
+        $apply = APositionApply::findOne(['id'=>$applyId,'status'=>0]);
+
+        if ( !$apply ){
+            $this->Error(Constants::APPLY_NOT_FOUND,Constants::$error_message[Constants::APPLY_NOT_FOUND]);
+        }
+        $user = AUser::findOne(['id'=>$apply['uid']]);
+        $position = APosition::findOne(['id'=>$apply['position_id']]);
+        if (!$user || !$position){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        if ($type == 1){
+            $transaction= Yii::$app->db->beginTransaction();
+            try {
+                $apply->status = '1';
+                if ( !$apply->save(false)){
+                    $this->Error(Constants::RET_ERROR,$apply->getErrors());
+                }
+                $user->position_id = $apply['position_id'];
+                if (!$user->save(false)){
+                    $this->Error(Constants::RET_ERROR,$apply->getErrors());
+                }
+                $transaction->commit();
+                $this->Success();
+            } catch (\Exception $e) {
+                //如果操作失败, 数据回滚
+                $transaction->rollback();
+                $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+            }
+
+        } else {
+            $apply->status = '2';
+            if ( !$apply->save(false)){
+                $this->Error(Constants::RET_ERROR,$apply->getErrors());
+            }
+            $this->Success();
+        }
+
+
     }
 }
