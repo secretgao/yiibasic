@@ -269,7 +269,7 @@ class ProjectController extends BasicController
         //根据最后返回信息 遍历 是否存在文件
         $fileArr = [];
         foreach ($result as $k=>$cata){
-
+            $result[$k]['type'] = '0';
             $file = AFile::find()->select('id,name,path,type')
                 ->where([
                     'uid'=>$userId,
