@@ -226,13 +226,16 @@ class ProjectController extends BasicController
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-   
+
         //目录id 切割成数组
         $catalogIdArr = explode(',', $project['model_id']);
-        
+
         $catalogArr =  $temp =  [];  //去除重复目录用
         foreach ($catalogIdArr as $id){
             $catalog = helps::getParents($id);
+            if (!$catalog){
+                continue;
+            }
             foreach ($catalog as $item){
                 //去除重复
                 if (!in_array($item['id'], $catalogArr)) {
@@ -242,7 +245,7 @@ class ProjectController extends BasicController
             }
         }
 
-       // echo '<pre>';print_r($catalogArr);exit();
+      //  echo '<pre>';print_r($catalogArr);exit();
         $data = helps::getson($temp,0,1);  //附上层级
 
        // echo '<pre>';print_r($data);exit();
@@ -267,7 +270,7 @@ class ProjectController extends BasicController
         }
 
         //根据最后返回信息 遍历 是否存在文件
-        $fileArr = [];
+
         foreach ($result as $k=>$cata){
             $result[$k]['type'] = '0';
             $file = AFile::find()->select('id,name,path,type')
@@ -283,18 +286,10 @@ class ProjectController extends BasicController
                     array_push($result,$item);
                 }
 
-               // $fileArr[] = $file;
-                //$result[$k]['file']['id'] = $file['id'];
-               // $result[$k]['file']['name'] = $file['name'];
-               // $result[$k]['file']['path'] = $file['path'];
-               // $result[$k]['file']['type'] = intval($file['type']);
             }
 
-           // echo '<pre>';print_r($file);
         }
-       // echo '<pre>';print_r($fileArr);
-      //  echo '<pre>';print_r($result);exit();
-
+     
         $this->Success(['data'=>$result]);
        
     }
