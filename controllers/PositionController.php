@@ -183,6 +183,7 @@ class PositionController extends BasicController
             $transaction= Yii::$app->db->beginTransaction();
             try {
                 $apply->status = '1';
+                $apply->update_time  = time();
                 if ( !$apply->save(false)){
                     $this->Error(Constants::RET_ERROR,$apply->getErrors());
                 }
@@ -200,6 +201,7 @@ class PositionController extends BasicController
 
         } else {
             $apply->status = '2';
+            $apply->update_time  = time();
             if ( !$apply->save(false)){
                 $this->Error(Constants::RET_ERROR,$apply->getErrors());
             }

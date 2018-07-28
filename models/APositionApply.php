@@ -5,13 +5,14 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "a_position_apply".
+ * This is the model class for table "{{%a_position_apply}}".
  *
  * @property int $id
  * @property int $uid 用户id
  * @property int $position_id 部门id
  * @property int $create_time 申请时间
  * @property int $status 状态 0申请    1 通过  2 不通过 
+ * @property int $update_time
  */
 class APositionApply extends \yii\db\ActiveRecord
 {
@@ -20,7 +21,7 @@ class APositionApply extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'a_position_apply';
+        return '{{%a_position_apply}}';
     }
 
     /**
@@ -29,7 +30,7 @@ class APositionApply extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['uid', 'position_id', 'create_time'], 'integer'],
+            [['uid', 'position_id', 'create_time', 'update_time'], 'integer'],
             [['status'], 'string', 'max' => 3],
         ];
     }
@@ -45,6 +46,7 @@ class APositionApply extends \yii\db\ActiveRecord
             'position_id' => 'Position ID',
             'create_time' => 'Create Time',
             'status' => 'Status',
+            'update_time' => 'Update Time',
         ];
     }
 }
