@@ -267,7 +267,7 @@ class ProjectController extends BasicController
         }
 
         //根据最后返回信息 遍历 是否存在文件
-
+        $fileArr = [];
         foreach ($result as $k=>$cata){
 
             $file = AFile::find()->select('id,name,path,type')
@@ -277,13 +277,23 @@ class ProjectController extends BasicController
                     'status'=>0,
                     'catalog_id'=>$cata['id']
                 ])->asArray()->all();
+
             if ($file){
-                $result[$k]['file']['id'] = $file['id'];
-                $result[$k]['file']['name'] = $file['name'];
-                $result[$k]['file']['path'] = $file['path'];
-                $result[$k]['file']['type'] = intval($file['type']);
+                foreach ($file as $item){
+                    array_push($result,$item);
+                }
+
+               // $fileArr[] = $file;
+                //$result[$k]['file']['id'] = $file['id'];
+               // $result[$k]['file']['name'] = $file['name'];
+               // $result[$k]['file']['path'] = $file['path'];
+               // $result[$k]['file']['type'] = intval($file['type']);
             }
+
+           // echo '<pre>';print_r($file);
         }
+       // echo '<pre>';print_r($fileArr);
+      //  echo '<pre>';print_r($result);exit();
 
         $this->Success(['data'=>$result]);
        
