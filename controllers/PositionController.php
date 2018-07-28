@@ -32,21 +32,26 @@ class PositionController extends BasicController
         }
 
         $userPosition = [];
-        $userPosition[0]['id'] = '-1';
-        $userPosition[0]['name'] = '';
+
 
         if (!empty($user['position_id'])){
             $userPosition[0] = APosition::find()->select('id,name')
                 ->where(['id'=>$user['position_id'],'status'=>0])->asArray()->one();
+
         }
        // echo '<pre>';print_r($userPosition);
         $parent = APosition::getAll();
         if (! $parent) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
+        if (empty($userPosition[0])){
+            $userPosition[0]['id'] = '-1';
+            $userPosition[0]['name'] = '';
+        }
         $result = array_merge($userPosition,$parent);
+//echo '<pre>';print_r($userPosition);
 
-        //echo '<pre>';print_r($result);exit();
+      //  echo '<pre>';print_r($result);exit();
        /* foreach ($parent as &$item){
             $item['children'] = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
         }*/
