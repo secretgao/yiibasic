@@ -31,7 +31,7 @@ class PositionController extends BasicController
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
 
-        $userPosition = [];
+        $userPosition[0] = [];
 
 
         if (!empty($user['position_id'])){
