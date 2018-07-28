@@ -178,7 +178,7 @@ class FileController extends BasicController
             if ($file->save()){
                 $this->Success($fileInfo);
             } else {
-                $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+                $this->Error(Constants::RET_ERROR,$file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
             }
         }
         $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
