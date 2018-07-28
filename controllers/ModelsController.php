@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\commond\Constants;
 use app\commond\helps;
+use app\models\AUser;
 use Yii;
 use app\models\AModel;
 
@@ -23,6 +24,11 @@ class ModelsController extends BasicController
     public function actionIndex(){
        // $this->isPost();
         $uid = $this->getParam('userId',true);
+
+        $user = AUser::find()->select('group')->where(['id'=>$uid,'status'=>0])->scalar();
+        if ($user && $user == 1){
+            $uid = 1;
+        }
         $data = AModel::find()->select('id,name,pid')
             ->where(['status'=>0,'create_uid'=>$uid])->asArray()->all();
         
