@@ -111,7 +111,7 @@ class ProjectController extends BasicController
           $projectObj->name = $name;
           $projectObj->start_time = intval(strtotime($startTime));
           $projectObj->description = $description;
-          $projectObj->allow_add = $allowAdd == 0 ? '0' : '1';
+          $projectObj->allow_add = $allowAdd == 'true' ? '1' : '0';
           $projectObj->members = $members;
           $projectObj->create_time = time();
           $projectObj->status = '0';
