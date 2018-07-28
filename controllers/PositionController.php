@@ -23,15 +23,35 @@ class PositionController extends BasicController
      */
     public function actionIndex(){
 
-        $parent = APosition::getAll();
-        if (! $parent) {
-            $this->Error();
-        }
-        foreach ($parent as &$item){
-            $item['children'] = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
+        $uid = $this->getParam('userId',true);
+
+        $user = AUser::find()->where(['id'=>$uid,'status'=>0])->asArray()->one();
+
+        if (!$user){
+            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
 
-        $this->Success(['data'=>$parent]);
+        $userPosition = [];
+        $userPosition[0]['id'] = '-1';
+        $userPosition[0]['name'] = '';
+
+        if (!empty($user['position_id'])){
+            $userPosition[0] = APosition::find()->select('id,name')
+                ->where(['id'=>$user['position_id'],'status'=>0])->asArray()->one();
+        }
+       // echo '<pre>';print_r($userPosition);
+        $parent = APosition::getAll();
+        if (! $parent) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $result = array_merge($userPosition,$parent);
+
+        //echo '<pre>';print_r($result);exit();
+       /* foreach ($parent as &$item){
+            $item['children'] = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
+        }*/
+
+        $this->Success(['data'=>$result]);
 
     }
 
