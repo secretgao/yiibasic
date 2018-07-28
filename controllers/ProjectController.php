@@ -279,7 +279,18 @@ class ProjectController extends BasicController
                     'project_id'=>$projectId,
                     'status'=>0,
                     'catalog_id'=>$cata['id']
-                ])->asArray()->all();
+                ])
+                ->asArray()->all();
+            if ($parentId == 0){
+                $file = AFile::find()->select('id,name,path,type')
+                    ->where([
+                        'uid'=>$userId,
+                        'project_id'=>$projectId,
+                        'status'=>0,
+                        'catalog_id'=>0
+                    ])
+                    ->asArray()->all();
+            }
 
             if ($file){
                 foreach ($file as $item){
