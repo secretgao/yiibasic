@@ -34,7 +34,7 @@ class ProjectController extends BasicController
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->asArray()->all(); 
         
         if (empty($data)){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);            
+            $this->Success(['data'=>[]]);
         }
         
         foreach ($data as &$item){
