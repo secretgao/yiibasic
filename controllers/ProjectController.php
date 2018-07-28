@@ -278,7 +278,10 @@ class ProjectController extends BasicController
                     'catalog_id'=>$cata['id']
                 ])->asArray()->all();
             if ($file){
-                $result[$k]['file'] = $file;
+                $result[$k]['file']['id'] = $file['id'];
+                $result[$k]['file']['name'] = $file['name'];
+                $result[$k]['file']['path'] = $file['path'];
+                $result[$k]['file']['type'] = intval($file['type']);
             }
         }
 
