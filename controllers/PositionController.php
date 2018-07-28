@@ -170,10 +170,10 @@ class PositionController extends BasicController
     public function actionApply()
     {
 
-        $applyId = $this->getParam('applyId',true);
+        $userId = $this->getParam('userId',true);
         $type = $this->getParam('type',true);
 
-        $apply = APositionApply::findOne(['id'=>$applyId,'status'=>0]);
+        $apply = APositionApply::findOne(['uid'=>$userId,'status'=>0]);
 
         if ( !$apply ){
             $this->Error(Constants::APPLY_NOT_FOUND,Constants::$error_message[Constants::APPLY_NOT_FOUND]);
