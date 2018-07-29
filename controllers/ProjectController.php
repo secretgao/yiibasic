@@ -227,20 +227,20 @@ class ProjectController extends BasicController
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        //目录id 切割成数组
-        $catalogIdArr = explode(',', $project['model_id']);
+        //模版id 切割成数组
+        $modelIdArr = explode(',', $project['model_id']);
 
-        $catalogArr =  $temp =  [];  //去除重复目录用
-        foreach ($catalogIdArr as $id){
+        $modelArr =  $temp =  [];  //去除重复目录用
+        foreach ($modelIdArr as $id){
             $catalog = helps::getParents($id);
             if (!$catalog){
                 continue;
             }
             foreach ($catalog as $item){
                 //去除重复
-                if (!in_array($item['id'], $catalogArr)) {
+                if (!in_array($item['id'], $modelArr)) {
                     $temp[] = $item;
-                    $catalogArr[]= $item['id'];
+                    $modelArr[]= $item['id'];
                 }
             }
         }
@@ -297,6 +297,15 @@ class ProjectController extends BasicController
                     array_push($result,$item);
                 }
 
+            }
+            //项目目录
+            $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
+            if ($cata) {
+                foreach ($cata as &$value){
+                    $value['type'] = '0';
+                }
+
+               $result = array_merge($result,$cata);
             }
 
         }
