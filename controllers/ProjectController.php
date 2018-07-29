@@ -271,6 +271,7 @@ class ProjectController extends BasicController
 
         //根据最后返回信息 遍历 是否存在文件
 //echo '<pre>';print_r($result);
+        $fileId = [];
         foreach ($result as $k=>$cata){
             $result[$k]['type'] = '0';
             $file = AFile::find()->select('id,name,path,type')
@@ -294,12 +295,12 @@ class ProjectController extends BasicController
 
             if ($file){
                 foreach ($file as $item){
-                    array_push($result,$item);
+                    if (!in_array($item['id'],$fileId)){
+                        $fileId[] = $item['id'];
+                        array_push($result,$item);
+                    }
                 }
-
             }
-
-
         }
 
 
