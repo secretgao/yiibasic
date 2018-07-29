@@ -262,7 +262,7 @@ class ProjectController extends BasicController
         //说明是顶级返回子集
         if ($parent && $parent['pid'] == 0){
             $result = AModel::find()->select('id,name,pid')
-                ->where(['pid'=>$parentId,'status'=>0])->asArray()->all();
+                ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
 
             foreach ($result as &$value){
                 $value['level'] = 2;
@@ -270,7 +270,7 @@ class ProjectController extends BasicController
         }
 
         //根据最后返回信息 遍历 是否存在文件
-
+//echo '<pre>';print_r($result);
         foreach ($result as $k=>$cata){
             $result[$k]['type'] = '0';
             $file = AFile::find()->select('id,name,path,type')
@@ -298,16 +298,19 @@ class ProjectController extends BasicController
                 }
 
             }
-            //项目目录
-            $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
-            if ($cata) {
-                foreach ($cata as &$value){
-                    $value['type'] = '0';
-                }
 
-               $result = array_merge($result,$cata);
+
+        }
+
+
+        //项目目录
+        $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
+        if ($cata) {
+            foreach ($cata as &$value){
+                $value['type'] = '0';
             }
 
+            $result = array_merge($result,$cata);
         }
 
         $this->Success(['data'=>$result]);
