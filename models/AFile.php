@@ -18,6 +18,11 @@ use Yii;
  * @property int $project_id 项目id
  * @property int $catalog_id 目录id
  * @property string $size 文件大小
+ * @property string $exif_date exif 日期时间
+ * @property string $exif_latitude exif 纬度
+ * @property string $exif_longitude exif 经度
+ * @property string $gps_latitude gps 纬度
+ * @property string $gps_loginitude gps 经度
  */
 class AFile extends \yii\db\ActiveRecord
 {
@@ -41,6 +46,8 @@ class AFile extends \yii\db\ActiveRecord
             [['name'], 'string', 'max' => 100],
             [['ext'], 'string', 'max' => 5],
             [['path', 'size'], 'string', 'max' => 200],
+            [['exif_date'], 'string', 'max' => 30],
+            [['exif_latitude', 'exif_longitude', 'gps_latitude', 'gps_loginitude'], 'string', 'max' => 60],
         ];
     }
 
@@ -61,6 +68,11 @@ class AFile extends \yii\db\ActiveRecord
             'project_id' => 'Project ID',
             'catalog_id' => 'Catalog ID',
             'size' => 'Size',
+            'exif_date' => 'Exif Date',
+            'exif_latitude' => 'Exif Latitude',
+            'exif_longitude' => 'Exif Longitude',
+            'gps_latitude' => 'Gps Latitude',
+            'gps_loginitude' => 'Gps Loginitude',
         ];
     }
 }

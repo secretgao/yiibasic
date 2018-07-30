@@ -153,6 +153,11 @@ class FileController extends BasicController
         $projectId = $this->getParam('projectId',true);
         $catalogId = $this->getParam('catalogId',true);
         $type = $this->getParam('type',true);
+        $exifDate = $this->getParam('exif_date',true);
+        $exifLatitude = $this->getParam('exif_latitude',true);
+        $exifLongitude = $this->getParam('exif_longitude',true);
+        $gpsLatitude = $this->getParam('gps_latitude',true);
+        $gpsLongitude = $this->getParam('gps_longitude',true);
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId);
 
@@ -167,7 +172,12 @@ class FileController extends BasicController
             $file->project_id = $projectId;
             $file->catalog_id = $catalogId;
             $file->size = (string)$fileInfo['fileInfo']['size'];
-
+            $file->exif_date = $exifDate;
+            $file->exif_latitude = $exifLatitude;
+            $file->exif_longitude = $exifLongitude;
+            $file->gps_latitude = $gpsLatitude;
+            $file->gps_longitude = $gpsLongitude;
+            
             if ($file->save()){
                 $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId)));
             } else {
