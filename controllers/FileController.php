@@ -169,7 +169,7 @@ class FileController extends BasicController
             $file->size = (string)$fileInfo['fileInfo']['size'];
 
             if ($file->save()){
-                $this->Success($fileInfo);
+                $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId)));
             } else {
                 $this->Error(Constants::RET_ERROR,$file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
             }
