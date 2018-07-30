@@ -31,7 +31,7 @@ class ProjectController extends BasicController
         $time = $this->getParam('time',true);
 
        // exit();
-        $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->orderBy('sort desc')->asArray()->all();
+        $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->orderBy('sort ASC')->asArray()->all();
         
         if (empty($data)){
             $this->Success(['data'=>[]]);
