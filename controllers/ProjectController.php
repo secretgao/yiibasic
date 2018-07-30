@@ -467,7 +467,7 @@ class ProjectController extends BasicController
      */
     public function actionDel()
     {
-        //$this->isPost();
+        $this->isPost();
         $projectId = $this->getParam('projectId',true);
         $userId    = $this->getParam('userId',true);
 
