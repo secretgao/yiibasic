@@ -22,7 +22,8 @@ final class Constants
     const USER_NOT_FOUND            = 1007;
     const POSITIONS_NOT_FOUND       = 1008;
     const APPLY_NOT_FOUND           = 1009;
-    const USER_IS_EXITS           = 1010;
+    const USER_IS_EXITS             = 1010;
+    const EMAIL_IS_ERROR             = 1011;
 
     const REQUSET_NO_POST           = 2000;
     const REQUSET_NO_GET            = 2001;
@@ -41,7 +42,8 @@ final class Constants
         self::POSITIONS_NOT_FOUND =>'部门不存在',
         self::PASSWORD_ERROR  => '密码错误',
         self::APPLY_NOT_FOUND => '申请不存在',
-        self::USER_IS_EXITS  =>'用户已经注册过'
+        self::USER_IS_EXITS  =>'用户已经注册过',
+        self::EMAIL_IS_ERROR=>'邮箱不合法'
     ];
 
 }

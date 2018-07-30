@@ -127,11 +127,18 @@ class UserController extends BasicController
         $userId = $this->getParam('userId',true);
         $phone  = $this->getParam('phone',false);
         $realName = $this->getParam('realName',false);
+        $email = $this->getParam('email',false);
+
+
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+            $this->Error(Constants::EMAIL_IS_ERROR,Constants::$error_message[Constants::EMAIL_IS_ERROR]);
+        }
+
 
         $user = AUser::findOne(['id'=>$userId]);
 
         if (!$user){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
 
         if (is_numeric($phone)){
@@ -141,6 +148,10 @@ class UserController extends BasicController
         if ($realName){
             $user->true_name = $realName;
         }
+        if ($email){
+            $user->email = $email;
+        }
+
         if ($user->save(false)){
             $this->Success();
         }

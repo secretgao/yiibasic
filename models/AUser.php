@@ -10,6 +10,7 @@ use Yii;
  * @property int $id 主键
  * @property string $nick_name 昵称
  * @property string $true_name 真实姓名
+ * @property string $email 邮箱
  * @property string $avatar 头像
  * @property int $status 状态:0 正常  -1 删除
  * @property int $create_time 创建时间
@@ -38,6 +39,7 @@ class AUser extends \yii\db\ActiveRecord
             [['create_time', 'position_id'], 'integer'],
             [['nick_name'], 'string', 'max' => 50],
             [['true_name', 'phone'], 'string', 'max' => 20],
+            [['email'], 'string', 'max' => 60],
             [['avatar'], 'string', 'max' => 255],
             [['status', 'sex', 'group'], 'string', 'max' => 3],
             [['weixin_id'], 'string', 'max' => 100],
@@ -53,6 +55,7 @@ class AUser extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nick_name' => 'Nick Name',
             'true_name' => 'True Name',
+            'email' => 'Email',
             'avatar' => 'Avatar',
             'status' => 'Status',
             'create_time' => 'Create Time',
