@@ -23,15 +23,40 @@ class PositionController extends BasicController
      */
     public function actionIndex(){
 
-        $parent = APosition::getAll();
-        if (! $parent) {
-            $this->Error();
-        }
-        foreach ($parent as &$item){
-            $item['children'] = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
+        $uid = $this->getParam('userId',true);
+
+        $user = AUser::find()->where(['id'=>$uid,'status'=>0])->asArray()->one();
+
+        if (!$user){
+            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
 
-        $this->Success(['data'=>$parent]);
+        $userPosition[0] = [];
+
+
+        if (!empty($user['position_id'])){
+            $userPosition[0] = APosition::find()->select('id,name')
+                ->where(['id'=>$user['position_id'],'status'=>0])->asArray()->one();
+
+        }
+       // echo '<pre>';print_r($userPosition);
+        $parent = APosition::getAll();
+        if (! $parent) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        if (empty($userPosition[0])){
+            $userPosition[0]['id'] = '-1';
+            $userPosition[0]['name'] = '';
+        }
+        $result = array_merge($userPosition,$parent);
+//echo '<pre>';print_r($userPosition);
+
+      //  echo '<pre>';print_r($result);exit();
+       /* foreach ($parent as &$item){
+            $item['children'] = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
+        }*/
+
+        $this->Success(['data'=>$result]);
 
     }
 
@@ -145,10 +170,10 @@ class PositionController extends BasicController
     public function actionApply()
     {
 
-        $applyId = $this->getParam('applyId',true);
+        $userId = $this->getParam('userId',true);
         $type = $this->getParam('type',true);
 
-        $apply = APositionApply::findOne(['id'=>$applyId,'status'=>0]);
+        $apply = APositionApply::findOne(['uid'=>$userId,'status'=>0]);
 
         if ( !$apply ){
             $this->Error(Constants::APPLY_NOT_FOUND,Constants::$error_message[Constants::APPLY_NOT_FOUND]);
@@ -163,6 +188,7 @@ class PositionController extends BasicController
             $transaction= Yii::$app->db->beginTransaction();
             try {
                 $apply->status = '1';
+                $apply->update_time  = time();
                 if ( !$apply->save(false)){
                     $this->Error(Constants::RET_ERROR,$apply->getErrors());
                 }
@@ -180,6 +206,7 @@ class PositionController extends BasicController
 
         } else {
             $apply->status = '2';
+            $apply->update_time  = time();
             if ( !$apply->save(false)){
                 $this->Error(Constants::RET_ERROR,$apply->getErrors());
             }

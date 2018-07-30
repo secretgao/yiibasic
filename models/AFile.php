@@ -38,7 +38,7 @@ class AFile extends \yii\db\ActiveRecord
             [['uid', 'create_time', 'project_id', 'catalog_id'], 'integer'],
             [['type'], 'required'],
             [['type', 'status'], 'string', 'max' => 3],
-            [['name'], 'string', 'max' => 50],
+            [['name'], 'string', 'max' => 100],
             [['ext'], 'string', 'max' => 5],
             [['path', 'size'], 'string', 'max' => 200],
         ];

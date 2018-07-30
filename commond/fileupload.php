@@ -30,7 +30,7 @@ class fileupload
 
     const PLEASE_LOGIN_ERROR_CODE = 50001;
     const PLEASE_LOGIN_ERROR_MSG = '请登录';
-    private $uploadDir = './uploads/';//上传文件的存储目录
+    private $uploadDir = './uploads';//上传文件的存储目录
 /*    const UPLOAD_AVATAR_DIR ='/uploadAvatar';//上传头像存储目录
     const UPLOAD_COVER_IMAGE_DIR ='/coverImages';//上传封面图存储目录
     const UPLOAD_BANNER_DIR ='/banner';//上传栏目banner存储目录

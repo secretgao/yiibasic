@@ -34,7 +34,7 @@ class ProjectController extends BasicController
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])->asArray()->all(); 
         
         if (empty($data)){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);            
+            $this->Success(['data'=>[]]);
         }
         
         foreach ($data as &$item){
@@ -111,7 +111,7 @@ class ProjectController extends BasicController
           $projectObj->name = $name;
           $projectObj->start_time = intval(strtotime($startTime));
           $projectObj->description = $description;
-          $projectObj->allow_add = $allowAdd == 0 ? '0' : '1';
+          $projectObj->allow_add = $allowAdd == 'true' ? '1' : '0';
           $projectObj->members = $members;
           $projectObj->create_time = time();
           $projectObj->status = '0';
@@ -226,23 +226,26 @@ class ProjectController extends BasicController
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-   
-        //目录id 切割成数组
-        $catalogIdArr = explode(',', $project['model_id']);
-        
-        $catalogArr =  $temp =  [];  //去除重复目录用
-        foreach ($catalogIdArr as $id){
+
+        //模版id 切割成数组
+        $modelIdArr = explode(',', $project['model_id']);
+
+        $modelArr =  $temp =  [];  //去除重复目录用
+        foreach ($modelIdArr as $id){
             $catalog = helps::getParents($id);
+            if (!$catalog){
+                continue;
+            }
             foreach ($catalog as $item){
                 //去除重复
-                if (!in_array($item['id'], $catalogArr)) {
+                if (!in_array($item['id'], $modelArr)) {
                     $temp[] = $item;
-                    $catalogArr[]= $item['id'];
+                    $modelArr[]= $item['id'];
                 }
             }
         }
 
-       // echo '<pre>';print_r($catalogArr);exit();
+      //  echo '<pre>';print_r($catalogArr);exit();
         $data = helps::getson($temp,0,1);  //附上层级
 
        // echo '<pre>';print_r($data);exit();
@@ -259,7 +262,7 @@ class ProjectController extends BasicController
         //说明是顶级返回子集
         if ($parent && $parent['pid'] == 0){
             $result = AModel::find()->select('id,name,pid')
-                ->where(['pid'=>$parentId,'status'=>0])->asArray()->all();
+                ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
 
             foreach ($result as &$value){
                 $value['level'] = 2;
@@ -267,19 +270,48 @@ class ProjectController extends BasicController
         }
 
         //根据最后返回信息 遍历 是否存在文件
-
+//echo '<pre>';print_r($result);
+        $fileId = [];
         foreach ($result as $k=>$cata){
-
+            $result[$k]['type'] = '0';
             $file = AFile::find()->select('id,name,path,type')
                 ->where([
                     'uid'=>$userId,
                     'project_id'=>$projectId,
                     'status'=>0,
                     'catalog_id'=>$cata['id']
-                ])->asArray()->all();
-            if ($file){
-                $result[$k]['file'] = $file;
+                ])
+                ->asArray()->all();
+            if ($parentId == 0){
+                $file = AFile::find()->select('id,name,path,type')
+                    ->where([
+                        'uid'=>$userId,
+                        'project_id'=>$projectId,
+                        'status'=>0,
+                        'catalog_id'=>0
+                    ])
+                    ->asArray()->all();
             }
+
+            if ($file){
+                foreach ($file as $item){
+                    if (!in_array($item['id'],$fileId)){
+                        $fileId[] = $item['id'];
+                        array_push($result,$item);
+                    }
+                }
+            }
+        }
+
+
+        //项目目录
+        $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
+        if ($cata) {
+            foreach ($cata as &$value){
+                $value['type'] = '0';
+            }
+
+            $result = array_merge($result,$cata);
         }
 
         $this->Success(['data'=>$result]);

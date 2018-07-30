@@ -50,7 +50,10 @@ class helps {
  
         $data = AModel::find()->select('id,name,pid')
         ->where(['id'=>$id,'status'=>0])->asArray()->one();
-     
+
+        if (!$data) {
+            return false;
+        }
         $arr[] = $data;    
         if ($data['pid'] == 0){          
             return  $arr;       

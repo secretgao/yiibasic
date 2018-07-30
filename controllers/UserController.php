@@ -96,11 +96,12 @@ class UserController extends BasicController
         }
         $user = [];
         foreach ($data as $item){
-            $userInfo = AUser::find()->select('true_name,position_id')
+            $userInfo = AUser::find()->select('true_name,position_id,phone')
                 ->where(['id'=>$item['uid']])->asArray()->one();
             $user[$item['position_id']][] =[
                 'userId'=>$item['uid'],
                 'trueName'=>$userInfo['true_name'],
+                'phone' =>$userInfo['phone']
             ];
         }
 
@@ -162,6 +163,10 @@ class UserController extends BasicController
             $this->Error(Constants::POSITIONS_NOT_FOUND,Constants::$error_message[Constants::POSITIONS_NOT_FOUND]);
         }
 
+        $exitsApply = APositionApply::find()->where(['uid'=>$userId,'status'=>0])->asArray()->one();
+        if ($exitsApply){
+            APositionApply::deleteAll(['uid'=>$userId,'status'=>0]);
+        }
         $apply = new APositionApply();
         $apply->uid = $userId;
         $apply->position_id = $positionId;

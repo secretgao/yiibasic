@@ -96,6 +96,7 @@ class FileController extends BasicController
             $file->path = $filePath;
             $file->create_time = time();
             $file->project_id = $projectId;
+            $file->catalog_id = $catalogId;
 
             if ($file->insert()) {
                 $this->Success();
@@ -104,14 +105,6 @@ class FileController extends BasicController
 
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
-    
-    /**
-     * 下载
-     */
-    public function actionEdit(){
-   
-    }
-
 
     
     public function actionFileList(){
@@ -178,7 +171,7 @@ class FileController extends BasicController
             if ($file->save()){
                 $this->Success($fileInfo);
             } else {
-                $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+                $this->Error(Constants::RET_ERROR,$file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
             }
         }
         $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
