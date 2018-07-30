@@ -270,29 +270,60 @@ class ProjectController extends BasicController
         }
 
         //根据最后返回信息 遍历 是否存在文件
-//echo '<pre>';print_r($result);
+//echo '<pre>';print_r($result);exit();
         $fileId = [];
-        foreach ($result as $k=>$cata){
-            $result[$k]['type'] = '0';
+        if ($result){
+
+            foreach ($result as $k=>$cata){
+                $result[$k]['type'] = '0';
+
+                if ($parentId == 0){
+                    $file = AFile::find()->select('id,name,path,type')
+                        ->where([
+                            'uid'=>$userId,
+                            'project_id'=>$projectId,
+                            'status'=>0,
+                            'catalog_id'=>0
+                        ])
+                        ->asArray()->all();
+                } else {
+                    $file = AFile::find()->select('id,name,path,type')
+                        ->where([
+                            'uid'=>$userId,
+                            'project_id'=>$projectId,
+                            'status'=>0,
+                            'catalog_id'=>$cata['pid']
+                        ])
+                        ->asArray()->all();
+                }
+
+                if ($file){
+                    foreach ($file as $item){
+                        if (!in_array($item['id'],$fileId)){
+                            $fileId[] = $item['id'];
+                            array_push($result,$item);
+                        }
+                    }
+                }
+            }
+
+            //项目目录
+            $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
+            if ($cata) {
+                foreach ($cata as &$value){
+                    $value['type'] = '0';
+                }
+                $result = array_merge($result,$cata);
+            }
+        } else {
             $file = AFile::find()->select('id,name,path,type')
                 ->where([
                     'uid'=>$userId,
                     'project_id'=>$projectId,
                     'status'=>0,
-                    'catalog_id'=>$cata['id']
+                    'catalog_id'=>$parentId
                 ])
                 ->asArray()->all();
-            if ($parentId == 0){
-                $file = AFile::find()->select('id,name,path,type')
-                    ->where([
-                        'uid'=>$userId,
-                        'project_id'=>$projectId,
-                        'status'=>0,
-                        'catalog_id'=>0
-                    ])
-                    ->asArray()->all();
-            }
-
             if ($file){
                 foreach ($file as $item){
                     if (!in_array($item['id'],$fileId)){
@@ -302,18 +333,7 @@ class ProjectController extends BasicController
                 }
             }
         }
-
-
-        //项目目录
-        $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
-        if ($cata) {
-            foreach ($cata as &$value){
-                $value['type'] = '0';
-            }
-
-            $result = array_merge($result,$cata);
-        }
-
+//echo '<pre>';print_r($result);exit;
         $this->Success(['data'=>$result]);
        
     }
