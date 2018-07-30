@@ -26,6 +26,10 @@ class RegisterController extends BasicController
         $id       = $this->getParam('id',true);
         $img      = $this->getParam('url',true);
 
+        $idExits = AUser::find()->where(['status'=>0,'weixin_id'=>$id])->exists();
+        if ($idExits){
+            $this->Error(Constants::USER_IS_EXITS,Constants::$error_message[Constants::USER_IS_EXITS]);
+        }
 
         $group = AUser::find()->where(['status'=>0,'group'=>1])->count();
 
