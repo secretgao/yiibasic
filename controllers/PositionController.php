@@ -139,7 +139,7 @@ class PositionController extends BasicController
     }
 
     /**
-     *
+     *部门申请 通过与拒绝
      */
 
     public function actionApply()
