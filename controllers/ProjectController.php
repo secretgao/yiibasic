@@ -460,4 +460,31 @@ class ProjectController extends BasicController
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
+
+
+    /**
+     *删除项目
+     */
+    public function actionDel()
+    {
+        //$this->isPost();
+        $projectId = $this->getParam('projectId',true);
+        $userId    = $this->getParam('userId',true);
+
+        $project = AProject::findOne(['id'=>$projectId,'create_uid'=>$userId]);
+
+        if (!$project) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+        if ($project->status == 4){
+            $this->Error(Constants::PROJECT_ALREADY_DEL,Constants::$error_message[Constants::PROJECT_ALREADY_DEL]);
+        }
+
+        $project->status = '4';
+        if ($project->save(false)){
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
 }
