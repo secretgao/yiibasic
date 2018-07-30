@@ -414,7 +414,7 @@ class ProjectController extends BasicController
             }
         }
 
-        $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result]);
+        $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result,'create_uid'=>$uid]);
     }
 
 
