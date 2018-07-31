@@ -130,9 +130,7 @@ class UserController extends BasicController
         $email = $this->getParam('email',false);
 
 
-        if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-            $this->Error(Constants::EMAIL_IS_ERROR,Constants::$error_message[Constants::EMAIL_IS_ERROR]);
-        }
+
 
 
         $user = AUser::findOne(['id'=>$userId]);
@@ -149,6 +147,9 @@ class UserController extends BasicController
             $user->true_name = $realName;
         }
         if ($email){
+            if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+                $this->Error(Constants::EMAIL_IS_ERROR,Constants::$error_message[Constants::EMAIL_IS_ERROR]);
+            }
             $user->email = $email;
         }
 
