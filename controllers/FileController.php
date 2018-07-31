@@ -249,4 +249,56 @@ class FileController extends BasicController
         exit();
 
     }
+
+
+    /**
+     * 项目打包
+     * @return array
+     */
+    public function actionProjectPack()
+    {
+        $projectId = 70;//$this->getParam('projectId',true,70);
+        $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
+
+        if (empty($project)) {
+
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+
+        }
+        $projectName = $project['name'];
+        $modelId = $project['model_id'];
+
+        $dir = './uploads/project';
+        $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
+        $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
+        //创建项目根目录
+        if (!is_dir($projectPath)){
+            mkdir($projectPath,0777,true);
+        }
+
+        echo "projectPath:".$projectPath.PHP_EOL;
+
+        //打包
+        $zip = new \ZipArchive();
+        if($zip->open($projectPath.'.zip', \ZipArchive::OVERWRITE)=== TRUE){
+            $this->addFileToZip($projectPath, $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
+            $zip->close(); //关闭处理的zip文件
+        }
+        var_dump($project);
+    }
+
+
+    private  function addFileToZip($path,$zip){
+        $handler=opendir($path); //打开当前文件夹由$path指定。
+        while(($filename=readdir($handler))!==false){
+            if($filename != "." && $filename != ".."){//文件夹文件名字为'.'和‘..'，不要对他们进行操作
+                if(is_dir($path."/".$filename)){// 如果读取的某个对象是文件夹，则递归
+                    $this->addFileToZip($path."/".$filename, $zip);
+                }else{ //将文件加入zip对象
+                    $zip->addFile($path."/".$filename);
+                }
+            }
+        }
+        @closedir($path);
+    }
 }

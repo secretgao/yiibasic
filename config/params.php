@@ -4,8 +4,8 @@ return [
 
     'mail' =>[
         'host'=>'smtp.qq.com',
-        'userName'=>'891841626@qq.com',
-        'password'=>'fwfiiyatpdlvbfib',
+        'username'=>'891841626@qq.com',
+        'password'=>'srdunpdhnzntbfei',
         'port'=>465
     ]
 ];
