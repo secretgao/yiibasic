@@ -69,8 +69,8 @@ class UserController extends BasicController
     public function actionIndex()
     {
         $data = APosition::find()->select('id as positionId,name as positionName')->where(['status'=>0])->asArray()->all();
-        if (!$data){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        if (!$data) {
+            $this->Success(['data'=>[]]);
         }
 
         foreach ($data as &$item){
@@ -92,7 +92,7 @@ class UserController extends BasicController
             ->orderBy('create_time DESC')->asArray()->all();
 
         if (!$data){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+            $this->Success(['data'=>[]]);
         }
         $user = [];
         foreach ($data as $item){

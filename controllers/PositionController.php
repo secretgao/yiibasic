@@ -27,8 +27,8 @@ class PositionController extends BasicController
 
         $user = AUser::find()->where(['id'=>$uid,'status'=>0])->asArray()->one();
 
-        if (!$user){
-            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
+        if (!$user) {
+            $this->Success(['data'=>[]]);
         }
 
         $userPosition[0] = [];
@@ -42,7 +42,7 @@ class PositionController extends BasicController
        // echo '<pre>';print_r($userPosition);
         $parent = APosition::getAll();
         if (! $parent) {
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+            $this->Success(['data'=>[]]);
         }
         if (empty($userPosition[0])){
             $userPosition[0]['id'] = '-1';
