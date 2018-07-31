@@ -5,9 +5,9 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%a_file}}".
+ * This is the model class for table "a_file".
  *
- * @property int $id
+ * @property string $id
  * @property int $uid 用户id
  * @property int $type 文件类型 1图片 2视频 3附件 4 笔记
  * @property string $name 文件名
@@ -22,7 +22,7 @@ use Yii;
  * @property string $exif_latitude exif 纬度
  * @property string $exif_longitude exif 经度
  * @property string $gps_latitude gps 纬度
- * @property string $gps_loginitude gps 经度
+ * @property string $gps_longitude gps 经度
  */
 class AFile extends \yii\db\ActiveRecord
 {
@@ -31,7 +31,7 @@ class AFile extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%a_file}}';
+        return 'a_file';
     }
 
     /**
@@ -47,7 +47,7 @@ class AFile extends \yii\db\ActiveRecord
             [['ext'], 'string', 'max' => 5],
             [['path', 'size'], 'string', 'max' => 200],
             [['exif_date'], 'string', 'max' => 30],
-            [['exif_latitude', 'exif_longitude', 'gps_latitude', 'gps_loginitude'], 'string', 'max' => 60],
+            [['exif_latitude', 'exif_longitude', 'gps_latitude', 'gps_longitude'], 'string', 'max' => 60],
         ];
     }
 
@@ -72,7 +72,7 @@ class AFile extends \yii\db\ActiveRecord
             'exif_latitude' => 'Exif Latitude',
             'exif_longitude' => 'Exif Longitude',
             'gps_latitude' => 'Gps Latitude',
-            'gps_loginitude' => 'Gps Loginitude',
+            'gps_longitude' => 'Gps Longitude',
         ];
     }
 }
