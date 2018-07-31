@@ -44,7 +44,7 @@ class Email {
     function sendfile() {
         $headers = $this->smtp_headers . $this->mime_headers;
         $message = $this->text_body . $this->text_encoded;
-        mail($this->addr_to,$this->subject,$message,$headers);
+        return mail($this->addr_to,$this->subject,$message,$headers);
     }
 
     function write_body($msgtext) {
