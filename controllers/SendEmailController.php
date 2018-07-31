@@ -46,6 +46,8 @@ class SendEmailController extends BasicController
         $excelname ='aaa.jpg';
 
         $mailfile = new Email($subject,$sendto,$replyto,$message,$filename,$excelname,$mimetype);
-        $mailfile->sendfile();
+        $res = $mailfile->sendfile();
+
+        echo '<pre>';print_r($res);
     }
 }
