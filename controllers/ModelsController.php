@@ -30,7 +30,7 @@ class ModelsController extends BasicController
             $uid = 1;
         }*/
         $data = AModel::find()->select('id,name,pid')
-            ->where(['status'=>0,'create_uid'=>1,'project_id'=>0])->asArray()->all();
+            ->where(['status'=>0,'project_id'=>0])->asArray()->all();
         
         if (empty($data)){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);    
