@@ -1,4 +1,5 @@
 <?php
+namespace app\commond\PHPMailer;
 /**
  * PHPMailer Exception class.
  * PHP Version 5.5.
@@ -17,7 +18,7 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
-namespace app\commond\PHPMailer\PHPMailer;
+
 
 
 /**
