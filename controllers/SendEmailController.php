@@ -38,7 +38,7 @@ class SendEmailController extends BasicController
             $mail->isSMTP();
             $mail->CharSet='utf-8';                                 //设置字符集// Set mailer to use SMTP
             $mail->Host = $config['mail']['host'];                          // Specify main and backup SMTP servers
-            $mail->SMTPAuth = true;                                 // Enable SMTP authentication
+            $mail->SMTPAuth = false;                                 // Enable SMTP authentication
             $mail->Username = $config['mail']['userName'];                  // SMTP username
             $mail->Password = $config['mail']['password'];                           // SMTP password
             $mail->SMTPSecure = 'tls';                              // Enable TLS encryption, `ssl` also accepted
@@ -46,8 +46,8 @@ class SendEmailController extends BasicController
 
             //Recipients
            // $mail->setFrom('from@example.com', 'Mailer');
-            $mail->addAddress('gaoxinyu@imooc.com', 'Joe User');     // Add a recipient
-            $mail->addAddress('gaoxinyu@imooc.com');               // Name is optional
+            $mail->addAddress('891841626@qq.com', 'Joe User');     // Add a recipient
+        //    $mail->addAddress('gaoxinyu@imooc.com');               // Name is optional
 
 
             //Attachments
