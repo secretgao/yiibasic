@@ -160,7 +160,8 @@ class FileController extends BasicController
         $gpsLongitude = $this->getParam('gps_longitude',true);
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId);
-
+        $this->Success(['data'=>$_POST]);
+        exit();
         if (isset($fileInfo['status'])){
             $file = new AFile();
             $file->uid = $userId;
