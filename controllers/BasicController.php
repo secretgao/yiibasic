@@ -59,14 +59,13 @@ class BasicController extends Controller
             }
 
         }
-        
-      
+
         if ( ($is_need && $val === NULL) || ($is_need && $val === '') )
         {
             $this->Error(Constants::GLOBAL_INVALID_PARAM, 'required param: ' . $key);
         }
       
-        return $val!==NULL ? $val : $default_value;
+        return $val!== NULL ? $val : $default_value;
     }
     
     

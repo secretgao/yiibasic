@@ -247,10 +247,10 @@ class ProjectController extends BasicController
             }
         }
 
-      //  echo '<pre>';print_r($catalogArr);exit();
+       // echo '<pre>';print_r($modelIdArr);exit();
         $data = helps::getson($temp,0,1);  //附上层级
 
-       // echo '<pre>';print_r($data);exit();
+
         $result = [];
         if ($data) {
             foreach ($data as $value) {
@@ -259,17 +259,18 @@ class ProjectController extends BasicController
                 }
             }
         }
-        $parent = AModel::find()->where(['id'=>$parentId,'status'=>0])->asArray()->one();
-
+       /* $parent = AModel::find()->where(['id'=>$parentId,'status'=>0])->asArray()->one();
+        echo 'result<pre>';print_r($result);
         //说明是顶级返回子集
         if ($parent && $parent['pid'] == 0){
+            echo '<hr>';
             $result = AModel::find()->select('id,name,pid')
                 ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
 
             foreach ($result as &$value){
                 $value['level'] = 2;
             }
-        }
+        }*/
 
         //根据最后返回信息 遍历 是否存在文件
 //echo '<pre>';print_r($result);exit();

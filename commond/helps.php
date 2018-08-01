@@ -5,7 +5,8 @@ use app\models\AModel;
 
 class helps {
     
-   static function make_tree($arr){
+   static function make_tree($arr)
+   {
         $refer = array();
         $tree = array();
         foreach($arr as $k => $v){
@@ -22,9 +23,10 @@ class helps {
             }
         }
         return $tree;
-    }
+   }
     
-    static function getson($arr,$pid=0,$level){
+   static function getson($arr,$pid=0,$level)
+   {
         static $res;//静态变量 只会被初始化一次
         foreach($arr as $k=>$v){
             $ctid = intval($v['pid']);
@@ -37,13 +39,14 @@ class helps {
             }
         }
         return $res;
-    }
+   }
     
     /**
      * 根据子目录查找 父级
      * @param unknown $id
      */
-    public static  function getParents($id,$arr = []){           
+    public static  function getParents($id,$arr = [])
+    {
         if (empty($id)){
             return $arr;
         }
@@ -66,7 +69,8 @@ class helps {
     /**
      * 根据多个底层目录id 返回整个目录结构
      */
-    public static function accordingCatalogToAllHierarchy($selectModuleIds){
+    public static function accordingCatalogToAllHierarchy($selectModuleIds)
+    {
         
         $result = $temp = [];
         if (empty($selectModuleIds)){
@@ -99,8 +103,8 @@ class helps {
      * @return mixed
      * 完美过滤特殊字符串
      */
-    public static function replace_specialChar($strParam){
-
+    public static function replace_specialChar($strParam)
+    {
         $regex = "/\/|\～|\，|\。|\！|\？|\“|\”|\【|\】|\『|\』|\：|\；|\《|\》|\’|\‘|\ |\·|\~|\!|\#|\\$|\%|\^|\&|\*|\(|\)|\_|\+|\{|\}|\:|\<|\>|\?|\[|\]|\/|\;|\'|\`|\-|\=|\\\|\|/";
         return preg_replace($regex,"",$strParam);
     }
@@ -148,8 +152,13 @@ class helps {
     }
 
 
+    /**
+     * 记录日志
+     * @param $message
+     */
+    public static function writeLog($message){
 
-    
+    }
     
     
 }
