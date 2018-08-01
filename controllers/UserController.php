@@ -69,7 +69,7 @@ class UserController extends BasicController
     public function actionIndex()
     {
         $data = APosition::find()->select('id as positionId,name as positionName')->where(['status'=>0])->asArray()->all();
-        if (!$data) {
+        if (!$data){
             $this->Success(['data'=>[]]);
         }
 

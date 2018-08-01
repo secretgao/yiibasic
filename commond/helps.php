@@ -68,8 +68,39 @@ class helps {
     /**根据顶级id 获取所有子集
      * @param $id
      */
-    public static function getChile($id){
+    public static function getChildren($id,$result = []){
 
+        if (empty($id)){
+            return $result;
+        }
+
+        $result = AModel::find()->select('id,name,pid')
+            ->where(['pid'=>$id,'status'=>0])->asArray()->one();
+
+        if (empty($data)) {
+            return  $result;
+            //return false;
+        }
+        //$arr[] = $data;
+        return self::getChildren($data['pid'],$result);
+    }
+
+
+    public static function recursion($res)
+    {
+        $output = array();
+        foreach ($res as $k => $v)
+        {
+            $tmpRes = AModel::find()->select('id,name,pid')
+                ->where(['pid'=>$v['id'],'project_id'=>0,'status'=>0])
+                ->asArray()->all();
+            $output []= $v;
+            if (!empty($tmpRes))
+            {
+                $output = array_merge($output, self::recursion($tmpRes));
+            }
+        }
+        return $output;
     }
     
     /**

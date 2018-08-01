@@ -264,6 +264,15 @@ class ProjectController extends BasicController
                     }
                 }
             }
+            //特殊情况 要把所有层级找出来然后筛选
+            if (empty($result)){
+                $allstep = $this->getAllStep($projectId);
+                foreach ($allstep as $item){
+                    if ($parentId == $item['pid']){
+                        $result[] = $item;
+                    }
+                }
+            }
         }
 
         //根据最后返回信息 遍历 是否存在文件
@@ -485,26 +494,38 @@ class ProjectController extends BasicController
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 
-    public function actionTest()
+    /**
+     * 根据项目返回所有层级
+     * @param $projectId
+     * @return array
+     *
+     */
+
+    private function getAllStep($projectId)
     {
-        $id = 153;
-        $projectId = 111;
+
+        //$projectId = 111;
         $project = AProject::find()->select('model_id')
             ->where(['id'=>$projectId])->asArray()->one();
         $modelIdArr = explode(',', $project['model_id']);
-        $result = [];
+        $top = $step = [];
         //说明是顶级返回所有子集
-        if (count($modelIdArr) == 1){
-            $a = helps::getParents($project['model_id']);
+        if (count($modelIdArr) == 1) {
+            $top = helps::getParents($project['model_id']);
+        }
 
-        }
-        $dingjiId = 0;
-        foreach ($a as $item){
-            if ($item['pid'] == 0){
-                $dingjiId = $item['id'];
+        $toparr = [];
+        if ($top) {
+            foreach ($top as $item){
+                if ($item['pid'] == 0){
+                    $toparr[] = $item;
+                }
             }
+
+            $all = helps::recursion($toparr);
+            $step  = helps::getson($all,0,1);
         }
-echo '<pre>';print_r($a);
-echo '<pre>';print_r($dingjiId);
+
+        return $step;
     }
 }
