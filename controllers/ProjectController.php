@@ -231,46 +231,40 @@ class ProjectController extends BasicController
 
         //模版id 切割成数组
         $modelIdArr = explode(',', $project['model_id']);
-
-        $modelArr =  $temp =  [];  //去除重复目录用
-        foreach ($modelIdArr as $id){
-            $catalog = helps::getParents($id);
-            if (!$catalog){
-                continue;
-            }
-            foreach ($catalog as $item){
-                //去除重复
-                if (!in_array($item['id'], $modelArr)) {
-                    $temp[] = $item;
-                    $modelArr[]= $item['id'];
-                }
-            }
-        }
-
-       // echo '<pre>';print_r($modelIdArr);exit();
-        $data = helps::getson($temp,0,1);  //附上层级
-
-
         $result = [];
-        if ($data) {
-            foreach ($data as $value) {
-                if ($value['pid'] == $parentId){
-                    $result[] = $value;
-                }
-            }
-        }
-       /* $parent = AModel::find()->where(['id'=>$parentId,'status'=>0])->asArray()->one();
-        echo 'result<pre>';print_r($result);
-        //说明是顶级返回子集
-        if ($parent && $parent['pid'] == 0){
-            echo '<hr>';
+        //说明是顶级返回所有子集
+        if (count($modelIdArr) == 1 && $project['model_id'] == $parentId){
             $result = AModel::find()->select('id,name,pid')
                 ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
-
             foreach ($result as &$value){
                 $value['level'] = 2;
             }
-        }*/
+        } else {
+            $modelArr =  $temp =  [];  //去除重复目录用
+            foreach ($modelIdArr as $id){
+                $catalog = helps::getParents($id);
+                if (!$catalog){
+                    continue;
+                }
+                foreach ($catalog as $item){
+                    //去除重复
+                    if (!in_array($item['id'], $modelArr)) {
+                        $temp[] = $item;
+                        $modelArr[]= $item['id'];
+                    }
+                }
+            }
+            // echo '<pre>';print_r($modelIdArr);exit();
+            $data = helps::getson($temp,0,1);  //附上层级
+
+            if ($data) {
+                foreach ($data as $value) {
+                    if ($value['pid'] == $parentId){
+                        $result[] = $value;
+                    }
+                }
+            }
+        }
 
         //根据最后返回信息 遍历 是否存在文件
 //echo '<pre>';print_r($result);exit();
