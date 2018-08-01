@@ -62,9 +62,15 @@ class helps {
             return  $arr;       
         }       
         return self::getParents($data['pid'],$arr);
-    } 
-   
+    }
 
+
+    /**根据顶级id 获取所有子集
+     * @param $id
+     */
+    public static function getChile($id){
+
+    }
     
     /**
      * 根据多个底层目录id 返回整个目录结构

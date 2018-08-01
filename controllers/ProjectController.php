@@ -484,4 +484,27 @@ class ProjectController extends BasicController
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
+
+    public function actionTest()
+    {
+        $id = 153;
+        $projectId = 111;
+        $project = AProject::find()->select('model_id')
+            ->where(['id'=>$projectId])->asArray()->one();
+        $modelIdArr = explode(',', $project['model_id']);
+        $result = [];
+        //说明是顶级返回所有子集
+        if (count($modelIdArr) == 1){
+            $a = helps::getParents($project['model_id']);
+
+        }
+        $dingjiId = 0;
+        foreach ($a as $item){
+            if ($item['pid'] == 0){
+                $dingjiId = $item['id'];
+            }
+        }
+echo '<pre>';print_r($a);
+echo '<pre>';print_r($dingjiId);
+    }
 }
