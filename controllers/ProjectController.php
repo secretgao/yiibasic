@@ -38,11 +38,11 @@ class ProjectController extends BasicController
         if (empty($data)){
             $this->Success(['data'=>[],'isCertified'=>$isPosition]);
         }
-        
+        $nowTime = time();
         foreach ($data as &$item){
             $usedTime = '';
-            if (time() > $item['start_time']) {
-                $usedTime = helps::timediff(time(),$item['start_time']);
+            if ($nowTime > $item['start_time']) {
+                $usedTime = helps::timediff($nowTime,$item['start_time']);
             }
             $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
             $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
