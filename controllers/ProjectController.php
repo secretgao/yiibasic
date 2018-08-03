@@ -367,6 +367,10 @@ class ProjectController extends BasicController
             $project->members = $members;
         }
         if ($projectStatus){
+            if ($projectStatus == 1){
+                $project->start_time = time();
+            }
+
             $project->status = $projectStatus;
         }
 
