@@ -30,13 +30,13 @@ class ProjectController extends BasicController
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
 
-       // exit();
+
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])
             ->andWhere(['!=','status',4])
             ->orderBy('sort ASC')->asArray()->all();
-        
+        $isPosition = AUser::getUserIsPosition($uid);
         if (empty($data)){
-            $this->Success(['data'=>[]]);
+            $this->Success(['data'=>[],'isCertified'=>$isPosition]);
         }
         
         foreach ($data as &$item){
@@ -52,7 +52,7 @@ class ProjectController extends BasicController
             $item['used_time']  = $usedTime;
         }
 
-        $this->Success(['data'=>$data]);
+        $this->Success(['data'=>$data,'isCertified'=>$isPosition]);
     
     }
 
