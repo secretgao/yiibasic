@@ -233,7 +233,7 @@ class ProjectController extends BasicController
         $modelIdArr = explode(',', $project['model_id']);
         $result = [];
         //说明是顶级返回所有子集
-        if (count($modelIdArr) == 1 && $project['model_id'] == $parentId){
+        if ($project['model_id'] == $parentId  || in_array($parentId,$modelIdArr)){
             $result = AModel::find()->select('id,name,pid')
                 ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
             foreach ($result as &$value){
