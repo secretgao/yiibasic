@@ -30,19 +30,19 @@ class ProjectController extends BasicController
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
 
-       // exit();
+
         $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])
             ->andWhere(['!=','status',4])
             ->orderBy('sort ASC')->asArray()->all();
-        
+        $isPosition = AUser::getUserIsPosition($uid);
         if (empty($data)){
-            $this->Success(['data'=>[]]);
+            $this->Success(['data'=>[],'isCertified'=>$isPosition]);
         }
-        
+        $nowTime = time();
         foreach ($data as &$item){
             $usedTime = '';
-            if (time() > $item['start_time']) {
-                $usedTime = helps::timediff(time(),$item['start_time']);
+            if ($nowTime > $item['start_time']) {
+                $usedTime = helps::timediff($nowTime,$item['start_time']);
             }
             $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
             $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
@@ -52,7 +52,7 @@ class ProjectController extends BasicController
             $item['used_time']  = $usedTime;
         }
 
-        $this->Success(['data'=>$data]);
+        $this->Success(['data'=>$data,'isCertified'=>$isPosition]);
     
     }
 
@@ -353,18 +353,24 @@ class ProjectController extends BasicController
         $projectId = $this->getParam('projectId',true);
         $projectStatus = $this->getParam('status',false);
         $selectUserIds  = $this->getParam('selectUserIds',false);
-// `status` tinyint(3) DEFAULT '0' COMMENT '项目状态   0 未开始  1 进行中  2 已结束  3 暂停',
+        // `status` '项目状态   0 未开始  1 进行中  2 已结束  3 暂停 4删除',
         $project = AProject::findOne(['id'=>$projectId,'create_uid'=>$userId]);
 
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
         if ($selectUserIds){
-            $members = count(explode(',',$selectUserIds));
-            $project->join_uid = $selectUserIds;
+            $joinUid = $project->join_uid;
+            $joinUid .= ','.$selectUserIds;
+            $members = count(explode(',',$joinUid));
+            $project->join_uid = $joinUid;
             $project->members = $members;
         }
         if ($projectStatus){
+            if ($projectStatus == 1){
+                $project->start_time = time();
+            }
+
             $project->status = $projectStatus;
         }
 

@@ -66,4 +66,21 @@ class AUser extends \yii\db\ActiveRecord
             'weixin_id' => 'Weixin ID',
         ];
     }
+
+    /**
+     * 判断用户是否有部门
+     */
+    public static function getUserIsPosition($uid){
+
+        if (empty($uid)) {
+            return false;
+        }
+
+        $position = self::find()->select('position_id')->where(['id'=>$uid,'status'=>0])->scalar();
+
+        if (empty($position)) {
+            return false;
+        }
+        return true;
+    }
 }
