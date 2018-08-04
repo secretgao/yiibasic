@@ -54,6 +54,16 @@ class ModelsController extends BasicController
 
         $projectId = $this->getParam('projectId',false);
         $createUid = $this->getParam('userId',true);
+
+        $level = 1;
+
+        //模型带上层级
+        if (!empty($pid) && $type == 0){
+            $level = AModel::find()->select('level')
+                ->where(['id'=>$pid,'type'=>0,'status'=>0])->scalar();
+            $level = intval($level) + 1;
+        }
+
         $Obj = new AModel();
         $Obj->name = $name;
         $Obj->create_time = time();
@@ -61,6 +71,7 @@ class ModelsController extends BasicController
         $Obj->create_uid = $createUid;
         $Obj->type = empty($type) ? '0' : (string)$type;
         $Obj->pid = empty($pid) ? 0 : $pid;
+        $Obj->level = $level;
 
        
         if ($Obj->insert()) {

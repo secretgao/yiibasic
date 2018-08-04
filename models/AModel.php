@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "a_model".
+ * This is the model class for table "{{%a_model}}".
  *
  * @property int $id
  * @property string $name
@@ -13,9 +13,10 @@ use Yii;
  * @property int $type 区分 0是 模版  1是目录 
  * @property int $create_time
  * @property int $update_time
- * @property int $pid
- * @property int $project_id
- * @property int $create_uid
+ * @property int $pid 父id
+ * @property int $project_id 项目id
+ * @property int $create_uid 创建id
+ * @property int $level 层级
  */
 class AModel extends \yii\db\ActiveRecord
 {
@@ -24,7 +25,7 @@ class AModel extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'a_model';
+        return '{{%a_model}}';
     }
 
     /**
@@ -33,7 +34,7 @@ class AModel extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_time', 'update_time', 'pid', 'project_id', 'create_uid'], 'integer'],
+            [['create_time', 'update_time', 'pid', 'project_id', 'create_uid', 'level'], 'integer'],
             [['name'], 'string', 'max' => 20],
             [['status', 'type'], 'string', 'max' => 2],
         ];
@@ -54,6 +55,7 @@ class AModel extends \yii\db\ActiveRecord
             'pid' => 'Pid',
             'project_id' => 'Project ID',
             'create_uid' => 'Create Uid',
+            'level' => 'Level',
         ];
     }
 }
