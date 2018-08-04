@@ -254,9 +254,9 @@ class ProjectController extends BasicController
                     }
                 }
             }
-            // echo '<pre>';print_r($modelIdArr);exit();
+           //  echo '<pre>';print_r($modelIdArr);exit();
             $data = helps::getson($temp,0,1);  //附上层级
-
+           // echo '<pre>';print_r($data);exit();
             if ($data) {
                 foreach ($data as $value) {
                     if ($value['pid'] == $parentId){
@@ -322,6 +322,14 @@ class ProjectController extends BasicController
                 $result = array_merge($result,$cata);
             }
         } else {
+            //项目目录
+            $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
+            if ($cata) {
+                foreach ($cata as &$value){
+                    $value['type'] = '0';
+                }
+                $result = array_merge($result,$cata);
+            }
             $file = AFile::find()->select('id,name,path,type')
                 ->where([
                     'uid'=>$userId,
