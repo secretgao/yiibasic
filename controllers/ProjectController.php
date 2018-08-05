@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\commond\Constants;
 use app\models\AFile;
 use app\models\APosition;
+use app\models\AProjectExt;
 use app\models\AUser;
 use Yii;
 use app\models\AModel;
@@ -31,65 +32,45 @@ class ProjectController extends BasicController
         $time = $this->getParam('time',true);
 
 
-        $data = AProject::find()->where(['create_uid'=>$uid,'year'=>$time])
+        $createProejct = AProject::find()->where(['create_uid'=>$uid,
+            'year'=>$time])
             ->andWhere(['!=','status',4])
             ->orderBy('sort ASC')->asArray()->all();
         $isPosition = AUser::getUserIsPosition($uid);
-        if (empty($data)){
-            $this->Success(['data'=>[],'isCertified'=>$isPosition]);
+        $joinProjectId = AProjectExt::find()->select('project_id')
+        ->where(['uid'=>$uid])->asArray()->column();
+        $joinProject = [];
+        if ($joinProjectId) {
+
+            $joinProject = AProject::find()->where(['in','id',$joinProjectId])->andWhere(['year'=>$time])->andWhere(['!=','status',4])->orderBy('sort ASC')->asArray()
+                ->all();
         }
-        $nowTime = time();
-        foreach ($data as &$item){
-            $usedTime = '';
-            if ($nowTime > $item['start_time']) {
-                $usedTime = helps::timediff($nowTime,$item['start_time']);
+        $data = array_merge($createProejct,$joinProject);
+        if ($data) {
+            $nowTime = time();
+            foreach ($data as &$item){
+                $usedTime = '';
+                if ($nowTime > $item['start_time']) {
+                    $usedTime = helps::timediff($nowTime,$item['start_time']);
+                }
+                $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
+                $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
+                $item['status'] = intval($item['status']);
+                $item['members'] = intval($item['members']);
+                $item['describe'] = $item['description'];
+                $item['used_time']  = $usedTime;
             }
-            $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
-            $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
-            $item['status'] = intval($item['status']);
-            $item['members'] = intval($item['members']);
-            $item['describe'] = $item['description'];
-            $item['used_time']  = $usedTime;
+
         }
+
 
         $this->Success(['data'=>$data,'isCertified'=>$isPosition]);
     
     }
 
 
-    public function actionGetModels(){
-        //$id = 21;
-       // $arr = [18,21];
-        $arr = [21,26];
-       // $res = helps::getParents($id); 
-       // $new = helps::getson($res,0,1);
-        
-       // echo '<pre>';print_r($new);
-        ///$result = helps::make_tree($new);
-       // echo '<pre>';print_r($result);
-        $test= [];
-        $idArr = [];
-        foreach ($arr as $id){
-            $a = helps::getParents($id);
-            foreach ($a as $item){
-                //去除重复
-                if (!in_array($item['id'], $idArr)) {
-                    $test[] = $item;
-                    $idArr[]= $item['id'];
-                }
-                
-            }
-        }
-        
-       
-        $new = helps::getson($test,0,1);
-       // echo '<pre>';print_r($new);
-        $result = helps::make_tree($new);
-       //  echo '<pre>';print_r($result);
-         $this->Success($result);
-        exit();
-    }
-    
+
+
     /**
      * 创建项目
      */
@@ -104,36 +85,51 @@ class ProjectController extends BasicController
           $selectUserIds  = $this->getParam('selectUserIds',true);
 
 
-          $members = count(explode(',',$selectUserIds));
+          $member = (explode(',',$selectUserIds));
 
 
           $uid          = $this->getParam('userId',true);
+          $transaction= Yii::$app->db->beginTransaction();
           $projectObj = new AProject();
-          
-          $projectObj->name = $name;
-          $projectObj->start_time = intval(strtotime($startTime));
-          $projectObj->description = $description;
-          $projectObj->allow_add = $allowAdd == 'true' ? '1' : '0';
-          $projectObj->members = $members;
-          $projectObj->create_time = time();
-          $projectObj->status = '0';
-          $projectObj->year = date('Y',time());
-          $projectObj->create_uid = $uid;
-          $projectObj->model_id = $selectModuleIds;
-          $projectObj->join_uid = $selectUserIds;
-          if ($projectObj->insert()){
+
+          try {
+              $projectObj->name = $name;
+              $projectObj->start_time = intval(strtotime($startTime));
+              $projectObj->description = $description;
+              $projectObj->allow_add = $allowAdd == 'true' ? '1' : '0';
+              $projectObj->members = count($member);
+              $projectObj->create_time = time();
+              $projectObj->status = '0';
+              $projectObj->year = date('Y',time());
+              $projectObj->create_uid = $uid;
+              $projectObj->model_id = $selectModuleIds;
+              $projectObj->join_uid = $selectUserIds;
+              if (!$projectObj->insert()) {
+                  $this->Error(Constants::RET_ERROR,$projectObj->getErrors());
+              }
               $projectObjId = $projectObj->getAttribute('id');
-                       
+              foreach ($member as $joinUid) {
+                  $projectExtObj = new AProjectExt();
+                  $projectExtObj->project_id = $projectObjId;
+                  $projectExtObj->uid = $joinUid;
+                  if (!$projectExtObj->insert()) {
+                      $this->Error(Constants::RET_ERROR,$projectExtObj->getErrors());
+                  }
+              }
+              $transaction->commit();
+
               $result = [
                   'projectId'=>(string) $projectObjId,
-                 //
-              ];
-              
-              $this->Success($result);
-          }
-       
 
-          $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+              ];
+
+              $this->Success($result);
+
+          } catch (\Exception $e) {
+              //如果操作失败, 数据回滚
+              $transaction->rollback();
+              $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+          }
     }
     
 
@@ -385,25 +381,47 @@ class ProjectController extends BasicController
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        if ($selectUserIds){
-            $joinUid = $project->join_uid;
-            $joinUid .= ','.$selectUserIds;
-            $members = count(explode(',',$joinUid));
-            $project->join_uid = $joinUid;
-            $project->members = $members;
-        }
-        if ($projectStatus){
-            if ($projectStatus == 1){
-                $project->start_time = time();
+        $transaction= Yii::$app->db->beginTransaction();
+        try {
+            if ($selectUserIds){
+
+                $joinUid = $project->join_uid;
+                $joinUid .= ','.$selectUserIds;
+                $members = count(explode(',',$joinUid));
+                $project->join_uid = $joinUid;
+                $project->members = $members;
+                $member = explode(',',$selectUserIds);
+                foreach ($member as $uid) {
+                    $projectExt = new AProjectExt();
+                    $projectExt->project_id = $projectId;
+                    $projectExt->uid = $uid;
+                    if (!$projectExt->insert()){
+                        $this->Error(Constants::RET_ERROR,$projectExt->getErrors());
+                    }
+                }
+            }
+            if ($projectStatus){
+                if ($projectStatus == 1){
+                    $project->start_time = time();
+                }
+
+                $project->status = $projectStatus;
             }
 
-            $project->status = $projectStatus;
-        }
 
+            if ( !$project->save(false)){
+                $this->Error(Constants::RET_ERROR,$project->getErrors());
 
-        if ($project->save(false)){
+            }
+            $transaction->commit();
             $this->Success();
+        } catch (\Exception $e) {
+            //如果操作失败, 数据回滚
+            $transaction->rollback();
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
         }
+
+
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }
@@ -490,13 +508,31 @@ class ProjectController extends BasicController
 
         $joinUid = implode(',',$memberArr);
 
-        $project->join_uid = $joinUid;
-        $project->members = $num;
+        $transaction= Yii::$app->db->beginTransaction();
+        try {
+             AProjectExt::deleteAll(['project_id'=>$projectId]);
+             $project->join_uid = $joinUid;
+             $project->members = $num;
 
-        if ($project->save(false)){
+             foreach ($memberArr as $uid) {
+                 $projectExt = new AProjectExt();
+                 $projectExt->project_id = $projectId;
+                 $projectExt->uid = $uid;
+                 if (!$projectExt->insert()) {
+                     $this->Error(Constants::RET_ERROR,$projectExt->getErrors());
+                 }
+             }
+            if (!$project->save(false)){
+                $this->Error(Constants::RET_ERROR,$project->getErrors());
+            }
+            $transaction->commit();
             $this->Success();
         }
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        catch (\Exception $e) {
+                //如果操作失败, 数据回滚
+            $transaction->rollback();
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        }
     }
 
 
