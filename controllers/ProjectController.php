@@ -347,8 +347,26 @@ class ProjectController extends BasicController
                 }
             }
         }
+
+        //首先显示目录 然后显示文件
+        $data = [];
+        if ($result) {
+            $files = $chapter = [];
+            foreach ($result as $item){
+                if ($item['type'] == 0) {
+                    $chapter[] = $item;
+                } else {
+                    $files[]=$item;
+                }
+            }
+            $data = array_merge($chapter,$files);
+
+        }
+
+
+
 //echo '<pre>';print_r($result);exit;
-        $this->Success(['data'=>$result]);
+        $this->Success(['data'=>$data]);
        
     }
 
@@ -434,7 +452,7 @@ class ProjectController extends BasicController
             }
         }
 
-        $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result,'create_uid'=>$uid]);
+        $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result,'create_uid'=>$createUid]);
     }
 
 
