@@ -286,7 +286,7 @@ class ProjectController extends BasicController
                 if ($parentId == 0){
                     $file = AFile::find()->select('id,name,path,type')
                         ->where([
-                            'uid'=>$userId,
+                         //   'uid'=>$userId,
                             'project_id'=>$projectId,
                             'status'=>0,
                             'catalog_id'=>0
@@ -295,7 +295,7 @@ class ProjectController extends BasicController
                 } else {
                     $file = AFile::find()->select('id,name,path,type')
                         ->where([
-                            'uid'=>$userId,
+                           // 'uid'=>$userId,
                             'project_id'=>$projectId,
                             'status'=>0,
                             'catalog_id'=>$cata['pid']
@@ -332,7 +332,7 @@ class ProjectController extends BasicController
             }
             $file = AFile::find()->select('id,name,path,type')
                 ->where([
-                    'uid'=>$userId,
+                  //  'uid'=>$userId,
                     'project_id'=>$projectId,
                     'status'=>0,
                     'catalog_id'=>$parentId
