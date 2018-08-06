@@ -18,56 +18,20 @@ use app\commond\fileupload;
 class FileController extends BasicController
 {
 
-    public $mainPath = '';
-    public $typePath = '';
-    
-    public function init(){
+    public function init()
+    {
        parent::init();
     }
 
-    /**
-     * 根据uid  type 类型
-     * 返回主目录路径和子目录
-     * @param $uid
-     * @param $type
-     */
-    public function getPath($uid,$type){
-
-        return $result = [
-             'main'=>md5($uid),
-             'type'=>md5($uid.$type)
-        ];
-    }
-    /**
-     * http://www.api.com/position/index
-     * 获取
-     */
-    public function actionIndex(){
-        
-      /*   $r=  \YII::$app->Aliyunoss->listObjects();//\YII::$app->Aliyunoss->createObjectDir('testaa');
-        echo '<pre>';print_r($r);
-        exit(); */
-       // $file = '/Users/gaoxinyu/Downloads/52317.jpg';
-        $file = '/usr/local/var/www/basic/README.md';
-
-        $re = \YII::$app->Aliyunoss->upload('gggggg.log',$file);
-       // $re = \YII::$app->Aliyunoss->multiuploadFile('gggggg.mp4','C:\Users\Administrator\Documents\Tencent Files\891841626\FileRecv\1531814365942920_1531817438125471.mp4');
-
-       
-        echo '<pre>';print_r($re);
-        echo '<hr>';
-        echo $re['oss-stringtosign'];
-        exit();
 
 
-    }
 
 
     /**
      * 上传
      * /usr/local/var/www/basic/README.md
      */
-    
+    /*
     public function actionUpload(){
 //`type` tinyint(3) DEFAULT NULL COMMENT '文件类型 1图片 2视频 3附件 4 笔记'
         $uid = $this->getParam('userId',true);
@@ -139,7 +103,7 @@ class FileController extends BasicController
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }
-
+*/
 
     public function actionTest()
     {
@@ -148,7 +112,7 @@ class FileController extends BasicController
 
     public function actionUploads()
     {
-
+        $this->isPost();
         $userId = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
         $catalogId = $this->getParam('catalogId',true);
@@ -161,7 +125,7 @@ class FileController extends BasicController
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId);
        
-        if (isset($fileInfo['status'])){
+        if (isset($fileInfo['status'])) {
             $file = new AFile();
             $file->uid = $userId;
             $file->type = $type;
@@ -178,14 +142,13 @@ class FileController extends BasicController
             $file->gps_latitude = $gpsLatitude;
             $file->gps_longitude = $gpsLongitude;
             
-            if ($file->save()){
+            if ($file->save()) {
                 $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId)));
             } else {
                 $this->Error(Constants::RET_ERROR,$file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
             }
         }
         $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
-
     }
 
     /**
@@ -197,13 +160,15 @@ class FileController extends BasicController
         $this->isPost();
         $uid = $this->getParam('userId',true);
 
-        $file = AFile::find()->select('id,type,name,create_time,size,project_id as projectId')->where(['uid'=>$uid,'status'=>0])
+        $column = 'id,type,name,create_time,size,project_id as projectId';
+        $file = AFile::find()->select($column)
+            ->where(['uid'=>$uid,'status'=>0])
             ->asArray()->all();
 
-        if (!$file){
+        if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        foreach ($file as $key=>$item){
+        foreach ($file as $key=>$item) {
             if (empty($item['projectId'])){
                 $file[$key]['projectId'] = '0';
             }
@@ -212,25 +177,24 @@ class FileController extends BasicController
             $file[$key]['size'] = intval($item['size']);
 
         }
-
         $this->Success(['data'=>$file]);
-
-
     }
-
 
     /**
      * 文件下载
      */
 
-    public function actionDownload(){
+    public function actionDownload()
+    {
 
         ob_clean();
         $fileId = $this->getParam('fileId',true);
         $userId = $this->getParam('userId',true);
-        $file = AFile::find()->select('*')->where(['id'=>$fileId,'status'=>0,'uid'=>$userId])->asArray()->one();
+        $file = AFile::find()->select('*')
+            ->where(['id'=>$fileId,'status'=>0,'uid'=>$userId])
+            ->asArray()->one();
 
-        if (! $file){
+        if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
         //用以解决中文不能显示出来的问题
@@ -238,7 +202,7 @@ class FileController extends BasicController
         $file_path = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$path;
 
         //首先要判断给定的文件存在与否
-        if(!file_exists($file_path)){
+        if(!file_exists($file_path)) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 

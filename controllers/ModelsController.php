@@ -11,9 +11,9 @@ use app\models\AModel;
 
 class ModelsController extends BasicController
 {
-        
-    
-    public function init(){
+
+    public function init()
+    {
        parent::init();
     }
 
@@ -45,9 +45,9 @@ class ModelsController extends BasicController
      *  添加
      * http://www.api.com/models/add
      */
-    public function actionAdd(){
-    
-       // $this->isPost();
+    public function actionAdd()
+    {
+        $this->isPost();
         $name = $this->getParam('name',true);
         $pid  = $this->getParam('pid',false);
         $type  = $this->getParam('type',false);
@@ -58,7 +58,7 @@ class ModelsController extends BasicController
         $level = 1;
 
         //模型带上层级
-        if (!empty($pid) && $type == 0){
+        if (!empty($pid) && $type == 0) {
             $level = AModel::find()->select('level')
                 ->where(['id'=>$pid,'type'=>0,'status'=>0])->scalar();
             $level = intval($level) + 1;
@@ -73,27 +73,25 @@ class ModelsController extends BasicController
         $Obj->pid = empty($pid) ? 0 : $pid;
         $Obj->level = $level;
 
-       
         if ($Obj->insert()) {
             $this->Success(['id'=>$Obj->attributes['id']]);
         }
-
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 
     /**
      * 编辑
      */
-    public function actionEdit(){
+    public function actionEdit()
+    {
         $this->isPost();
         $id      = $this->getParam('id',true);
         $name = $this->getParam('name',true);
 
         $Obj = AModel::findOne($id);
 
-        if (!$Obj){
+        if (!$Obj) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-
         }
 
         $Obj->name = $name;
@@ -109,7 +107,8 @@ class ModelsController extends BasicController
     /**
      * 删除
      */
-    public function actionDel(){
+    public function actionDel()
+    {
         $this->isPost();
         $id          = $this->getParam('id',true);
         $Obj = AModel::findOne($id);
