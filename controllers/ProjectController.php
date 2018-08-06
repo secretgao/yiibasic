@@ -35,15 +35,18 @@ class ProjectController extends BasicController
         $createProejct = AProject::find()->where(['create_uid'=>$uid,
             'year'=>$time])
             ->andWhere(['!=','status',4])
-            ->orderBy('sort ASC')->asArray()->all();
+            ->orderBy('sort ASC,id DESC')->asArray()->all();
         $isPosition = AUser::getUserIsPosition($uid);
         $joinProjectId = AProjectExt::find()->select('project_id')
         ->where(['uid'=>$uid])->asArray()->column();
         $joinProject = [];
         if ($joinProjectId) {
-
-            $joinProject = AProject::find()->where(['in','id',$joinProjectId])->andWhere(['year'=>$time])->andWhere(['!=','status',4])->orderBy('sort ASC')->asArray()
-                ->all();
+            $joinProject = AProject::find()
+                ->where(['in','id',$joinProjectId])
+                ->andWhere(['year'=>$time])
+                ->andWhere(['!=','status',4])
+                ->orderBy('sort ASC,id DESC')
+                ->asArray()->all();
         }
         $data = array_merge($createProejct,$joinProject);
         if ($data) {
@@ -234,7 +237,7 @@ class ProjectController extends BasicController
         if ($project['model_id'] == $parentId  || in_array($parentId,$modelIdArr)){
             $result = AModel::find()->select('id,name,pid,level')
                 ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
-           
+
         } else {
             $modelArr =  $temp =  [];  //去除重复目录用
             foreach ($modelIdArr as $id){
