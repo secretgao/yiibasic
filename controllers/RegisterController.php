@@ -9,9 +9,8 @@ use Yii;
 
 class RegisterController extends BasicController
 {
-        
-    
-    public function init(){
+    public function init()
+    {
        parent::init();
     }
 
@@ -19,8 +18,8 @@ class RegisterController extends BasicController
      * http://www.api.com/register/sign-up
      * 注册用户
      */
-    public function actionSignUp(){
-
+    public function actionSignUp()
+    {
         $this->isPost();
         $nickName = $this->getParam('nick_name',true);
         $id       = $this->getParam('id',true);
@@ -28,8 +27,7 @@ class RegisterController extends BasicController
 
         $idExits = AUser::find()->where(['status'=>0,'weixin_id'=>$id])
                 ->asArray()->one();
-        if ($idExits){
-
+        if ($idExits) {
             $isCertified = true;
             if (empty($idExits['position_id'])) {
                 $isCertified = false;
