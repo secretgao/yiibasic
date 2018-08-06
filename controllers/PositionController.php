@@ -11,9 +11,9 @@ use Yii;
 
 class PositionController extends BasicController
 {
-        
-    
-    public function init(){
+
+    public function init()
+    {
        parent::init();
     }
 
@@ -21,10 +21,10 @@ class PositionController extends BasicController
      * http://www.api.com/position/index
      * 获取所有职位
      */
-    public function actionIndex(){
+    public function actionIndex()
+    {
 
         $uid = $this->getParam('userId',true);
-
         $user = AUser::find()->where(['id'=>$uid,'status'=>0])->asArray()->one();
 
         if (!$user) {
@@ -33,13 +33,12 @@ class PositionController extends BasicController
 
         $userPosition[0] = [];
 
-
         if (!empty($user['position_id'])){
             $userPosition[0] = APosition::find()->select('id,name')
                 ->where(['id'=>$user['position_id'],'status'=>0])->asArray()->one();
 
         }
-       // echo '<pre>';print_r($userPosition);
+
         $parent = APosition::getAll();
         if (! $parent) {
             $this->Success(['data'=>[]]);
@@ -49,13 +48,6 @@ class PositionController extends BasicController
             $userPosition[0]['name'] = '';
         }
         $result = array_merge($userPosition,$parent);
-//echo '<pre>';print_r($userPosition);
-
-      //  echo '<pre>';print_r($result);exit();
-       /* foreach ($parent as &$item){
-            $item['children'] = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
-        }*/
-
         $this->Success(['data'=>$result]);
 
     }
@@ -64,14 +56,15 @@ class PositionController extends BasicController
      *  部门添加
      * http://www.api.com/position/add
      */
-    public function actionAdd(){
-       // $this->isPost();
+    public function actionAdd()
+    {
+        $this->isPost();
         $positionName = $this->getParam('name',true);
         $pid          = $this->getParam('pid',false);
 
         $positionObj = new APosition();
         $positionObj->name = $positionName;
-        if (!empty($pid)){
+        if (!empty($pid)) {
             $positionObj->pid = $pid;
 
         }
@@ -83,7 +76,7 @@ class PositionController extends BasicController
                     'data'=>[
                         'positionId'=> (string)$positionObj->attributes['id'],
                         'positionName'=>$positionObj->attributes['name']
-                        ]
+                    ]
                 ]
             );
         }
@@ -94,16 +87,16 @@ class PositionController extends BasicController
     /**
      * 部门编辑
      */
-    public function actionEdit(){
+    public function actionEdit()
+    {
         $this->isPost();
         $id          = $this->getParam('id',true);
         $positionName = $this->getParam('name',true);
 
         $positionObj = APosition::findOne($id);
 
-        if (!$positionObj){
+        if (!$positionObj) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-
         }
 
         $positionObj->name = $positionName;
@@ -118,12 +111,13 @@ class PositionController extends BasicController
     /**
      * 部门删除
      */
-    public function actionDel(){
+    public function actionDel()
+    {
         $this->isPost();
         $id          = $this->getParam('id',true);
 
         $positionObj = APosition::findOne($id);
-        if (!$positionObj){
+        if (!$positionObj) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
@@ -140,24 +134,23 @@ class PositionController extends BasicController
      */
     public function actionManageUser()
     {
-
         $id = $this->getParam('id',true);
         $userId = $this->getParam('userId',true);
         $isAdd = $this->getParam('isAdd',true);
 
         $user = AUser::findOne(['id'=>$userId]);
         $position = APosition::findOne(['id'=>$id]);
-        if (!$user || !$position){
+        if (!$user || !$position) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        if ($isAdd == 'true'){
+        if ($isAdd == 'true') {
             $user->position_id = $id;
         } else {
             $user->position_id = 0;
         }
 
-        if ($user->save(false)){
+        if ($user->save(false)) {
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
@@ -169,22 +162,21 @@ class PositionController extends BasicController
 
     public function actionApply()
     {
-
         $userId = $this->getParam('userId',true);
         $type = $this->getParam('type',true);
 
         $apply = APositionApply::findOne(['uid'=>$userId,'status'=>0]);
 
-        if ( !$apply ){
+        if (!$apply) {
             $this->Error(Constants::APPLY_NOT_FOUND,Constants::$error_message[Constants::APPLY_NOT_FOUND]);
         }
         $user = AUser::findOne(['id'=>$apply['uid']]);
         $position = APosition::findOne(['id'=>$apply['position_id']]);
-        if (!$user || !$position){
+        if (!$user || !$position) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        if ($type == 1){
+        if ($type == 1) {
             $transaction= Yii::$app->db->beginTransaction();
             try {
                 $apply->status = '1';
@@ -212,7 +204,5 @@ class PositionController extends BasicController
             }
             $this->Success();
         }
-
-
     }
 }
