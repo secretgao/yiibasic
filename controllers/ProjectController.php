@@ -180,26 +180,6 @@ class ProjectController extends BasicController
         $this->Success(['data'=>$parent]);       
     }
     
-  
-    /**
-     * 获取项目详情
-     */
-    public function actionGetProjectDetail()
-    {
-        
-        $userId = $this->getParam('userId',true);
-        $projectId = $this->getParam('projectId',true);
-        
-        $columns = '*';
-        $project = AProject::find()->select($columns)
-        ->where(['id'=>$projectId,'create_uid'=>$userId])->asArray()->one();
-        
-        if (!$project) {
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-        }
-
-        $this->Success(['data'=>$project]);
-    }
 
     /**
      * 获取项目目录
