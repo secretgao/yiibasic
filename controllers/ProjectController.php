@@ -15,9 +15,8 @@ use app\commond\helps;
 
 class ProjectController extends BasicController
 {
-        
-    
-    public function init(){
+    public function init()
+    {
        parent::init();
     }
 
@@ -25,20 +24,22 @@ class ProjectController extends BasicController
      * http://www.api.com/position/index
      * 获取
      */
-    public function actionGetlist(){
-
+    public function actionGetlist()
+    {
 
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
-
-
+        //查询该用户创建的项目
         $createProejct = AProject::find()->where(['create_uid'=>$uid,
             'year'=>$time])
             ->andWhere(['!=','status',4])
             ->orderBy('sort ASC,id DESC')->asArray()->all();
+        //判断该用户是否有部门
         $isPosition = AUser::getUserIsPosition($uid);
+        //查询该用户的参与项目
         $joinProjectId = AProjectExt::find()->select('project_id')
         ->where(['uid'=>$uid])->asArray()->column();
+
         $joinProject = [];
         if ($joinProjectId) {
             $joinProject = AProject::find()
@@ -64,23 +65,17 @@ class ProjectController extends BasicController
                 $item['describe'] = $item['description'];
                 $item['used_time']  = $usedTime;
             }
-
         }
-
-
         $this->Success(['data'=>$data,'isCertified'=>$isPosition]);
-    
     }
-
-
 
 
     /**
      * 创建项目
      */
     
-    public function actionCreate(){
-
+    public function actionCreate()
+    {
           $name         = $this->getParam('name',true);
           $startTime    = $this->getParam('start_time',true); 
           $allowAdd     = $this->getParam('allow_add',true);
@@ -88,9 +83,7 @@ class ProjectController extends BasicController
           $selectModuleIds  = $this->getParam('selectModuleIds',true);
           $selectUserIds  = $this->getParam('selectUserIds',true);
 
-
           $member = (explode(',',$selectUserIds));
-
 
           $uid          = $this->getParam('userId',true);
           $transaction= Yii::$app->db->beginTransaction();
@@ -124,7 +117,6 @@ class ProjectController extends BasicController
 
               $result = [
                   'projectId'=>(string) $projectObjId,
-
               ];
 
               $this->Success($result);
@@ -141,7 +133,8 @@ class ProjectController extends BasicController
     /**
      * 设置排序
      */
-    public function actionSettingSort(){
+    public function actionSettingSort()
+    {
         
         $this->ispost();
         $uid = $this->getParam('userId',true);
@@ -162,22 +155,21 @@ class ProjectController extends BasicController
         } catch (\Exception $e){
             $trans->rollBack();
             $this->Error($e);
-          
         }    
     }
 
     /**
      * 获取部门人数
      */
-    public function actionGetPositionNumber(){
-        
+    public function actionGetPositionNumber()
+    {
         $parent = APosition::getAll();
         if (! $parent) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
+
         foreach ($parent as $k=>$item){
             $children = empty(APosition::getChildren($item['id'])) ? [] : APosition::getChildren($item['id']);
-                  
              if ($children){
                 foreach ($children as $key=>$value){
                     $children[$key]['number'] = AUser::find()->where(['position_id'=>$value['id']])->count();                    
@@ -185,7 +177,6 @@ class ProjectController extends BasicController
             } 
             $parent[$k]['children'] = $children;
         }
-        
         $this->Success(['data'=>$parent]);       
     }
     
@@ -193,7 +184,8 @@ class ProjectController extends BasicController
     /**
      * 获取项目详情
      */
-    public function actionGetProjectDetail(){
+    public function actionGetProjectDetail()
+    {
         
         $userId = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
@@ -202,22 +194,18 @@ class ProjectController extends BasicController
         $project = AProject::find()->select($columns)
         ->where(['id'=>$projectId,'create_uid'=>$userId])->asArray()->one();
         
-        if (!$project){
+        if (!$project) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        
-       // echo '<pre>';print_r($project);
-      
-    //    $project['cata_log'] = helps::accordingCatalogToAllHierarchy($project['model_id']);
-        
+
         $this->Success(['data'=>$project]);
     }
-
 
     /**
      * 获取项目目录
      */
-    public function actionGetProjectCatalog(){
+    public function actionGetProjectCatalog()
+    {
         $userId = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
         $parentId = $this->getParam('parentId',true);
@@ -227,7 +215,7 @@ class ProjectController extends BasicController
         ->andWhere(['<>','status',4])
             ->asArray()->one();
         
-        if (!$project){
+        if (!$project) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
@@ -425,7 +413,6 @@ class ProjectController extends BasicController
             $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
         }
 
-
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }
@@ -476,8 +463,6 @@ class ProjectController extends BasicController
 
         $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result,'create_uid'=>$createUid]);
     }
-
-
 
     /**
      * 删除项目参与人员
