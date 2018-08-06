@@ -219,7 +219,9 @@ class ProjectController extends BasicController
         $parentId = $this->getParam('parentId',true);
         
         $project = AProject::find()->select('model_id')
-        ->where(['id'=>$projectId,'create_uid'=>$userId])->asArray()->one();
+        ->where(['id'=>$projectId])
+        ->andWhere(['<>','status',4])
+            ->asArray()->one();
         
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
@@ -230,11 +232,9 @@ class ProjectController extends BasicController
         $result = [];
         //说明是顶级返回所有子集
         if ($project['model_id'] == $parentId  || in_array($parentId,$modelIdArr)){
-            $result = AModel::find()->select('id,name,pid')
+            $result = AModel::find()->select('id,name,pid,level')
                 ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
-            foreach ($result as &$value){
-                $value['level'] = 2;
-            }
+           
         } else {
             $modelArr =  $temp =  [];  //去除重复目录用
             foreach ($modelIdArr as $id){
