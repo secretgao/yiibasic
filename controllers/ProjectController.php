@@ -45,6 +45,7 @@ class ProjectController extends BasicController
                 ->where(['in','id',$joinProjectId])
                 ->andWhere(['year'=>$time])
                 ->andWhere(['!=','status',4])
+                ->andWhere(['!=','create_uid',$uid])
                 ->orderBy('sort ASC,id DESC')
                 ->asArray()->all();
         }
