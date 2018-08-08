@@ -113,7 +113,7 @@ class ModelsController extends BasicController
         $id          = $this->getParam('id',true);
         $Obj = AModel::findOne($id);
 
-        if (!$Obj){
+        if (!$Obj) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
@@ -125,4 +125,29 @@ class ModelsController extends BasicController
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 
+
+    /**
+     * 模块备注添加
+     */
+    public function actionAddRemark(){
+
+        //$this->isPost();
+        $modelId = $this->getParam('modelId',true);
+        $remark = $this->getParam('remark',true);
+
+        $model = AModel::findOne(['id'=>$modelId,'status'=>0]);
+
+        if (!$model) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $model->remark      = $remark;
+        $model->update_time = time();
+
+        if ($model->save(false)) {
+            $this->Success();
+        }
+
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
 }

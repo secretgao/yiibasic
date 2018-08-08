@@ -17,6 +17,7 @@ use Yii;
  * @property int $project_id 项目id
  * @property int $create_uid 创建id
  * @property int $level 层级
+ * @property string $remark 模块备注
  */
 class AModel extends \yii\db\ActiveRecord
 {
@@ -37,6 +38,7 @@ class AModel extends \yii\db\ActiveRecord
             [['create_time', 'update_time', 'pid', 'project_id', 'create_uid', 'level'], 'integer'],
             [['name'], 'string', 'max' => 20],
             [['status', 'type'], 'string', 'max' => 2],
+            [['remark'], 'string', 'max' => 100],
         ];
     }
 
@@ -56,6 +58,7 @@ class AModel extends \yii\db\ActiveRecord
             'project_id' => 'Project ID',
             'create_uid' => 'Create Uid',
             'level' => 'Level',
+            'remark' => 'Remark',
         ];
     }
 }

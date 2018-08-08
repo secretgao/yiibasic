@@ -205,4 +205,28 @@ class PositionController extends BasicController
             $this->Success();
         }
     }
+
+
+
+    /**
+     * 职位添加
+     */
+
+    public function actionAddPosition(){
+
+        $this->isPost();
+        $name = $this->getParam('name',true);
+
+        $positionObj = new APosition();
+        $positionObj->name = $name;
+        $positionObj->pid  = -1;
+        $positionObj->create_time = time();
+
+        if ($positionObj->insert()) {
+            $this->Success();
+        }
+
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
+    }
 }
