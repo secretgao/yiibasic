@@ -24,10 +24,6 @@ class FileController extends BasicController
        parent::init();
     }
 
-
-
-
-
     /**
      * 上传
      * /usr/local/var/www/basic/README.md
@@ -144,6 +140,8 @@ class FileController extends BasicController
             $file->gps_longitude = $gpsLongitude;
             
             if ($file->save()) {
+                $msg = '上传文件:'.$fileInfo['fileInfo']['name'];
+                helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
                 $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId)));
             } else {
                 $this->Error(Constants::RET_ERROR,$file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
@@ -158,7 +156,7 @@ class FileController extends BasicController
      */
     public function actionUserFileList()
     {
-        $this->isPost();
+
         $uid = $this->getParam('userId',true);
 
         $column = 'id,type,name,create_time,size,project_id as projectId';
@@ -198,6 +196,8 @@ class FileController extends BasicController
         if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
+        $msg = '下载文件:'.$file['name'];
+        helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
         //用以解决中文不能显示出来的问题
         $path = iconv("utf-8","gb2312",$file['path']);
         $file_path = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$path;
@@ -270,7 +270,7 @@ class FileController extends BasicController
                 // 如果读取的某个对象是文件夹，则递归
                 if (is_dir($path."/".$filename)) {
                     $this->addFileToZip($path."/".$filename, $zip);
-                } else { //将文件加入zip对象
+                } else{ //将文件加入zip对象
                     $zip->addFile($path."/".$filename);
                 }
             }
