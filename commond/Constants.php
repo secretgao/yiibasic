@@ -55,11 +55,13 @@ final class Constants
     const OPERATION_CATE    = 2;
     const OPERATION_FILE    = 3;
     const OPERATION_PROJECT   = 4;
+    const OPERATION_USER   = 5;
 
     public static $operationType = [
 
         self::OPERATION_MODEL =>'模板日志',
         self::OPERATION_CATE  =>'目录日志',
+        self::OPERATION_USER  =>'用户日志',
 
 
 

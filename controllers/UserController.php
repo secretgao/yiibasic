@@ -129,22 +129,27 @@ class UserController extends BasicController
         if (!$user) {
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
-
+        $msg = '操作人:';
+        $msg.= AUser::getName($userId);
         if (is_numeric($phone)) {
+            $msg.= '手机号:'.$user->phone.'改成'.$phone;
             $user->phone = $phone;
         }
 
         if ($realName) {
+            $msg.= '真实姓名:'.$user->true_name.'改成'.$realName;
             $user->true_name = $realName;
         }
         if ($email) {
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->Error(Constants::EMAIL_IS_ERROR,Constants::$error_message[Constants::EMAIL_IS_ERROR]);
             }
+            $msg.= '邮箱:'.$user->email.'改成'.$email;
             $user->email = $email;
         }
 
         if ($user->save(false)) {
+            helps::writeLog(Constants::OPERATION_USER,$msg);
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
@@ -161,7 +166,8 @@ class UserController extends BasicController
         if (!$user) {
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
-        $position = APosition::find()->select('id')->where(['id'=>$positionId,'status'=>0])->scalar();
+        $position = APosition::find()->select('id,name')->where
+        (['id'=>$positionId,'status'=>0])->one();
         if (!$position) {
             $this->Error(Constants::POSITIONS_NOT_FOUND,Constants::$error_message[Constants::POSITIONS_NOT_FOUND]);
         }
@@ -177,6 +183,11 @@ class UserController extends BasicController
         $apply->create_time = time();
 
         if ($apply->save()){
+            $msg = '操作人:';
+            $msg.= AUser::getName($userId);
+            $msg.= '申请添加部门:'.$position['name'];
+
+            helps::writeLog(Constants::OPERATION_USER,$msg);
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
