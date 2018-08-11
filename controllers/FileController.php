@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\commond\helps;
 use app\components\Aliyunoss;
 
 use app\models\AFile;
@@ -221,7 +222,7 @@ class FileController extends BasicController
      */
     public function actionProjectPack()
     {
-        $projectId = 70;//$this->getParam('projectId',true,70);
+        $projectId = 151;//$this->getParam('projectId',true,70);
         $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
 
         if (empty($project)) {
@@ -231,34 +232,45 @@ class FileController extends BasicController
         }
         $projectName = $project['name'];
         $modelId = $project['model_id'];
-
+//var_dump($projectName);
         $dir = './uploads/project';
-        $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
+    //    $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
         $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
         //创建项目根目录
-        if (!is_dir($projectPath)){
+       // var_dump($projectPath);exit();
+        if (!is_dir($projectPath)) {
             mkdir($projectPath,0777,true);
         }
 
-        echo "projectPath:".$projectPath.PHP_EOL;
+       // echo "projectPath:".$projectPath.PHP_EOL;
+        //获取所有模板
+        $allstep = helps::allStep($projectId);
+        //获取所有文件
+        $allfile = helps::getProjectAllFile($projectId);
+        //创建文件夹 把文件复制到指定目录下
+        helps::createDirectory($projectPath,$allstep,$allfile,0);
 
         //打包
         $zip = new \ZipArchive();
-        if($zip->open($projectPath.'.zip', \ZipArchive::OVERWRITE)=== TRUE){
+        $zipName = $projectPath.'.zip';
+        echo  $zipName.PHP_EOL;
+        if($zip->open($zipName, \ZipArchive::OVERWRITE)=== TRUE){
             $this->addFileToZip($projectPath, $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
             $zip->close(); //关闭处理的zip文件
         }
-        var_dump($project);
+
     }
 
 
-    private  function addFileToZip($path,$zip){
-        $handler=opendir($path); //打开当前文件夹由$path指定。
-        while(($filename=readdir($handler))!==false){
-            if($filename != "." && $filename != ".."){//文件夹文件名字为'.'和‘..'，不要对他们进行操作
-                if(is_dir($path."/".$filename)){// 如果读取的某个对象是文件夹，则递归
+    private  function addFileToZip($path,$zip) {
+        $handler = opendir($path); //打开当前文件夹由$path指定。
+        while (($filename=readdir($handler))!==false) {
+            //文件夹文件名字为'.'和‘..'，不要对他们进行操作
+            if ($filename != "." && $filename != "..") {
+                // 如果读取的某个对象是文件夹，则递归
+                if (is_dir($path."/".$filename)) {
                     $this->addFileToZip($path."/".$filename, $zip);
-                }else{ //将文件加入zip对象
+                } else { //将文件加入zip对象
                     $zip->addFile($path."/".$filename);
                 }
             }

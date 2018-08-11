@@ -1,8 +1,9 @@
 <?php
 namespace app\commond;
 
+use app\models\AFile;
 use app\models\AModel;
-
+use app\models\AProject;
 class helps {
     
    static function make_tree($arr)
@@ -196,6 +197,107 @@ class helps {
     public static function writeLog($message){
 
     }
-    
-    
+
+    /**获取所有模版
+     * @param $projectId
+     * @return array
+     */
+
+    public static function allStep($projectId){
+        $project = AProject::find()->select('model_id')
+            ->where(['id'=>$projectId])->asArray()->one();
+        $modelIdArr = explode(',', $project['model_id']);
+        $top = $step = [];
+        //说明是顶级返回所有子集
+        if (count($modelIdArr) == 1) {
+            $top = self::getParents($project['model_id']);
+        }
+
+        $toparr = [];
+        if ($top) {
+            foreach ($top as $item){
+                if ($item['pid'] == 0){
+                    $toparr[] = $item;
+                }
+            }
+
+            $all = self::recursion($toparr);
+            $step  = self::getson($all,0,1);
+        }
+
+        return $step;
+    }
+
+
+    /**获取项目中的所有文件
+     * @param $projectId
+     */
+
+    public static function getProjectAllFile($projectId){
+
+        $result = [];
+
+        if (empty($projectId)) {
+            return $result;
+        }
+
+        $file = AFile::find()->select('catalog_id as cid,path,name')
+            ->where(['status'=>0,'project_id'=>$projectId])
+            ->asArray()->all();
+
+        if (empty($file)) {
+            return $result;
+        }
+
+        return $file;
+    }
+
+    /**创建目录
+     * DIRECTORY_SEPARATOR
+     * @param $path   路径
+     * @param $param  所有模板加目录
+     * @param $allfiles 项目下的所有文件
+     * @param $pid    上层id
+     */
+    public static function createDirectory($path,$param,$allFiles,$pid){
+
+        foreach ($param as $key=>$item) {
+            if ($item['pid'] == $pid) {
+               // $item['name'] = iconv("UTF-8", "GBK", $item['name']);
+               //汉字转码 防止乱码
+                $newPath = $path.DIRECTORY_SEPARATOR.$item['name'];
+               // echo $newPath.PHP_EOL;
+                if (!is_dir($newPath)) {
+                    mkdir($newPath,0777,true);
+                }
+
+                if (!empty($allFiles)) {
+                    //循环项目文件 ，放到指定目录下
+                    foreach ($allFiles as $k=>$value){
+                        if ($pid == $value['cid']) {
+                            self::copyToDir($value['path'],$newPath,$value['name']);
+                            unset($allFiles[$k]);
+                        }
+                    }
+                }
+
+                $id = $item['id'];
+                unset($param[$key]);
+                self::createDirectory($newPath,$param,$allFiles,$id);
+            }
+        }
+    }
+
+    /**复制文件到指定目录
+     * @param $sourcefile
+     * @param $dir
+     * @param $filename
+     * @return bool
+     */
+    public static function copyToDir($sourcefile, $dir,$filename){
+        if( ! file_exists($sourcefile)) {
+            return false;
+        }
+        return copy($sourcefile, $dir .DIRECTORY_SEPARATOR. $filename);
+    }
 }
