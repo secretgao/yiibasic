@@ -61,7 +61,7 @@ class PositionController extends BasicController
         $this->isPost();
         $positionName = $this->getParam('name',true);
         $pid          = $this->getParam('pid',false);
-
+        $uid          = $this->getParam('userId',true);
         $positionObj = new APosition();
         $positionObj->name = $positionName;
         if (!empty($pid)) {
@@ -71,14 +71,14 @@ class PositionController extends BasicController
         $positionObj->create_time = time();
 
         if ($positionObj->insert()) {
-            $this->Success(
-                [
-                    'data'=>[
-                        'positionId'=> (string)$positionObj->attributes['id'],
-                        'positionName'=>$positionObj->attributes['name']
-                    ]
+            $msg = '创建部门:'.$positionName;
+            helps::writeLog(Constants::OPERATION_POSITION,$msg,$uid);
+            $this->Success([
+                'data'=>[
+                    'positionId'=> (string)$positionObj->attributes['id'],
+                    'positionName'=>$positionObj->attributes['name']
                 ]
-            );
+            ]);
         }
 
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
@@ -92,6 +92,7 @@ class PositionController extends BasicController
         $this->isPost();
         $id          = $this->getParam('id',true);
         $positionName = $this->getParam('name',true);
+        $uid          = $this->getParam('userId',true);
 
         $positionObj = APosition::findOne($id);
 
@@ -101,6 +102,8 @@ class PositionController extends BasicController
 
         $positionObj->name = $positionName;
         if ($positionObj->save(false)) {
+            $msg = '编辑部门:'.$positionName;
+            helps::writeLog(Constants::OPERATION_POSITION,$msg,$uid);
             $this->Success();
         }
 
@@ -115,6 +118,7 @@ class PositionController extends BasicController
     {
         $this->isPost();
         $id          = $this->getParam('id',true);
+        $uid          = $this->getParam('userId',true);
 
         $positionObj = APosition::findOne($id);
         if (!$positionObj) {
@@ -123,6 +127,8 @@ class PositionController extends BasicController
 
         $positionObj->status =-1;
         if ($positionObj->save(false)) {
+            $msg = '删除部门:'.$positionObj->name;
+            helps::writeLog(Constants::OPERATION_POSITION,$msg,$uid);
             $this->Success();
         }
 
@@ -216,6 +222,7 @@ class PositionController extends BasicController
 
         $this->isPost();
         $name = $this->getParam('name',true);
+        $userId = $this->getParam('userId',true);
 
         $positionObj = new APosition();
         $positionObj->name = $name;
@@ -223,6 +230,9 @@ class PositionController extends BasicController
         $positionObj->create_time = time();
 
         if ($positionObj->insert()) {
+
+            $msg = '添加职位:'.$name;
+            helps::writeLog(Constants::OPERATION_POSITION,$msg,$userId);
             $this->Success();
         }
 
