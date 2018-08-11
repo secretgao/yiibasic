@@ -129,8 +129,7 @@ class UserController extends BasicController
         if (!$user) {
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
-        $msg = '操作人:';
-        $msg.= AUser::getName($userId);
+        $msg = '';
         if (is_numeric($phone)) {
             $msg.= '手机号:'.$user->phone.'改成'.$phone;
             $user->phone = $phone;
@@ -149,7 +148,7 @@ class UserController extends BasicController
         }
 
         if ($user->save(false)) {
-            helps::writeLog(Constants::OPERATION_USER,$msg);
+            helps::writeLog(Constants::OPERATION_USER,$msg,$userId);
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
@@ -183,11 +182,8 @@ class UserController extends BasicController
         $apply->create_time = time();
 
         if ($apply->save()){
-            $msg = '操作人:';
-            $msg.= AUser::getName($userId);
-            $msg.= '申请添加部门:'.$position['name'];
-
-            helps::writeLog(Constants::OPERATION_USER,$msg);
+            $msg = '申请添加部门:'.$position['name'];
+            helps::writeLog(Constants::OPERATION_USER,$msg,$userId);
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);

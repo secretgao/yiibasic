@@ -5,6 +5,7 @@ use app\models\AFile;
 use app\models\ALog;
 use app\models\AModel;
 use app\models\AProject;
+use app\models\AUser;
 class helps {
     
    static function make_tree($arr)
@@ -195,7 +196,10 @@ class helps {
      * 记录日志
      * @param $message
      */
-    public static function writeLog($type,$message){
+    public static function writeLog($type,$message,$uid){
+
+        $msg = '操作人:';
+        $msg.= AUser::getName($uid);
 
         $controllerName =  \Yii::$app->controller->id;
         $actionName =  \Yii::$app->controller->action->id;
@@ -204,7 +208,7 @@ class helps {
         $log->c_name = $controllerName;
         $log->a_name = $actionName;
         $log->create_time = time();
-        $log->operation = $message;
+        $log->operation = $msg.$message;
         $log->insert();
     }
 

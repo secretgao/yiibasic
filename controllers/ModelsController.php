@@ -70,14 +70,12 @@ class ModelsController extends BasicController
         $Obj->level = $level;
 
         if ($Obj->insert()) {
-            $msg = '操作人:';
-            $msg .= AUser::getName($createUid);
             if ($type == 0) {
-                $msg.= '创建模板:'.$name;
-                helps::writeLog(Constants::OPERATION_MODEL,$msg);
+                $msg = '创建模板:'.$name;
+                helps::writeLog(Constants::OPERATION_MODEL,$msg,$createUid);
             } else {
-                $msg.= '创建目录:'.$name;
-                helps::writeLog(Constants::OPERATION_CATE,$msg);
+                $msg = '创建目录:'.$name;
+                helps::writeLog(Constants::OPERATION_CATE,$msg,$createUid);
             }
 
             $this->Success(['id'=>$Obj->attributes['id']]);
@@ -104,14 +102,12 @@ class ModelsController extends BasicController
         $Obj->name = $name;
         $Obj->update_time = time();
         if ($Obj->save(false)) {
-            $msg = '操作人:';
-            $msg .= AUser::getName($uid);
             if ($Obj->type == 0) {
-                $msg.= '编辑模板:'.$oldName.'改成'.$name;
-                helps::writeLog(Constants::OPERATION_MODEL,$msg);
+                $msg = '编辑模板:'.$oldName.'改成'.$name;
+                helps::writeLog(Constants::OPERATION_MODEL,$msg,$uid);
             } else {
-                $msg.= '编辑目录:'.$oldName.'改成'.$name;
-                helps::writeLog(Constants::OPERATION_CATE,$msg);
+                $msg = '编辑目录:'.$oldName.'改成'.$name;
+                helps::writeLog(Constants::OPERATION_CATE,$msg,$uid);
             }
             $this->Success();
         }
@@ -136,14 +132,13 @@ class ModelsController extends BasicController
 
         $Obj->status = -1;
         if ($Obj->save(false)) {
-            $msg = '操作人:';
-            $msg .= AUser::getName($uid);
+
             if ($Obj->type == 0) {
-                $msg.= '删除模板:'.$Obj->name;
-                helps::writeLog(Constants::OPERATION_MODEL,$msg);
+                $msg = '删除模板:'.$Obj->name;
+                helps::writeLog(Constants::OPERATION_MODEL,$msg,$uid);
             } else {
-                $msg.= '删除目录:'.$Obj->name;
-                helps::writeLog(Constants::OPERATION_CATE,$msg);
+                $msg = '删除目录:'.$Obj->name;
+                helps::writeLog(Constants::OPERATION_CATE,$msg,$uid);
             }
             $this->Success();
         }
@@ -172,10 +167,9 @@ class ModelsController extends BasicController
         $model->update_time = time();
 
         if ($model->save(false)) {
-            $msg = '操作人:';
-            $msg.= AUser::getName($uid);
-            $msg.= '模块:'.$model->name.'添加备注:'.$remark;
-            helps::writeLog(Constants::OPERATION_MODEL,$msg);
+
+            $msg = '模块:'.$model->name.'添加备注:'.$remark;
+            helps::writeLog(Constants::OPERATION_MODEL,$msg,$uid);
             $this->Success();
         }
 
