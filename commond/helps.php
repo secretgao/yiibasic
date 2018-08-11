@@ -2,6 +2,7 @@
 namespace app\commond;
 
 use app\models\AFile;
+use app\models\ALog;
 use app\models\AModel;
 use app\models\AProject;
 class helps {
@@ -194,9 +195,31 @@ class helps {
      * 记录日志
      * @param $message
      */
-    public static function writeLog($message){
+    public static function writeLog($type,$message){
+
+        $controllerName =  \Yii::$app->controller->id;
+        $actionName =  \Yii::$app->controller->action->id;
+        $log = new ALog();
+        $log->type = $type;
+        $log->c_name = $controllerName;
+        $log->a_name = $actionName;
+        $log->create_time = time();
+        $log->operation = $message;
+        $log->insert();
+    }
+
+    /**
+     * 根据控制器和方法 获取操作类型
+     * @param $cName
+     * @param $aName
+     */
+
+    public static function operationType($cName,$aName){
+
+
 
     }
+
 
     /**获取所有模版
      * @param $projectId
