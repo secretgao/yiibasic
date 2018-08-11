@@ -10,7 +10,7 @@ use Yii;
  * @property int $id
  * @property int $create_time
  * @property string $operation 操作记录
- * @property string $type 操作类型
+ * @property int $type 操作类型
  * @property string $c_name 控制器名
  * @property string $a_name 方法名
  */
@@ -30,9 +30,9 @@ class ALog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_time'], 'integer'],
+            [['create_time', 'type'], 'integer'],
             [['operation'], 'string'],
-            [['type', 'c_name', 'a_name'], 'string', 'max' => 20],
+            [['c_name', 'a_name'], 'string', 'max' => 20],
         ];
     }
 

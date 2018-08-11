@@ -50,4 +50,20 @@ final class Constants
         self::PROJECT_ALREADY_DEL =>'项目已经删除'
     ];
 
+
+    const OPERATION_MODEL   = 1;
+    const OPERATION_CATE    = 2;
+    const OPERATION_FILE    = 3;
+    const OPERATION_PROJECT   = 4;
+
+    public static $operationType = [
+
+        self::OPERATION_MODEL =>'模板日志',
+        self::OPERATION_CATE  =>'目录日志',
+
+
+
+
+    ];
+
 }

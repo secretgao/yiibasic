@@ -74,10 +74,10 @@ class ModelsController extends BasicController
             $msg .= AUser::getName($createUid);
             if ($type == 0) {
                 $msg.= '创建模板:'.$name;
-                helps::writeLog('模板日志',$msg);
+                helps::writeLog(Constants::OPERATION_MODEL,$msg);
             } else {
                 $msg.= '创建目录:'.$name;
-                helps::writeLog('目录日志',$msg);
+                helps::writeLog(Constants::OPERATION_CATE,$msg);
             }
 
             $this->Success(['id'=>$Obj->attributes['id']]);
@@ -108,10 +108,10 @@ class ModelsController extends BasicController
             $msg .= AUser::getName($uid);
             if ($Obj->type == 0) {
                 $msg.= '编辑模板:'.$oldName.'改成'.$name;
-                helps::writeLog('模板日志',$msg);
+                helps::writeLog(Constants::OPERATION_MODEL,$msg);
             } else {
                 $msg.= '编辑目录:'.$oldName.'改成'.$name;
-                helps::writeLog('目录日志',$msg);
+                helps::writeLog(Constants::OPERATION_CATE,$msg);
             }
             $this->Success();
         }
@@ -140,10 +140,10 @@ class ModelsController extends BasicController
             $msg .= AUser::getName($uid);
             if ($Obj->type == 0) {
                 $msg.= '删除模板:'.$Obj->name;
-                helps::writeLog('模板日志',$msg);
+                helps::writeLog(Constants::OPERATION_MODEL,$msg);
             } else {
                 $msg.= '删除目录:'.$Obj->name;
-                helps::writeLog('目录日志',$msg);
+                helps::writeLog(Constants::OPERATION_CATE,$msg);
             }
             $this->Success();
         }
@@ -173,9 +173,9 @@ class ModelsController extends BasicController
 
         if ($model->save(false)) {
             $msg = '操作人:';
-            $msg .= AUser::getName($uid);
+            $msg.= AUser::getName($uid);
             $msg.= '模块:'.$model->name.'添加备注:'.$remark;
-            helps::writeLog('模板日志',$msg);
+            helps::writeLog(Constants::OPERATION_MODEL,$msg);
             $this->Success();
         }
 

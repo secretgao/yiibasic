@@ -83,4 +83,23 @@ class AUser extends \yii\db\ActiveRecord
         }
         return true;
     }
+
+
+    /**
+     *
+     * 返回用户名称
+     */
+    public static function getName($uid){
+
+        $data = self::find()->select('nick_name,true_name')
+            ->where(['id'=>$uid,'status'=>0])->asArray()->one();
+
+        if (empty($data)) {
+            return $uid;
+        } else if (!empty($data['true_name'])) {
+            return $data['true_name'];
+        } else if (!empty($data['nick_name'])) {
+            return $data['nick_name'];
+        }
+    }
 }
