@@ -11,6 +11,7 @@ final class Constants
     const TEST_USER                 = 'test';
     const PASSWORD_ERROR            = 999;
 
+    //接口错误返回
     const RET_SUCCESS               = 0;
     const RET_ERROR                 = 1000;
     const GLOBAL_INVALID_PARAM      = 1001;
@@ -50,7 +51,7 @@ final class Constants
         self::PROJECT_ALREADY_DEL =>'项目已经删除'
     ];
 
-
+    //操作日志相关
     const OPERATION_MODEL   = 1;
     const OPERATION_CATE    = 2;
     const OPERATION_FILE    = 3;
@@ -66,9 +67,21 @@ final class Constants
         self::OPERATION_FILE  =>'文件日志',
         self::OPERATION_POSITION  =>'部门日志',
 
-
-
-
     ];
 
+    //项目相关
+    // `status` '项目状态   0 未开始  1 进行中  2 已结束  3 暂停 4删除',
+    const PROJECT_NONSTARTER  = 0;
+    const PROJECT_START  = 1;
+    const PROJECT_END    = 2;
+    const PROJECT_STOP   = 3;
+    const PROJECT_DELETE = 4;
+
+    public static $projectStatus = [
+        self::PROJECT_NONSTARTER =>'未开始',
+        self::PROJECT_START =>'进行中',
+        self::PROJECT_END =>'已结束',
+        self::PROJECT_STOP =>'暂停',
+        self::PROJECT_DELETE =>'删除',
+    ];
 }

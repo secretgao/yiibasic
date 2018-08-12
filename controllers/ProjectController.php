@@ -118,6 +118,8 @@ class ProjectController extends BasicController
               $result = [
                   'projectId'=>(string) $projectObjId,
               ];
+              $msg = '创建项目:'.$name;
+              helps::writeLog(Constants::OPERATION_PROJECT,$msg,$uid);
 
               $this->Success($result);
 
@@ -143,14 +145,18 @@ class ProjectController extends BasicController
         $idArr = explode(',', $ids);
         $trans = Yii::$app->db->beginTransaction();
         try {
+            $msg = '排序项目:';
             foreach ($idArr as $key=>$projectId){
                 $data = AProject::findOne($projectId);
                 if ($data){
                     $data->sort = $key+1;
                     $data->save(false);
+                    $msg .= $data->name.',';
                 }
             }
             $trans->commit();
+
+            helps::writeLog(Constants::OPERATION_PROJECT,$msg,$uid);
             $this->Success();
         } catch (\Exception $e){
             $trans->rollBack();
@@ -355,6 +361,7 @@ class ProjectController extends BasicController
         }
         $transaction= Yii::$app->db->beginTransaction();
         try {
+            $msg = '编辑项目:'.$project->name;
             if ($selectUserIds){
 
                 $joinUid = $project->join_uid;
@@ -363,21 +370,25 @@ class ProjectController extends BasicController
                 $project->join_uid = $joinUid;
                 $project->members = $members;
                 $member = explode(',',$selectUserIds);
+                $msg.='添加人员：';
                 foreach ($member as $uid) {
                     $projectExt = new AProjectExt();
                     $projectExt->project_id = $projectId;
                     $projectExt->uid = $uid;
+                    $msg.= AUser::getName($uid);
                     if (!$projectExt->insert()){
                         $this->Error(Constants::RET_ERROR,$projectExt->getErrors());
                     }
                 }
             }
             if ($projectStatus){
+                $msg.='设置项目状态：';
                 if ($projectStatus == 1){
                     $project->start_time = time();
                 }
 
                 $project->status = $projectStatus;
+                $msg .=Constants::$projectStatus[$projectStatus];
             }
 
 
@@ -386,6 +397,9 @@ class ProjectController extends BasicController
 
             }
             $transaction->commit();
+
+            helps::writeLog(Constants::OPERATION_PROJECT,$msg,$userId);
+
             $this->Success();
         } catch (\Exception $e) {
             //如果操作失败, 数据回滚
@@ -449,12 +463,12 @@ class ProjectController extends BasicController
      */
     public function actionDelProjectMember()
     {
-        $uid = $this->getParam('userId',true);
+        $userId = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
         $memberId = $this->getParam('memberId',true);
 
         $project = AProject::find()
-            ->where(['id'=>$projectId,'create_uid'=>$uid])
+            ->where(['id'=>$projectId,'create_uid'=>$userId])
             ->one();
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
@@ -465,11 +479,12 @@ class ProjectController extends BasicController
         if (!in_array($memberId,$memberArr)){
             $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
-
+        $msg = '删除项目参与人员:';
         $num = 0; //从新计算参与人数
         foreach ($memberArr as $key=>$mid){
             if ($mid == $memberId){
                 unset($memberArr[$key]);
+                $msg.= AUser::getName($memberId).',';
             } else {
                 $num++;
             }
@@ -495,6 +510,8 @@ class ProjectController extends BasicController
                 $this->Error(Constants::RET_ERROR,$project->getErrors());
             }
             $transaction->commit();
+            helps::writeLog(Constants::OPERATION_PROJECT,$msg,$userId);
+
             $this->Success();
         }
         catch (\Exception $e) {
@@ -526,6 +543,8 @@ class ProjectController extends BasicController
 
         $project->status = '4';
         if ($project->save(false)){
+            $msg = '删除项目:'.$project->name;
+            helps::writeLog(Constants::OPERATION_PROJECT,$msg,$userId);
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
