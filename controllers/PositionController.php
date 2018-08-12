@@ -157,6 +157,13 @@ class PositionController extends BasicController
         }
 
         if ($user->save(false)) {
+            if ($isAdd == 'true') {
+                $msg = '添加部门:'.$position->name;
+                helps::writeLog(Constants::OPERATION_POSITION,$msg,$userId);
+            } else {
+                $msg = '移除部门:'.$position->name;
+                helps::writeLog(Constants::OPERATION_POSITION,$msg,$userId);
+            }
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);

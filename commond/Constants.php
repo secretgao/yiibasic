@@ -64,6 +64,7 @@ final class Constants
         self::OPERATION_CATE  =>'目录日志',
         self::OPERATION_USER  =>'用户日志',
         self::OPERATION_FILE  =>'文件日志',
+        self::OPERATION_POSITION  =>'部门日志',
 
 
 
