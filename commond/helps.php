@@ -209,6 +209,8 @@ class helps {
         $log->a_name = $actionName;
         $log->create_time = time();
         $log->operation = $msg.$message;
+        $log->uid = $uid;
+
         $log->insert();
     }
 

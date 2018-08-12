@@ -91,6 +91,10 @@ class AUser extends \yii\db\ActiveRecord
      */
     public static function getName($uid){
 
+        if (empty($uid)){
+            return 0;
+        }
+
         $data = self::find()->select('nick_name,true_name')
             ->where(['id'=>$uid,'status'=>0])->asArray()->one();
 

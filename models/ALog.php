@@ -13,6 +13,7 @@ use Yii;
  * @property int $type 操作类型
  * @property string $c_name 控制器名
  * @property string $a_name 方法名
+ * @property int $uid 操作人id
  */
 class ALog extends \yii\db\ActiveRecord
 {
@@ -30,7 +31,7 @@ class ALog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_time', 'type'], 'integer'],
+            [['create_time', 'type', 'uid'], 'integer'],
             [['operation'], 'string'],
             [['c_name', 'a_name'], 'string', 'max' => 20],
         ];
@@ -48,6 +49,7 @@ class ALog extends \yii\db\ActiveRecord
             'type' => 'Type',
             'c_name' => 'C Name',
             'a_name' => 'A Name',
+            'uid' => 'Uid',
         ];
     }
 }
