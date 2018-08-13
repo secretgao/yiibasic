@@ -226,9 +226,7 @@ class FileController extends BasicController
         $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
 
         if (empty($project)) {
-
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
-
         }
         $projectName = $project['name'];
         $modelId = $project['model_id'];
@@ -264,11 +262,16 @@ class FileController extends BasicController
             $zip->close(); //关闭处理的zip文件
         }
 
+        if (file_exists($zipName)){
+            $this->Success(['data'=>$zipName]);
+        } else {
+            $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
+        }
+
     }
 
 
     private  function addFileToZip($path,$zip) {
-       // echo '<pre>';print_r($path);
         $handler = opendir($path); //打开当前文件夹由$path指定。
         while (($filename=readdir($handler))!==false) {
             //文件夹文件名字为'.'和‘..'，不要对他们进行操作

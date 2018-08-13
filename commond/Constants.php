@@ -27,6 +27,7 @@ final class Constants
     const EMAIL_IS_ERROR            = 1011;
     const PROJECT_NOT_FOUND         = 1012;
     const PROJECT_ALREADY_DEL       = 1013;
+    const PROJECT_PACK_FAIL         = 1014;
 
     const REQUSET_NO_POST           = 2000;
     const REQUSET_NO_GET            = 2001;
@@ -48,7 +49,8 @@ final class Constants
         self::USER_IS_EXITS  =>'用户已经注册过',
         self::EMAIL_IS_ERROR=>'邮箱不合法',
         self::PROJECT_NOT_FOUND =>'项目不存在',
-        self::PROJECT_ALREADY_DEL =>'项目已经删除'
+        self::PROJECT_ALREADY_DEL =>'项目已经删除',
+        self::PROJECT_PACK_FAIL =>'项目压缩失败，可能是网络原因，请重试',
     ];
 
     //操作日志相关
