@@ -1352,7 +1352,6 @@ class PHPMailer
             return $this->postSend();
         } catch (Exception $exc) {
 
-            var_dump($exc);
             $this->mailHeader = '';
             $this->setError($exc->getMessage());
             if ($this->exceptions) {

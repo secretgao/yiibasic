@@ -30,7 +30,7 @@ class SendEmailController extends BasicController
 
         $fileAdress = $this->getParam('file',true);
         $email = $this->getParam('email',true);
-       
+
         $mail = new PHPMailer(true);
         try {
 
@@ -71,9 +71,10 @@ class SendEmailController extends BasicController
             $mail->addAttachment($fileAdress);
             // 发送邮件 返回状态
             $status = $mail->send();
+            @unlink($fileAdress);
             $this->Success();
            // echo 'Message has been sent';
-            @unlink($fileAdress);
+
         } catch (Exception $e) {
             $this->Error(Constants::RET_ERROR, 'Message could not be sent. Mailer Error: '.$mail->ErrorInfo);
            // echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
