@@ -28,6 +28,8 @@ class SendEmailController extends BasicController
     {
         $config = YII::$app->params;
 
+        $fileAdress = $this->getParam('file',true);
+        $email = $this->getParam('email',true);
         $mail = new PHPMailer(true);
         try {
 
@@ -57,7 +59,7 @@ class SendEmailController extends BasicController
             // 邮件正文是否为html编码 注意此处是一个方法
             $mail->isHTML(true);
             // 设置收件人邮箱地址
-            $mail->addAddress('784617405@qq.com');
+            $mail->addAddress($email);
             // 添加多个收件人 则多次调用方法即可
        //     $mail->addAddress('87654321@163.com');
             // 添加该邮件的主题
@@ -65,12 +67,12 @@ class SendEmailController extends BasicController
             // 添加邮件正文
             $mail->Body = '<h1>Hello World</h1>';
             // 为该邮件添加附件
-            $mail->addAttachment('./example.pdf');
+            $mail->addAttachment($fileAdress);
             // 发送邮件 返回状态
             $status = $mail->send();
             $this->Success();
            // echo 'Message has been sent';
-
+            @unlink($fileAdress);
         } catch (Exception $e) {
             $this->Error(Constants::RET_ERROR, 'Message could not be sent. Mailer Error: '.$mail->ErrorInfo);
            // echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
