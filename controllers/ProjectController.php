@@ -281,6 +281,7 @@ class ProjectController extends BasicController
                     foreach ($file as $item){
                         if (!in_array($item['id'],$fileId)){
                             $fileId[] = $item['id'];
+                            $item['path'] = trim($item['path'],'.');
                             array_push($result,$item);
                         }
                     }
@@ -316,6 +317,7 @@ class ProjectController extends BasicController
                 foreach ($file as $item){
                     if (!in_array($item['id'],$fileId)){
                         $fileId[] = $item['id'];
+                        $item['path'] = trim($item['path'],'.');
                         array_push($result,$item);
                     }
                 }
