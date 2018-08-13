@@ -234,7 +234,7 @@ class FileController extends BasicController
         $modelId = $project['model_id'];
 //var_dump($projectName);
         $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'project';
-        $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
+      //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
         $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
         //创建项目根目录
        // var_dump($projectPath);exit();
@@ -255,8 +255,8 @@ class FileController extends BasicController
         //打包
         $zip = new \ZipArchive();
         $zipName = $projectPath.'.zip';
-      //  $rec = fopen($zipName,'wb');
-      //  fclose($rec);
+        $rec = fopen($zipName,'wb');
+        fclose($rec);
        // echo  $zipName.PHP_EOL;
       //  echo $projectPath;
         if($zip->open($zipName, \ZipArchive::OVERWRITE)=== TRUE){
@@ -268,7 +268,7 @@ class FileController extends BasicController
 
 
     private  function addFileToZip($path,$zip) {
-        echo '<pre>';print_r($path);
+       // echo '<pre>';print_r($path);
         $handler = opendir($path); //打开当前文件夹由$path指定。
         while (($filename=readdir($handler))!==false) {
             //文件夹文件名字为'.'和‘..'，不要对他们进行操作
