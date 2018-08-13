@@ -45,14 +45,14 @@ class BasicController extends Controller
     public function getParam($key, $is_need = true, $default_value = NULL)
     {
 
-        if ($key == 'url'){
+        if ($key == 'file'){
             $val = self::$request->get($key);
         } else {
             $val = self::replace_specialChar(self::$request->get($key));
         }
         if ($val === NULL || $val === '')
         {
-            if ($key == 'url'){
+            if ($key == 'file'){
                 $val = self::$request->post($key);
             } else {
                 $val = self::replace_specialChar(self::$request->post($key));
