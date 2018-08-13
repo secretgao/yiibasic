@@ -30,8 +30,7 @@ class SendEmailController extends BasicController
 
         $fileAdress = $this->getParam('file',true);
         $email = $this->getParam('email',true);
-        var_dump($fileAdress);
-        exit();
+       
         $mail = new PHPMailer(true);
         try {
 
