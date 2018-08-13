@@ -233,8 +233,8 @@ class FileController extends BasicController
         $projectName = $project['name'];
         $modelId = $project['model_id'];
 //var_dump($projectName);
-        $dir = './uploads/project';
-    //    $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
+        $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'project';
+        $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
         $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
         //创建项目根目录
        // var_dump($projectPath);exit();
@@ -245,17 +245,22 @@ class FileController extends BasicController
        // echo "projectPath:".$projectPath.PHP_EOL;
         //获取所有模板
         $allstep = helps::allStep($projectId);
+
         //获取所有文件
         $allfile = helps::getProjectAllFile($projectId);
         //创建文件夹 把文件复制到指定目录下
         helps::createDirectory($projectPath,$allstep,$allfile,0);
 
+
         //打包
         $zip = new \ZipArchive();
         $zipName = $projectPath.'.zip';
-        echo  $zipName.PHP_EOL;
+      //  $rec = fopen($zipName,'wb');
+      //  fclose($rec);
+       // echo  $zipName.PHP_EOL;
+      //  echo $projectPath;
         if($zip->open($zipName, \ZipArchive::OVERWRITE)=== TRUE){
-            $this->addFileToZip($projectPath, $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
+            $this->addFileToZip($projectPath.DIRECTORY_SEPARATOR, $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
             $zip->close(); //关闭处理的zip文件
         }
 
@@ -263,6 +268,7 @@ class FileController extends BasicController
 
 
     private  function addFileToZip($path,$zip) {
+        echo '<pre>';print_r($path);
         $handler = opendir($path); //打开当前文件夹由$path指定。
         while (($filename=readdir($handler))!==false) {
             //文件夹文件名字为'.'和‘..'，不要对他们进行操作

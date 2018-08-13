@@ -292,10 +292,10 @@ class helps {
 
         foreach ($param as $key=>$item) {
             if ($item['pid'] == $pid) {
-               // $item['name'] = iconv("UTF-8", "GBK", $item['name']);
+                $item['name'] = iconv("UTF-8", "GBK", $item['name']);
                //汉字转码 防止乱码
                 $newPath = $path.DIRECTORY_SEPARATOR.$item['name'];
-               // echo $newPath.PHP_EOL;
+               // echo '<pre>';print_r($newPath).PHP_EOL;
                 if (!is_dir($newPath)) {
                     mkdir($newPath,0777,true);
                 }
