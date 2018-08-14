@@ -434,18 +434,20 @@ class ProjectController extends BasicController
         }
         $userArr = explode(',',$project['join_uid']);
 
-        $user = [];
-        if ($userArr) {
-            foreach ($userArr as $uid){
+        $user = $result =[];
 
+        if ($userArr) {
+            foreach ($userArr as $uid) {
                 $userInfo = AUser::find()->select('true_name,position_id')
-                    ->where(['id'=>$uid])->asArray()->one();
-                $user[$userInfo['position_id']][] =[
-                    'userId'=>$uid,
-                    'trueName'=>$userInfo['true_name'],
-                ];
+                    ->where(['id'=>$uid,'status'=>0])->asArray()->one();
+                if ($userInfo) {
+                    $user[$userInfo['position_id']][] =[
+                        'userId'=>$uid,
+                        'trueName'=>$userInfo['true_name'],
+                    ];
+                }
             }
-            $result = [];
+
             foreach ($user as $positionId=>$value){
                 $position = APosition::find()->select('name')
                     ->where(['id'=>$positionId])->asArray()->scalar();
