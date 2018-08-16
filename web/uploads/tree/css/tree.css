@@ -1,0 +1,144 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+body {
+  font-size: 14px;
+  color: #333;
+  font-family: "Microsoft Yahei";
+}
+ul, li {
+  list-style-type: none;
+}
+ul a{
+  color: #333;
+  text-decoration: none;
+}
+#treeView {
+  width: 600px;
+  margin: 20px auto 0;
+  border: 1px solid #f2f2f2;
+}
+.treeNode {
+  height: 32px;
+  border: 1px solid #fff;
+  border-width: 1px 0;
+  cursor: pointer;
+  font-size: 0;
+}
+.treeNode:hover {
+  background: #f4f9fd;
+  border-color: #e5f0fb;
+}
+.treeNode-cur,
+.treeNode-cur:hover {
+  /*background: #e5f0fb;
+  border-color: #BBD4EF #fff;*/
+}
+.treeNode-search-cur,
+.treeNode-search-cur:hover {
+  background: #e5f0fb;
+  border-color: #BBD4EF #fff;
+}
+.icon {
+  display: inline-block;
+  background: url(../imgs/icon.png) no-repeat;
+  vertical-align: middle;
+}
+.icon-minus {
+  width: 15px;
+  height: 15px;
+  margin: 0 4px;
+  background-position: -30px -22px;
+}
+.icon-add {
+  width: 15px;
+  height: 15px;
+  margin: 0 4px;
+  background-position: -30px 0;
+}
+.icon-file-close {
+  width: 22px;
+  height: 18px;
+  margin-right: 5px;
+  background-position: 0 0;
+}
+.icon-file-open {
+  width: 22px;
+  height: 18px;
+  margin-right: 5px;
+  background-position: 0 -22px;
+}
+.icon-txt {
+  display: inline-block;
+  width: 22px;
+  height: 18px;
+  margin-right: 5px;
+  background: url(../imgs/txt.png) no-repeat;
+  vertical-align: middle;
+}
+.icon-img {
+  display: inline-block;
+  width: 22px;
+  height: 18px;
+  margin-right: 5px;
+  background: url(../imgs/img.png) no-repeat;
+  vertical-align: middle;
+}
+.icon-music {
+  display: inline-block;
+  width: 22px;
+  height: 18px;
+  margin-right: 5px;
+  background: url(../imgs/music.png) no-repeat;
+  vertical-align: middle;
+}
+.icon-video {
+  display: inline-block;
+  width: 22px;
+  height: 18px;
+  margin-right: 5px;
+  background: url(../imgs/video.png) no-repeat;
+  vertical-align: middle;
+}
+.title {
+  position: relative;
+  top: 6px;
+  font-size: 14px;
+}
+.treeNode-empty .icon-minus {
+  background-position: -999px -999px;
+}
+.treeNode-empty .icon-add {
+  background-position: -999px -999px;
+}
+#treeView ul.none {
+  display: none;
+}
+.search-text{
+  width: 150px;
+  padding: 8px 10px;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  transition: border-color .2s;
+}
+.search{
+  padding-top: 15px;
+  text-align: center;
+}
+.search-text:focus{
+  border-color: #409eff;
+  outline: none;
+}
+.search-btn{
+  padding: 8px 15px;
+  background: #409eff;
+  border: 0;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+.treeNode-div{
+  display: inline-block;
+  height: 100%;
+}
