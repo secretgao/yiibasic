@@ -240,7 +240,7 @@ class ProjectController extends BasicController
             }
             //特殊情况 要把所有层级找出来然后筛选
             if (empty($result)){
-                $allstep = $this->getAllStep($projectId);
+                $allstep = helps::allStep($projectId);
                 foreach ($allstep as $item){
                     if ($parentId == $item['pid']){
                         $result[] = $item;
@@ -554,38 +554,27 @@ class ProjectController extends BasicController
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 
+
     /**
-     * 根据项目返回所有层级
-     * @param $projectId
+     * 项目打包之前预览
      * @return array
-     *
      */
 
-    private function getAllStep($projectId)
+    public function actionPreview()
     {
 
-        //$projectId = 111;
-        $project = AProject::find()->select('model_id')
-            ->where(['id'=>$projectId])->asArray()->one();
-        $modelIdArr = explode(',', $project['model_id']);
-        $top = $step = [];
-        //说明是顶级返回所有子集
-        if (count($modelIdArr) == 1) {
-            $top = helps::getParents($project['model_id']);
+        //$projectId = $this->getParam('projectId',true);
+        $projectId = 151;
+        $allstep = helps::allStep($projectId);
+
+        if (empty($allstep)){
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
         }
 
-        $toparr = [];
-        if ($top) {
-            foreach ($top as $item){
-                if ($item['pid'] == 0){
-                    $toparr[] = $item;
-                }
-            }
+        $columns = "id,catalog_id as pid,type,FROM_UNIXTIME(create_time) as uploadTime ";
+        $allfile = helps::getProjectAllFile($projectId,$columns);
 
-            $all = helps::recursion($toparr);
-            $step  = helps::getson($all,0,1);
-        }
+        $this->Success(['data'=>array_merge($allstep,$allfile)]);
 
-        return $step;
     }
 }

@@ -37,6 +37,7 @@ class helps {
             if($ctid === $pid){
                 $tmp = $v;
                 $tmp['level'] = $level;
+                $tmp['type']  = 0;
                 $res[] = $tmp;
                 self::getson($arr,$cid,$level+1);
             }
@@ -262,7 +263,7 @@ class helps {
      * @param $projectId
      */
 
-    public static function getProjectAllFile($projectId){
+    public static function getProjectAllFile($projectId,$columns = "catalog_id as cid,path,name"){
 
         $result = [];
 
@@ -270,7 +271,7 @@ class helps {
             return $result;
         }
 
-        $file = AFile::find()->select('catalog_id as cid,path,name')
+        $file = AFile::find()->select($columns)
             ->where(['status'=>0,'project_id'=>$projectId])
             ->asArray()->all();
 
