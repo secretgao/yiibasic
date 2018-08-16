@@ -263,7 +263,7 @@ class helps {
      * @param $projectId
      */
 
-    public static function getProjectAllFile($projectId,$columns = "catalog_id as cid,path,name"){
+    public static function getProjectAllFile($projectId){
 
         $result = [];
 
@@ -271,7 +271,7 @@ class helps {
             return $result;
         }
 
-        $file = AFile::find()->select($columns)
+        $file = AFile::find()->select('id,catalog_id as pid,type,FROM_UNIXTIME(create_time) as uploadTime ')
             ->where(['status'=>0,'project_id'=>$projectId])
             ->asArray()->all();
 
@@ -304,7 +304,7 @@ class helps {
                 if (!empty($allFiles)) {
                     //循环项目文件 ，放到指定目录下
                     foreach ($allFiles as $k=>$value){
-                        if ($pid == $value['cid']) {
+                        if ($pid == $value['pid']) {
                             self::copyToDir($value['path'],$newPath,$value['name']);
                             unset($allFiles[$k]);
                         }
