@@ -249,14 +249,16 @@ class FileController extends BasicController
         //创建文件夹 把文件复制到指定目录下
         helps::createDirectory($projectPath,$allstep,$allfile,0);
 
-
+        //生成预览数据格式
+        $jsonData = json_encode(array_merge($allstep,$allfile));
+        $json = " var json = ".$jsonData;
+        file_put_contents('data.js',$json);
         //打包
         $zip = new \ZipArchive();
         $zipName = $projectPath.'.zip';
         $rec = fopen($zipName,'wb');
         fclose($rec);
-       // echo  $zipName.PHP_EOL;
-      //  echo $projectPath;
+      
         if($zip->open($zipName, \ZipArchive::OVERWRITE)=== TRUE){
             $this->addFileToZip($projectPath.DIRECTORY_SEPARATOR, $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
             $zip->close(); //关闭处理的zip文件

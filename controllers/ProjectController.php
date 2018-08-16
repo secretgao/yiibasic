@@ -574,8 +574,10 @@ class ProjectController extends BasicController
         $columns = "id,catalog_id as pid,type,FROM_UNIXTIME(create_time) as uploadTime ";
         $allfile = helps::getProjectAllFile($projectId,$columns);
 
-        $this->Success(['data'=>array_merge($allstep,$allfile)]);
-
+       // $this->Success(['data'=>array_merge($allstep,$allfile)]);
+        $jsonData = json_encode(array_merge($allstep,$allfile));
+        $json = " var json = ".$jsonData;
+        file_put_contents('data.js',$json);
     }
 
 
