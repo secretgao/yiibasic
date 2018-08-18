@@ -230,29 +230,29 @@ class FileController extends BasicController
         }
         $projectName = $project['name'];
         $modelId = $project['model_id'];
-//var_dump($projectName);
+
         $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'project';
       //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
         $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
         //创建项目根目录
-       // var_dump($projectPath);exit();
         if (!is_dir($projectPath)) {
             mkdir($projectPath,0777,true);
         }
 
-       // echo "projectPath:".$projectPath.PHP_EOL;
         //获取所有模板
-        $allstep = helps::allStep($projectId);
-
+        $allStep = helps::allStep($projectId);
         //获取所有文件
         $allfile = helps::getProjectAllFile($projectId);
-        //创建文件夹 把文件复制到指定目录下
-        helps::createDirectory($projectPath,$allstep,$allfile,0);
-
+        //项目预览 复制到打包文件中
+        $preview = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'tree';
+        helps::xCopy($preview, $projectPath);
         //生成预览数据格式
-        $jsonData = json_encode(array_merge($allstep,$allfile));
+        $jsonData = json_encode(array_merge($allStep,$allfile));
         $json = " var json = ".$jsonData;
-        file_put_contents('data.js',$json);
+        file_put_contents($projectPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'data.js',
+            $json);
+        //创建文件夹 把文件复制到指定目录下
+        helps::createDirectory($projectPath,$allStep,$allfile,0);
         //打包
         $zip = new \ZipArchive();
         $zipName = $projectPath.'.zip';
@@ -288,4 +288,5 @@ class FileController extends BasicController
         }
         @closedir($path);
     }
+
 }
