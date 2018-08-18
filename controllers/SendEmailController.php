@@ -30,13 +30,15 @@ class SendEmailController extends BasicController
 
         $fileAdress = $this->getParam('file',true);
         $email = $this->getParam('email',true);
+        $subject = $this->getParam('subject',true);
+        $content = $this->getParam('content',true);
 
         $mail = new PHPMailer(true);
         try {
 
             $mail = new PHPMailer();
             // 是否启用smtp的debug进行调试 开发环境建议开启 生产环境注释掉即可 默认关闭debug调试模式
-            $mail->SMTPDebug = 1;
+           // $mail->SMTPDebug = 1;
             // 使用smtp鉴权方式发送邮件
             $mail->isSMTP();
             // smtp需要鉴权 这个必须是true
@@ -64,9 +66,9 @@ class SendEmailController extends BasicController
             // 添加多个收件人 则多次调用方法即可
        //     $mail->addAddress('87654321@163.com');
             // 添加该邮件的主题
-            $mail->Subject = '邮件主题';
+            $mail->Subject = $subject;
             // 添加邮件正文
-            $mail->Body = '<h1>Hello World</h1>';
+            $mail->Body = $content;
             // 为该邮件添加附件
             $mail->addAttachment($fileAdress);
             // 发送邮件 返回状态

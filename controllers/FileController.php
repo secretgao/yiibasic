@@ -222,7 +222,7 @@ class FileController extends BasicController
      */
     public function actionProjectPack()
     {
-        $projectId = 151;//$this->getParam('projectId',true,70);
+        $projectId = $this->getParam('projectId',true,70);
         $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
 
         if (empty($project)) {
