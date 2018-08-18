@@ -7,8 +7,8 @@ use app\commond\Constants;
 use app\commond\Email;
 use app\commond\PHPMailer\PHPMailer;
 use Yii;
-
-
+use app\models\AProject;
+use app\commond\helps;
 use yii\base\Exception;
 
 /**
@@ -24,14 +24,81 @@ class SendEmailController extends BasicController
        parent::init();
     }
 
+
+    private  function addFileToZip($path,$zip) {
+        $handler = opendir($path); //打开当前文件夹由$path指定。
+        while (($filename=readdir($handler))!==false) {
+            //文件夹文件名字为'.'和‘..'，不要对他们进行操作
+            if ($filename != "." && $filename != "..") {
+                // 如果读取的某个对象是文件夹，则递归
+                if (is_dir($path."/".$filename)) {
+                    $this->addFileToZip($path."/".$filename, $zip);
+                } else{ //将文件加入zip对象
+                    $zip->addFile($path."/".$filename);
+                }
+            }
+        }
+        @closedir($path);
+    }
+
+    /**
+     * 打包项目发送邮件
+     */
     public function actionSend()
     {
         $config = YII::$app->params;
 
-        $fileAdress = $this->getParam('file',true);
         $email = $this->getParam('email',true);
-        $subject = $this->getParam('subject',true);
         $content = $this->getParam('content',true);
+        $projectId = $this->getParam('projectId',true);
+
+        $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
+
+        if (empty($project)) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+        $projectName = $project['name'];
+        $modelId = $project['model_id'];
+
+
+        $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'project';
+        //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
+        $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
+        //创建项目根目录
+        if (!is_dir($projectPath)) {
+            mkdir($projectPath,0777,true);
+        }
+
+        //获取所有模板
+        $allStep = helps::allStep($projectId);
+        //获取所有文件
+        $allfile = helps::getProjectAllFile($projectId);
+        //项目预览 复制到打包文件中
+        $preview = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'tree';
+        helps::xCopy($preview, $projectPath);
+        //生成预览数据格式
+        $jsonData = json_encode(array_merge($allStep,$allfile));
+        $json = " var json = ".$jsonData;
+        file_put_contents($projectPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'data.js',
+            $json);
+        //创建文件夹 把文件复制到指定目录下
+        helps::createDirectory($projectPath,$allStep,$allfile,0);
+
+
+        //打包
+        $zip = new \ZipArchive();
+        $zipName = $projectPath.'.zip';
+        $rec = fopen($zipName,'wb');
+        fclose($rec);
+
+        if($zip->open($zipName, \ZipArchive::OVERWRITE)=== TRUE){
+            $this->addFileToZip($projectPath.DIRECTORY_SEPARATOR, $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
+            $zip->close(); //关闭处理的zip文件
+        }
+
+        if (!file_exists($zipName)){
+            $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
+        }
 
         $mail = new PHPMailer(true);
         try {
@@ -66,14 +133,14 @@ class SendEmailController extends BasicController
             // 添加多个收件人 则多次调用方法即可
        //     $mail->addAddress('87654321@163.com');
             // 添加该邮件的主题
-            $mail->Subject = $subject;
+            $mail->Subject = $projectName;
             // 添加邮件正文
             $mail->Body = $content;
             // 为该邮件添加附件
-            $mail->addAttachment($fileAdress);
+            $mail->addAttachment($zipName);
             // 发送邮件 返回状态
             $status = $mail->send();
-            @unlink($fileAdress);
+            @unlink($zipName);
             $this->Success();
            // echo 'Message has been sent';
 
