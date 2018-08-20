@@ -28,6 +28,7 @@ final class Constants
     const PROJECT_NOT_FOUND         = 1012;
     const PROJECT_ALREADY_DEL       = 1013;
     const PROJECT_PACK_FAIL         = 1014;
+    const NOT_SYS_POSITION          = 1015;
 
     const REQUSET_NO_POST           = 2000;
     const REQUSET_NO_GET            = 2001;
@@ -51,6 +52,7 @@ final class Constants
         self::PROJECT_NOT_FOUND =>'项目不存在',
         self::PROJECT_ALREADY_DEL =>'项目已经删除',
         self::PROJECT_PACK_FAIL =>'项目压缩失败，可能是网络原因，请重试',
+        self::NOT_SYS_POSITION =>'不是系统职位',
     ];
 
     //操作日志相关
@@ -86,4 +88,21 @@ final class Constants
         self::PROJECT_STOP =>'暂停',
         self::PROJECT_DELETE =>'删除',
     ];
+
+
+    //职位 不是部门-----主管,专管员,部门领导，普通职员
+    const MEMBER = 0;            //普通职员
+    const DIRECTOR = 1;          //主管
+    const ADMINISTRATION = 2;    //专管员
+    const LEADER = 3;            //部门领导
+
+
+    public static $position = [
+        self::MEMBER => '普通职员',
+        self::DIRECTOR => '主管',
+        self::ADMINISTRATION => '专管员',
+        self::LEADER => '部门领导',
+
+    ];
+
 }

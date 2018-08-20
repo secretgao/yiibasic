@@ -19,6 +19,7 @@ use Yii;
  * @property string $phone 手机号
  * @property int $group 是否是超级管理员
  * @property string $weixin_id 微信id
+ * @property int $sys_position 系统职位
  */
 class AUser extends \yii\db\ActiveRecord
 {
@@ -37,12 +38,15 @@ class AUser extends \yii\db\ActiveRecord
     {
         return [
             [['create_time', 'position_id'], 'integer'],
+            [['create_time', 'position_id', 'sys_position'], 'integer'],
             [['nick_name'], 'string', 'max' => 50],
             [['true_name', 'phone'], 'string', 'max' => 20],
             [['email'], 'string', 'max' => 60],
-            [['avatar'], 'string', 'max' => 255],
-            [['status', 'sex', 'group'], 'string', 'max' => 3],
-            [['weixin_id'], 'string', 'max' => 100],
+
+            'phone' => 'Phone',
+            'group' => 'Group',
+            'weixin_id' => 'Weixin ID',
+            'sys_position' => 'Sys Position',
         ];
     }
 

@@ -246,4 +246,44 @@ class PositionController extends BasicController
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }
+
+    /**
+     * 获取系统职位。不是部门
+     * @return array
+     */
+
+    public function actionGetSysPosition()
+    {
+        $this->Success(['data'=>Constants::$position]);
+    }
+
+
+    /**
+     * 设置系统职位
+     */
+    public function actionSetPosition()
+    {
+       $userId = $this->getParam('userId',true);
+       $positionId = $this->getParam('positionId',true);
+
+       $sysPosition = array_flip(Constants::$position);
+       if (!in_array($positionId,$sysPosition)) {
+           $this->Error(Constants::NOT_SYS_POSITION,Constants::$error_message[Constants::NOT_SYS_POSITION]);
+       }
+    
+       $user = AUser::findOne(['id'=>$userId,'status'=>0]);
+
+       if (!$user) {
+           $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
+       }
+
+       $user->sys_position = $positionId;
+
+       if ($user->save(false)){
+           $this->Success();
+       }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
+    }
+
 }
