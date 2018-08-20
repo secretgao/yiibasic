@@ -64,8 +64,20 @@ class ProjectController extends BasicController
                 $item['members'] = intval($item['members']);
                 $item['describe'] = $item['description'];
                 $item['used_time']  = $usedTime;
+                $projectAllStep = helps::allStep($item['id']);
+                $remark = [];
+                if ($projectAllStep) {
+                        foreach ($projectAllStep as $key =>$value) {
+                            if ($value['level'] == 2){
+                                $remark[] = $value['remark'];
+                            }
+                            unset($projectAllStep[$key]);
+                        }
+                }
+                $item['remark'] = $remark;
             }
         }
+
         $this->Success(['data'=>$data,'isCertified'=>$isPosition]);
     }
 

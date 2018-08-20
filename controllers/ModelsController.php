@@ -50,6 +50,7 @@ class ModelsController extends BasicController
 
         $projectId = $this->getParam('projectId',false);
         $createUid = $this->getParam('userId',true);
+        $remark = $this->getParam('remark',true);
 
         $level = 1;
 
@@ -68,6 +69,7 @@ class ModelsController extends BasicController
         $Obj->type = empty($type) ? '0' : (string)$type;
         $Obj->pid = empty($pid) ? 0 : $pid;
         $Obj->level = $level;
+        $Obj->remark = $remark;
 
         if ($Obj->insert()) {
             if ($type == 0) {
