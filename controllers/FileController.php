@@ -154,7 +154,7 @@ class FileController extends BasicController
      * 用户上传过的列表
      * @return array
      */
-    public function actionUserFileList()
+    public function actionFileList()
     {
 
         $uid = $this->getParam('userId',true);
