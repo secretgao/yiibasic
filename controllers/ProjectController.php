@@ -196,15 +196,14 @@ class ProjectController extends BasicController
         $projectId = $this->getParam('projectId',true);
         $parentId = $this->getParam('parentId',true);
         
-        $project = AProject::find()->select('model_id')
-        ->where(['id'=>$projectId])
-        ->andWhere(['<>','status',4])
-            ->asArray()->one();
+        $project = AProject::find()
+            ->select('model_id')->where(['id'=>$projectId])
+            ->andWhere(['<>','status',4])->asArray()->one();
         
         if (!$project) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-
+        $fileColumns = 'id,name,path,type,uid,create_time,size';
         //模版id 切割成数组
         $modelIdArr = explode(',', $project['model_id']);
         $result = [];
@@ -215,12 +214,12 @@ class ProjectController extends BasicController
 
         } else {
             $modelArr =  $temp =  [];  //去除重复目录用
-            foreach ($modelIdArr as $id){
+            foreach ($modelIdArr as $id) {
                 $catalog = helps::getParents($id);
-                if (!$catalog){
+                if (!$catalog) {
                     continue;
                 }
-                foreach ($catalog as $item){
+                foreach ($catalog as $item) {
                     //去除重复
                     if (!in_array($item['id'], $modelArr)) {
                         $temp[] = $item;
@@ -239,10 +238,10 @@ class ProjectController extends BasicController
                 }
             }
             //特殊情况 要把所有层级找出来然后筛选
-            if (empty($result)){
+            if (empty($result)) {
                 $allstep = helps::allStep($projectId);
-                foreach ($allstep as $item){
-                    if ($parentId == $item['pid']){
+                foreach ($allstep as $item) {
+                    if ($parentId == $item['pid']) {
                         $result[] = $item;
                     }
                 }
@@ -252,13 +251,12 @@ class ProjectController extends BasicController
         //根据最后返回信息 遍历 是否存在文件
 //echo '<pre>';print_r($result);exit();
         $fileId = [];
-        if ($result){
-
-            foreach ($result as $k=>$cata){
+        if ($result) {
+            foreach ($result as $k=>$cata) {
                 $result[$k]['type'] = '0';
 
-                if ($parentId == 0){
-                    $file = AFile::find()->select('id,name,path,type')
+                if ($parentId == 0) {
+                    $file = AFile::find()->select($fileColumns)
                         ->where([
                          //   'uid'=>$userId,
                             'project_id'=>$projectId,
@@ -267,7 +265,7 @@ class ProjectController extends BasicController
                         ])
                         ->asArray()->all();
                 } else {
-                    $file = AFile::find()->select('id,name,path,type')
+                    $file = AFile::find()->select($fileColumns)
                         ->where([
                            // 'uid'=>$userId,
                             'project_id'=>$projectId,
@@ -277,11 +275,13 @@ class ProjectController extends BasicController
                         ->asArray()->all();
                 }
 
-                if ($file){
-                    foreach ($file as $item){
-                        if (!in_array($item['id'],$fileId)){
+                if ($file) {
+                    foreach ($file as $item) {
+                        if (!in_array($item['id'],$fileId)) {
                             $fileId[] = $item['id'];
                             $item['path'] = trim($item['path'],'.');
+                            $item['creater'] = AUser::getName($item['uid']);
+                            $item['time'] = date('Y-m-d',$item['create_time']);
                             array_push($result,$item);
                         }
                     }
@@ -291,7 +291,7 @@ class ProjectController extends BasicController
             //项目目录
             $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
             if ($cata) {
-                foreach ($cata as &$value){
+                foreach ($cata as &$value) {
                     $value['type'] = '0';
                 }
                 $result = array_merge($result,$cata);
@@ -300,12 +300,12 @@ class ProjectController extends BasicController
             //项目目录
             $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
             if ($cata) {
-                foreach ($cata as &$value){
+                foreach ($cata as &$value) {
                     $value['type'] = '0';
                 }
                 $result = array_merge($result,$cata);
             }
-            $file = AFile::find()->select('id,name,path,type')
+            $file = AFile::find()->select($fileColumns)
                 ->where([
                   //  'uid'=>$userId,
                     'project_id'=>$projectId,
@@ -313,11 +313,13 @@ class ProjectController extends BasicController
                     'catalog_id'=>$parentId
                 ])
                 ->asArray()->all();
-            if ($file){
-                foreach ($file as $item){
-                    if (!in_array($item['id'],$fileId)){
+            if ($file) {
+                foreach ($file as &$item) {
+                    if (!in_array($item['id'],$fileId)) {
                         $fileId[] = $item['id'];
                         $item['path'] = trim($item['path'],'.');
+                        $item['creater'] = AUser::getName($item['uid']);
+                        $item['time'] = date('Y-m-d',$item['create_time']);
                         array_push($result,$item);
                     }
                 }
@@ -328,7 +330,7 @@ class ProjectController extends BasicController
         $data = [];
         if ($result) {
             $files = $chapter = [];
-            foreach ($result as $item){
+            foreach ($result as $item) {
                 if ($item['type'] == 0) {
                     $chapter[] = $item;
                 } else {
@@ -339,9 +341,6 @@ class ProjectController extends BasicController
 
         }
 
-
-
-//echo '<pre>';print_r($result);exit;
         $this->Success(['data'=>$data]);
        
     }
@@ -415,13 +414,13 @@ class ProjectController extends BasicController
 
     /**
      * 获取项目状态和参与人员用户
+     * status  0 未开始  1 进行中  2 已结束  3 暂停'
      */
     public function actionGetProjectStatusUser()
     {
         $createUid = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
 
-// `status` tinyint(3) DEFAULT '0' COMMENT '项目状态   0 未开始  1 进行中  2 已结束  3 暂停',
         $project = AProject::find()->select('status,join_uid')
             ->where(['id'=>$projectId,'create_uid'=>$createUid])
             ->asArray()->one();
@@ -555,30 +554,7 @@ class ProjectController extends BasicController
     }
 
 
-    /**
-     * 项目打包之前预览
-     * @return array
-     */
 
-    public function actionPreview()
-    {
-
-        //$projectId = $this->getParam('projectId',true);
-        $projectId = 151;
-        $allstep = helps::allStep($projectId);
-
-        if (empty($allstep)){
-            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-        }
-
-        $columns = "id,catalog_id as pid,type,FROM_UNIXTIME(create_time) as uploadTime ";
-        $allfile = helps::getProjectAllFile($projectId,$columns);
-
-       // $this->Success(['data'=>array_merge($allstep,$allfile)]);
-        $jsonData = json_encode(array_merge($allstep,$allfile));
-        $json = " var json = ".$jsonData;
-        file_put_contents('data.js',$json);
-    }
 
 
     public function action()
