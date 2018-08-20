@@ -69,7 +69,7 @@ class ProjectController extends BasicController
                 if ($projectAllStep) {
                         foreach ($projectAllStep as $key =>$value) {
                             if ($value['level'] == 2){
-                                $remark[] = $value['remark'];
+                                $remark[] = empty($value['remark']) ? '' : $value['remark'];
                             }
                             unset($projectAllStep[$key]);
                         }
