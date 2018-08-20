@@ -8,6 +8,7 @@ use app\models\APositionApply;
 use app\models\AUser;
 use Yii;
 use app\commond\Constants;
+use app\commond\helps;
 use yii\base\Exception;
 
 /**
