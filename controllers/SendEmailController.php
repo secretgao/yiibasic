@@ -49,7 +49,7 @@ class SendEmailController extends BasicController
         $config = YII::$app->params;
 
         $email = $this->getParam('email',true);
-        $content = $this->getParam('content',true);
+      //  $content = $this->getParam('content',true);
         $projectId = $this->getParam('projectId',true);
 
         $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
@@ -135,7 +135,7 @@ class SendEmailController extends BasicController
             // 添加该邮件的主题
             $mail->Subject = $projectName;
             // 添加邮件正文
-            $mail->Body = $content;
+            $mail->Body = '';
             // 为该邮件添加附件
             $mail->addAttachment($zipName);
             // 发送邮件 返回状态
