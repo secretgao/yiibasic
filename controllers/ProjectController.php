@@ -557,7 +557,7 @@ class ProjectController extends BasicController
     /**
      * 获取项目目录
      * @return array
-     */
+
 
     public function actionGetSubgradeRemarks()
     {
@@ -573,12 +573,24 @@ class ProjectController extends BasicController
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
         }
 
-        $model = AModel::find()->select('remark')->where(['id'=>$nodeId,'status'=>0])->scalar();
+        //模版id 切割成数组
+        $modelIdArr = explode(',', $project['model_id']);
+        if (!$modelIdArr) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
 
-        if ($model) {
-            $this->Success(['data'=>$model]);
         }
+
+        $getAllModels = helps::allStep($projectId);
+
+        $result = [];
+        foreach ($getAllModels as $item){
+            if ($item[''])
+        }
+
+
+            $this->Success(['data'=>$model]);
+
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
-    }
+    }*/
 }

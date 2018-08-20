@@ -55,7 +55,7 @@ class helps {
             return $arr;
         }
  
-        $data = AModel::find()->select('id,name,pid')
+        $data = AModel::find()->select('id,name,pid,remark')
         ->where(['id'=>$id,'status'=>0])->asArray()->one();
 
         if (!$data) {
