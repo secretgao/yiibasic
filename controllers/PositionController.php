@@ -270,7 +270,7 @@ class PositionController extends BasicController
        if (!in_array($positionId,$sysPosition)) {
            $this->Error(Constants::NOT_SYS_POSITION,Constants::$error_message[Constants::NOT_SYS_POSITION]);
        }
-    
+
        $user = AUser::findOne(['id'=>$userId,'status'=>0]);
 
        if (!$user) {

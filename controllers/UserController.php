@@ -70,7 +70,7 @@ class UserController extends BasicController
         }
 
         foreach ($data as &$item) {
-            $user = AUser::find()->select('id as userId,true_name as trueName')
+            $user = AUser::find()->select('id as userId,true_name as trueName,sys_position as type')
                 ->where(['position_id'=>$item['positionId'],'status'=>0])->asArray()->all();
             $item['positionUser'] = $user;
         }
