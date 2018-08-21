@@ -303,19 +303,27 @@ class ProjectController extends BasicController
             }
 
             //项目目录
-            $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
+            $cata = AModel::find()->select('id,name,type,remark as describe')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
             if ($cata) {
                 foreach ($cata as &$value) {
                     $value['type'] = '0';
+                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])
+                        ->andWhere(['<>','remark',''])
+                        ->asArray()->column();
+                    $value['remark'] = $son;
                 }
                 $result = array_merge($result,$cata);
             }
         } else {
             //项目目录
-            $cata = AModel::find()->select('id,name,type')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
+            $cata = AModel::find()->select('id,name,type,remark as describe')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
             if ($cata) {
                 foreach ($cata as &$value) {
                     $value['type'] = '0';
+                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])
+                        ->andWhere(['<>','remark',''])
+                        ->asArray()->column();
+                    $value['remark'] = $son;
                 }
                 $result = array_merge($result,$cata);
             }
