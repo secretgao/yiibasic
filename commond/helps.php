@@ -55,7 +55,7 @@ class helps {
             return $arr;
         }
  
-        $data = AModel::find()->select('id,name,pid,remark')
+        $data = AModel::find()->select('id,name,pid,remark as describe')
         ->where(['id'=>$id,'status'=>0])->asArray()->one();
 
         if (!$data) {
@@ -78,14 +78,13 @@ class helps {
             return $result;
         }
 
-        $result = AModel::find()->select('id,name,pid')
+        $result = AModel::find()->select('id,name,pid,remark as describe')
             ->where(['pid'=>$id,'status'=>0])->asArray()->one();
 
         if (empty($data)) {
             return  $result;
-            //return false;
         }
-        //$arr[] = $data;
+
         return self::getChildren($data['pid'],$result);
     }
 
@@ -95,7 +94,7 @@ class helps {
         $output = array();
         foreach ($res as $k => $v)
         {
-            $tmpRes = AModel::find()->select('id,name,pid,remark')
+            $tmpRes = AModel::find()->select('id,name,pid,remark as describe')
                 ->where(['pid'=>$v['id'],'project_id'=>0,'status'=>0])
                 ->asArray()->all();
             $output []= $v;

@@ -221,7 +221,7 @@ class ProjectController extends BasicController
         $result = [];
         //说明是顶级返回所有子集
         if ($project['model_id'] == $parentId  || in_array($parentId,$modelIdArr)){
-            $result = AModel::find()->select('id,name,pid,level')
+            $result = AModel::find()->select('id,name,pid,level,remark as describe')
                 ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
 
         } else {
@@ -266,11 +266,13 @@ class ProjectController extends BasicController
         if ($result) {
             foreach ($result as $k=>$cata) {
                 $result[$k]['type'] = '0';
-
+                $son  = AModel::find()->select('remark')->where(['pid'=>$cata['id'],'status'=>0])
+                    ->andWhere(['<>','remark',''])
+                    ->asArray()->column();
+                $result[$k]['remark'] = $son;
                 if ($parentId == 0) {
                     $file = AFile::find()->select($fileColumns)
                         ->where([
-                         //   'uid'=>$userId,
                             'project_id'=>$projectId,
                             'status'=>0,
                             'catalog_id'=>0
@@ -319,7 +321,6 @@ class ProjectController extends BasicController
             }
             $file = AFile::find()->select($fileColumns)
                 ->where([
-                  //  'uid'=>$userId,
                     'project_id'=>$projectId,
                     'status'=>0,
                     'catalog_id'=>$parentId
@@ -350,7 +351,6 @@ class ProjectController extends BasicController
                 }
             }
             $data = array_merge($chapter,$files);
-
         }
 
         $this->Success(['data'=>$data]);
