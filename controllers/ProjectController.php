@@ -65,16 +65,34 @@ class ProjectController extends BasicController
                 $item['describe'] = $item['description'];
                 $item['used_time']  = $usedTime;
                 $projectAllStep = helps::allStep($item['id']);
-                $remark = [];
+                $projectCreateMkdir = helps::getProjectCateLog($item['id']);
+
+                $remark1 = [];
                 if ($projectAllStep) {
+                        $jihe = [];
                         foreach ($projectAllStep as $key =>$value) {
                             if ($value['level'] == 1){
-                                $remark[] = empty($value['remark']) ? '' : $value['remark'];
+                                if (!in_array($value['id'],$jihe)){
+                                    $remark1[] = empty($value['describe']) ? '' : $value['describe'];
+                                    $jihe[] = $value['id'];
+                                }
+
                             }
                             unset($projectAllStep[$key]);
                         }
+
                 }
-                $item['remark'] = $remark;
+                $remark2 = [];
+                if ($projectCreateMkdir){
+                    foreach ($projectCreateMkdir as $key =>$value) {
+                            $remark2[] = empty($value['remark']) ? '' : $value['remark'];
+                            unset($projectCreateMkdir[$key]);
+                    }
+                }
+
+
+                $item['remark'] = array_merge($remark1,$remark2);
+
             }
         }
 

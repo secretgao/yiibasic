@@ -240,6 +240,21 @@ class helps {
         //说明是顶级返回所有子集
         if (count($modelIdArr) == 1) {
             $top = self::getParents($project['model_id']);
+        } else {
+            $modelArr = [];
+            foreach ($modelIdArr as $id) {
+                $catalog = helps::getParents($id);
+                if (!$catalog) {
+                    continue;
+                }
+                foreach ($catalog as $item) {
+                    //去除重复
+                    if (!in_array($item['id'], $modelArr)) {
+                        $top[] = $item;
+                        $modelArr[]= $item['id'];
+                    }
+                }
+            }
         }
 
         $toparr = [];
@@ -257,6 +272,13 @@ class helps {
         return $step;
     }
 
+    public static function getProjectCateLog($projectId){
+          $data = AModel::find()->select('remark')
+              ->where(['project_id'=>$projectId,'status'=>0,'level'=>1,'pid'=>0])
+              ->asArray()->all();
+
+          return $data;
+    }
 
     /**获取项目中的所有文件
      * @param $projectId
