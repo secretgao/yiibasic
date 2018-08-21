@@ -68,7 +68,7 @@ class ProjectController extends BasicController
                 $remark = [];
                 if ($projectAllStep) {
                         foreach ($projectAllStep as $key =>$value) {
-                            if ($value['level'] == 2){
+                            if ($value['level'] == 1){
                                 $remark[] = empty($value['remark']) ? '' : $value['remark'];
                             }
                             unset($projectAllStep[$key]);
@@ -267,7 +267,6 @@ class ProjectController extends BasicController
             foreach ($result as $k=>$cata) {
                 $result[$k]['type'] = '0';
                 $son  = AModel::find()->select('remark')->where(['pid'=>$cata['id'],'status'=>0])
-                    ->andWhere(['<>','remark',''])
                     ->asArray()->column();
                 $result[$k]['remark'] = $son;
                 if ($parentId == 0) {
@@ -281,7 +280,6 @@ class ProjectController extends BasicController
                 } else {
                     $file = AFile::find()->select($fileColumns)
                         ->where([
-                           // 'uid'=>$userId,
                             'project_id'=>$projectId,
                             'status'=>0,
                             'catalog_id'=>$cata['pid']
@@ -308,7 +306,6 @@ class ProjectController extends BasicController
                 foreach ($cata as &$value) {
                     $value['type'] = '0';
                     $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])
-                        ->andWhere(['<>','remark',''])
                         ->asArray()->column();
                     $value['remark'] = $son;
                 }
@@ -321,7 +318,6 @@ class ProjectController extends BasicController
                 foreach ($cata as &$value) {
                     $value['type'] = '0';
                     $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])
-                        ->andWhere(['<>','remark',''])
                         ->asArray()->column();
                     $value['remark'] = $son;
                 }
