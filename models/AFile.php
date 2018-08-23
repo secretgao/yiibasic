@@ -23,6 +23,7 @@ use Yii;
  * @property string $exif_longitude exif 经度
  * @property string $gps_latitude gps 纬度
  * @property string $gps_longitude gps 经度
+ * @property string $remark 备注
  */
 class AFile extends \yii\db\ActiveRecord
 {
@@ -42,6 +43,7 @@ class AFile extends \yii\db\ActiveRecord
         return [
             [['uid', 'create_time', 'project_id', 'catalog_id'], 'integer'],
             [['type'], 'required'],
+            [['remark'], 'string'],
             [['type', 'status'], 'string', 'max' => 3],
             [['name'], 'string', 'max' => 100],
             [['ext'], 'string', 'max' => 5],
@@ -73,6 +75,7 @@ class AFile extends \yii\db\ActiveRecord
             'exif_longitude' => 'Exif Longitude',
             'gps_latitude' => 'Gps Latitude',
             'gps_longitude' => 'Gps Longitude',
+            'remark' => 'Remark',
         ];
     }
 }

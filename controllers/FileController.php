@@ -119,6 +119,7 @@ class FileController extends BasicController
         $exifLongitude = $this->getParam('exif_longitude',true);
         $gpsLatitude = $this->getParam('gps_latitude',true);
         $gpsLongitude = $this->getParam('gps_longitude',true);
+        $comments = $this->getParam('comments',true);
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId);
        
@@ -138,7 +139,7 @@ class FileController extends BasicController
             $file->exif_longitude = $exifLongitude;
             $file->gps_latitude = $gpsLatitude;
             $file->gps_longitude = $gpsLongitude;
-            
+            $file->remark = $comments;
             if ($file->save()) {
                 $msg = '上传文件:'.$fileInfo['fileInfo']['name'];
                 helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
