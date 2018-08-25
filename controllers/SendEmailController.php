@@ -52,14 +52,17 @@ class SendEmailController extends BasicController
       //  $content = $this->getParam('content',true);
         $projectId = $this->getParam('projectId',true);
 
+        if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->Error(Constants::EMAIL_IS_ERROR,Constants::$error_message[Constants::EMAIL_IS_ERROR]);
+        }
+
         $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
 
         if (empty($project)) {
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
         }
-        $projectName = $project['name'];
-        $modelId = $project['model_id'];
 
+        $projectName = $project['name'];
 
         $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'project';
         //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
@@ -83,8 +86,7 @@ class SendEmailController extends BasicController
             $json);
         //创建文件夹 把文件复制到指定目录下
         helps::createDirectory($projectPath,$allStep,$allfile,0);
-
-
+        
         //打包
         $zip = new \ZipArchive();
         $zipName = $projectPath.'.zip';
