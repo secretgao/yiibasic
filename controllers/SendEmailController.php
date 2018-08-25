@@ -49,7 +49,6 @@ class SendEmailController extends BasicController
         $config = YII::$app->params;
 
         $email = $this->getParam('email',true);
-      //  $content = $this->getParam('content',true);
         $projectId = $this->getParam('projectId',true);
 
         if(!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -86,7 +85,7 @@ class SendEmailController extends BasicController
             $json);
         //创建文件夹 把文件复制到指定目录下
         helps::createDirectory($projectPath,$allStep,$allfile,0);
-        
+
         //打包
         $zip = new \ZipArchive();
         $zipName = $projectPath.'.zip';
@@ -139,7 +138,7 @@ class SendEmailController extends BasicController
             // 添加邮件正文
             $mail->Body = 'hello';
             // 为该邮件添加附件
-            $mail->addAttachment($zipName);
+            $mail->addAttachment($zipName,$projectName);
             // 发送邮件 返回状态
             $status = $mail->send();
             @unlink($zipName);
