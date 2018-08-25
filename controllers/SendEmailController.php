@@ -138,7 +138,7 @@ class SendEmailController extends BasicController
             // 添加邮件正文
             $mail->Body = 'hello';
             // 为该邮件添加附件
-            $mail->addAttachment($zipName,$projectName);
+            $mail->addAttachment($zipName,$projectName.'.zip');
             // 发送邮件 返回状态
             $status = $mail->send();
             @unlink($zipName);
