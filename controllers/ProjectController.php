@@ -71,9 +71,9 @@ class ProjectController extends BasicController
                 if ($projectAllStep) {
                         $jihe = [];
                         foreach ($projectAllStep as $key =>$value) {
-                            if ($value['level'] == 1){
+                            if ($value['level'] == 1 && !empty($value['describe'])){
                                 if (!in_array($value['id'],$jihe)){
-                                    $remark1[] = empty($value['describe']) ? '' : $value['describe'];
+                                    $remark1[] = $value['describe'];
                                     $jihe[] = $value['id'];
                                 }
 
@@ -83,9 +83,11 @@ class ProjectController extends BasicController
 
                 }
                 $remark2 = [];
-                if ($projectCreateMkdir){
+                if ($projectCreateMkdir) {
                     foreach ($projectCreateMkdir as $key =>$value) {
-                            $remark2[] = empty($value['remark']) ? '' : $value['remark'];
+                            if (!empty($value['remark'])) {
+                                $remark2[]=$value['remark'];
+                            }
                             unset($projectCreateMkdir[$key]);
                     }
                 }
@@ -323,7 +325,7 @@ class ProjectController extends BasicController
             if ($cata) {
                 foreach ($cata as &$value) {
                     $value['type'] = '0';
-                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])
+                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])->andWhere(['<>','remark',''])
                         ->asArray()->column();
                     $value['remark'] = $son;
                 }
@@ -335,7 +337,7 @@ class ProjectController extends BasicController
             if ($cata) {
                 foreach ($cata as &$value) {
                     $value['type'] = '0';
-                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])
+                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])->andWhere(['<>','remark',''])
                         ->asArray()->column();
                     $value['remark'] = $son;
                 }
