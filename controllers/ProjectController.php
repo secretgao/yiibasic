@@ -395,9 +395,7 @@ class ProjectController extends BasicController
         $projectStatus = $this->getParam('status',false);
         $selectUserIds  = $this->getParam('selectUserIds',false);
         // `status` '项目状态   0 未开始  1 进行中  2 已结束  3 暂停 4删除',
-        $project = AProject::find()
-            ->where(['id'=>$projectId, 'create_uid'=>$userId])
-            ->andWhere(['<>','status',4])->One();
+        $project = AProject::findOne(['id'=>$projectId,'create_uid'=>$userId]);
 
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
@@ -407,6 +405,11 @@ class ProjectController extends BasicController
             $msg = '编辑项目:'.$project->name;
             if ($selectUserIds){
 
+                $joinUid = $project->join_uid;
+                $joinUid .= ','.$selectUserIds;
+                $members = count(explode(',',$joinUid));
+                $project->join_uid = $joinUid;
+                $project->members = $members;
                 $member = explode(',',$selectUserIds);
                 $msg.='添加人员：';
                 foreach ($member as $uid) {
@@ -418,12 +421,8 @@ class ProjectController extends BasicController
                         $this->Error(Constants::RET_ERROR,$projectExt->getErrors());
                     }
                 }
-
-                $joinUidCount = AProjectExt::find()
-                    ->where(['project_id'=>$projectId,'is_manage'=>0])->count();
-                $project->members = $joinUidCount;
             }
-            if ($projectStatus) {
+            if ($projectStatus){
                 $msg.='设置项目状态：';
                 if ($projectStatus == 1){
                     $project->start_time = time();
@@ -432,6 +431,7 @@ class ProjectController extends BasicController
                 $project->status = $projectStatus;
                 $msg .=Constants::$projectStatus[$projectStatus];
             }
+
 
             if ( !$project->save(false)){
                 $this->Error(Constants::RET_ERROR,$project->getErrors());
@@ -461,20 +461,17 @@ class ProjectController extends BasicController
         $createUid = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
 
-        $project = AProject::find()->select('status')
+        $project = AProject::find()->select('status,join_uid')
             ->where(['id'=>$projectId,'create_uid'=>$createUid])
-            ->andWhere(['<>','status',4])
             ->asArray()->one();
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        $joinMember = AProjectExt::find()->where(['project_id'=>$projectId])
-            ->asArray()->column();
-        if (empty($joinMember)){
+        if (empty($project['join_uid'])){
             $this->Success(['projectStatus'=>intval($project['status']),'data'=>[]]);
         }
-        $userArr = $joinMember;
+        $userArr = explode(',',$project['join_uid']);
 
         $user = $result =[];
 
@@ -515,14 +512,12 @@ class ProjectController extends BasicController
 
         $project = AProject::find()
             ->where(['id'=>$projectId,'create_uid'=>$userId])
-            ->andWhere(['<>','status',4])
             ->one();
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        $memberArr = AProjectExt::find()->where(['project_id'=>$projectId])
-            ->asArray()->column();
 
+        $memberArr = explode(',',$project['join_uid']);
 
         if (!in_array($memberId,$memberArr)){
             $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
@@ -542,7 +537,8 @@ class ProjectController extends BasicController
 
         $transaction= Yii::$app->db->beginTransaction();
         try {
-             AProjectExt::deleteAll(['project_id'=>$projectId,'is_manage'=>0]);
+             AProjectExt::deleteAll(['project_id'=>$projectId]);
+             $project->join_uid = $joinUid;
              $project->members = $num;
 
              foreach ($memberArr as $uid) {
