@@ -6,6 +6,7 @@ namespace app\controllers;
 use app\commond\Constants;
 use app\commond\Email;
 use app\commond\PHPMailer\PHPMailer;
+use app\models\ASendEmail;
 use Yii;
 use app\models\AProject;
 use app\commond\helps;
@@ -25,28 +26,14 @@ class SendEmailController extends BasicController
     }
 
 
-    private  function addFileToZip($path,$zip) {
-        $handler = opendir($path); //打开当前文件夹由$path指定。
-        while (($filename=readdir($handler))!==false) {
-            //文件夹文件名字为'.'和‘..'，不要对他们进行操作
-            if ($filename != "." && $filename != "..") {
-                // 如果读取的某个对象是文件夹，则递归
-                if (is_dir($path."/".$filename)) {
-                    $this->addFileToZip($path."/".$filename, $zip);
-                } else{ //将文件加入zip对象
-                    $zip->addFile($path."/".$filename);
-                }
-            }
-        }
-        @closedir($path);
-    }
+
 
     /**
      * 打包项目发送邮件
      */
     public function actionSend()
     {
-        $config = YII::$app->params;
+      //  $config = YII::$app->params;
 
         $email = $this->getParam('email',true);
         $projectId = $this->getParam('projectId',true);
@@ -55,10 +42,24 @@ class SendEmailController extends BasicController
             $this->Error(Constants::EMAIL_IS_ERROR,Constants::$error_message[Constants::EMAIL_IS_ERROR]);
         }
 
-        $project = AProject::find()->select('name,model_id')->where(['id'=>$projectId])->asArray()->one();
+        $project = AProject::find()->select('name,model_id')
+            ->where(['id'=>$projectId])->asArray()->one();
+
 
         if (empty($project)) {
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+
+        $sendEmail = new ASendEmail();
+        $sendEmail->project_id = $projectId;
+        $sendEmail->address = $email;
+        $sendEmail->create_time = time();
+        if ($sendEmail->save(false)) {
+             $this->Success();
+        } else {
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
         }
 
         $projectName = $project['name'];
@@ -72,9 +73,11 @@ class SendEmailController extends BasicController
         }
 
         //获取所有模板
-        $allStep = helps::allStep($projectId);
+       // $allStep = helps::allStep($projectId);
         //获取所有文件
         $allfile = helps::getProjectAllFile($projectId);
+        echo '<pre>';print_r($allfile);
+        exit();
         //项目预览 复制到打包文件中
         $preview = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'tree';
         helps::xCopy($preview, $projectPath);
