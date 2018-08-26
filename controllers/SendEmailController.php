@@ -50,12 +50,13 @@ class SendEmailController extends BasicController
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
         }
 
+        $projectName = $project['name'].'-'.date('YmdHis',$project['create_time']);
 
         $sendEmail = new ASendEmail();
         $sendEmail->project_id = $projectId;
         $sendEmail->address = $email;
         $sendEmail->create_time = time();
-        $sendEmail->project_name = $project['name'];
+        $sendEmail->project_name = $projectName;
 
         if ($sendEmail->save(false)) {
              $this->Success();
