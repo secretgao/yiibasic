@@ -153,4 +153,12 @@ class SendEmailController extends BasicController
            // echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
         }
     }
+
+
+
+    public function actionSendEmail()
+    {
+        echo 2222;
+        exit();
+    }
 }
