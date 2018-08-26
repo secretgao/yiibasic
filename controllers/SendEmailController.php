@@ -33,8 +33,6 @@ class SendEmailController extends BasicController
      */
     public function actionSend()
     {
-      //  $config = YII::$app->params;
-
         $email = $this->getParam('email',true);
         $projectId = $this->getParam('projectId',true);
 
@@ -42,8 +40,10 @@ class SendEmailController extends BasicController
             $this->Error(Constants::EMAIL_IS_ERROR,Constants::$error_message[Constants::EMAIL_IS_ERROR]);
         }
 
-        $project = AProject::find()->select('name,model_id')
-            ->where(['id'=>$projectId])->asArray()->one();
+        $project = AProject::find()
+            ->where(['id'=>$projectId])
+            ->andWhere(['<>','status',4])
+            ->asArray()->one();
 
 
         if (empty($project)) {
@@ -55,6 +55,8 @@ class SendEmailController extends BasicController
         $sendEmail->project_id = $projectId;
         $sendEmail->address = $email;
         $sendEmail->create_time = time();
+        $sendEmail->project_name = $project['name'];
+
         if ($sendEmail->save(false)) {
              $this->Success();
         } else {
@@ -68,11 +70,10 @@ class SendEmailController extends BasicController
 
 
     /**
-     * 打包项目发送邮件
+     * 打包项目
      */
-    public function actionSendEmail()
+    public function actionPack()
     {
-        $config = YII::$app->params;
 
         $sendEmail = ASendEmail::find()
             ->where(['status'=>0])->orderBy('id ASC')->one();
@@ -126,7 +127,48 @@ class SendEmailController extends BasicController
         if (!file_exists($zipName)){
             $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
         }
-       
+
+        $sendEmail->status = 1;
+        $sendEmail->pack_time = time();
+        $sendEmail->project_file = $zipName;
+        if($sendEmail->save(false)) {
+            $this->Success();
+        } else {
+            $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
+        }
+
+    }
+
+    private  function addFileToZip($path,$zip) {
+        $handler = opendir($path); //打开当前文件夹由$path指定。
+        while (($filename=readdir($handler))!==false) {
+            //文件夹文件名字为'.'和‘..'，不要对他们进行操作
+            if ($filename != "." && $filename != "..") {
+                // 如果读取的某个对象是文件夹，则递归
+                if (is_dir($path."/".$filename)) {
+                    $this->addFileToZip($path."/".$filename, $zip);
+                } else{ //将文件加入zip对象
+                    $zip->addFile($path."/".$filename);
+                }
+            }
+        }
+        @closedir($path);
+    }
+
+
+    public function actionSendEmail(){
+        $config = YII::$app->params;
+
+        $sendEmail = ASendEmail::find()
+            ->where(['status'=>1])->orderBy('id ASC')->one();
+
+        if (empty($sendEmail)){
+            exit('not found send email ');
+        }
+        $projectName =$sendEmail->project_name;
+
+        $email = $sendEmail->address;
+        $zipName = $sendEmail->project_file;
         $mail = new PHPMailer(true);
         try {
 
@@ -146,13 +188,13 @@ class SendEmailController extends BasicController
             // 设置发送的邮件的编码
             $mail->CharSet = 'UTF-8';
             // 设置发件人昵称 显示在收件人邮件的发件人邮箱地址前的发件人姓名
-            $mail->FromName = 'ssss';
+            $mail->FromName = 'sycalc123';
             // smtp登录的账号 QQ邮箱即可
             $mail->Username = $config['mail']['username'];
             // smtp登录的密码 使用生成的授权码
             $mail->Password = $config['mail']['password'];
             // 设置发件人邮箱地址 同登录账号
-            $mail->From = '891841626@qq.com';
+            $mail->From = $config['mail']['username'];
             // 邮件正文是否为html编码 注意此处是一个方法
             $mail->isHTML(true);
             // 设置收件人邮箱地址
@@ -169,9 +211,8 @@ class SendEmailController extends BasicController
             $status = $mail->send();
             @unlink($zipName);
 
-            $sendEmail->status = 1;
+            $sendEmail->status = 2;
             $sendEmail->send_time = time();
-            $sendEmail->project_file = $zipName;
             if($sendEmail->save(false)) {
                 $this->Success();
             }
@@ -182,22 +223,6 @@ class SendEmailController extends BasicController
             $this->Error(Constants::RET_ERROR, 'Message could not be sent. Mailer Error: '.$mail->ErrorInfo);
             // echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
         }
-    }
-
-    private  function addFileToZip($path,$zip) {
-        $handler = opendir($path); //打开当前文件夹由$path指定。
-        while (($filename=readdir($handler))!==false) {
-            //文件夹文件名字为'.'和‘..'，不要对他们进行操作
-            if ($filename != "." && $filename != "..") {
-                // 如果读取的某个对象是文件夹，则递归
-                if (is_dir($path."/".$filename)) {
-                    $this->addFileToZip($path."/".$filename, $zip);
-                } else{ //将文件加入zip对象
-                    $zip->addFile($path."/".$filename);
-                }
-            }
-        }
-        @closedir($path);
     }
 
 }

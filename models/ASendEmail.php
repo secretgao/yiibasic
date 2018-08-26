@@ -12,8 +12,10 @@ use Yii;
  * @property string $address 收件人
  * @property int $create_time 创建时间
  * @property int $send_time 发送时间
- * @property int $status 0 代发送 ，1发送
+ * @property int $status 0 代打包 ，1代发送 2，发送成功
  * @property string $project_file 项目打包文件
+ * @property int $pack_time 项目打包时间
+ * @property string $project_name 项目名称
  */
 class ASendEmail extends \yii\db\ActiveRecord
 {
@@ -31,10 +33,11 @@ class ASendEmail extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['project_id', 'create_time', 'send_time'], 'integer'],
+            [['project_id', 'create_time', 'send_time', 'pack_time'], 'integer'],
             [['address'], 'string', 'max' => 30],
             [['status'], 'string', 'max' => 3],
             [['project_file'], 'string', 'max' => 40],
+            [['project_name'], 'string', 'max' => 50],
         ];
     }
 
@@ -51,6 +54,8 @@ class ASendEmail extends \yii\db\ActiveRecord
             'send_time' => 'Send Time',
             'status' => 'Status',
             'project_file' => 'Project File',
+            'pack_time' => 'Pack Time',
+            'project_name' => 'Project Name',
         ];
     }
 }
