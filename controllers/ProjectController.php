@@ -114,7 +114,6 @@ class ProjectController extends BasicController
           $description  = $this->getParam('describe',false);
           $selectModuleIds  = $this->getParam('selectModuleIds',true);
           $selectUserIds  = $this->getParam('selectUserIds',true);
-          $finishTime   = $this->getParam('finish_time',true);
 
           $member = (explode(',',$selectUserIds));
 
@@ -133,7 +132,7 @@ class ProjectController extends BasicController
               $projectObj->year = date('Y',time());
               $projectObj->create_uid = $uid;
               $projectObj->model_id = $selectModuleIds;
-              $projectObj->finish_time = $finishTime;
+              $projectObj->join_uid = $selectUserIds;
               if (!$projectObj->insert()) {
                   $this->Error(Constants::RET_ERROR,$projectObj->getErrors());
               }
