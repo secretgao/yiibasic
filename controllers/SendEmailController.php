@@ -132,6 +132,8 @@ class SendEmailController extends BasicController
         $sendEmail->pack_time = time();
         $sendEmail->project_file = $zipName;
         if($sendEmail->save(false)) {
+            error_log('pack_file'.date('Y-m-d H:i:s').'#####'.$zipName
+                .PHP_EOL,3,'/tmp/packfile.log');
             $this->Success();
         } else {
             $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
@@ -169,6 +171,8 @@ class SendEmailController extends BasicController
 
         $email = $sendEmail->address;
         $zipName = $sendEmail->project_file;
+
+
         $mail = new PHPMailer(true);
         try {
 
@@ -214,6 +218,8 @@ class SendEmailController extends BasicController
             $sendEmail->status = 2;
             $sendEmail->send_time = time();
             if($sendEmail->save(false)) {
+                error_log('send_file'.date('Y-m-d H:i:s').'#####'.$zipName
+                    .PHP_EOL,3,'/tmp/send_file.log');
                 $this->Success();
             }
 
