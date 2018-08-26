@@ -90,7 +90,7 @@ class SendEmailController extends BasicController
         $projectName = $project['name'];
         $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'project';
         //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
-        $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
+        //$projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
         $projectPath = '.'.DIRECTORY_SEPARATOR.$projectName;
 
 
@@ -138,6 +138,7 @@ class SendEmailController extends BasicController
         if($sendEmail->save(false)) {
             error_log('pack_file'.date('Y-m-d H:i:s').'#####'.$zipName
                 .PHP_EOL,3,'/tmp/packfile.log');
+            @unlink($projectPath);
             $this->Success();
         } else {
             $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
