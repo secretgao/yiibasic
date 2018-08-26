@@ -84,14 +84,16 @@ class SendEmailController extends BasicController
 
         $projectId = $sendEmail->project_id;
         $project = AProject::find()->select('name,model_id')
-            ->where(['id'=>$sendEmail->project_id])->asArray()->one();
+            ->where(['id'=>$projectId])->asArray()->one();
 
 
         $projectName = $project['name'];
-        $email = $sendEmail->address;
         $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'project';
         //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
         $projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
+        $projectPath = '.'.DIRECTORY_SEPARATOR.$projectName;
+
+
         //创建项目根目录
         if (!is_dir($projectPath)) {
             mkdir($projectPath,0777,true);
@@ -101,7 +103,7 @@ class SendEmailController extends BasicController
         $allStep = helps::allStep($projectId);
         //获取所有文件
         $allfile = helps::getProjectAllFile($projectId);
-
+//echo '<pre>';print_r($allStep);
         //项目预览 复制到打包文件中
         $preview = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'tree';
         helps::xCopy($preview, $projectPath);
@@ -115,18 +117,20 @@ class SendEmailController extends BasicController
 
         //打包
         $zip = new \ZipArchive();
-        $zipName = $projectPath.'.zip';
+        $zipName = $projectName.'.zip';
         $rec = fopen($zipName,'wb');
         fclose($rec);
 
         if($zip->open($zipName, \ZipArchive::OVERWRITE)=== TRUE){
-            $this->addFileToZip($projectPath.DIRECTORY_SEPARATOR, $zip); //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
+            $this->addFileToZip($projectPath, $zip);
+            //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
             $zip->close(); //关闭处理的zip文件
         }
 
         if (!file_exists($zipName)){
             $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
         }
+       // var_dump($zipName);
 
         $sendEmail->status = 1;
         $sendEmail->pack_time = time();
