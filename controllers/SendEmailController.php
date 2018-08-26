@@ -138,7 +138,7 @@ class SendEmailController extends BasicController
         if($sendEmail->save(false)) {
             error_log('pack_file'.date('Y-m-d H:i:s').'#####'.$zipName
                 .PHP_EOL,3,'/tmp/packfile.log');
-            @unlink($projectPath);
+            //@unlink($projectPath);
             $this->Success();
         } else {
             $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
