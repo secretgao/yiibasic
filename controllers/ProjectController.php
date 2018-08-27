@@ -599,4 +599,33 @@ class ProjectController extends BasicController
     }
 
 
+    /**
+     * 设置项目负责人
+     * @return array
+     */
+    public function actionSetManage()
+    {
+        $projectId = $this->getParam('projectId',true);
+        $userId    = $this->getParam('manageId',true);
+
+        $project = AProject::find()
+            ->where(['id'=>$projectId])
+            ->andwhere(['<>','status',4])
+            ->exists();
+        if (!$project) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+        $set = new AProjectExt();
+        $set->project_id = $projectId;
+        $set->uid = $userId;
+        $set->is_manage = '1';
+
+        if ($set->save(false)) {
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
+    }
+
 }
