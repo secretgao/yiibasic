@@ -7,6 +7,7 @@ use app\components\Aliyunoss;
 
 use app\models\AFile;
 use app\models\AProject;
+use app\models\AProjectExt;
 use Yii;
 use app\commond\Constants;
 use app\commond\fileupload;
@@ -233,6 +234,45 @@ class FileController extends BasicController
         }
 
         $file->status = '2';
+        if ($file->save(false)) {
+            $this->Success();
+        } else {
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        }
+    }
+
+    /**
+     * 项目负责人审核文件
+     * @return array
+     */
+    public function actionCheckFile()
+    {
+        $projectId = $this->getParam('projectId',true);
+        $fileId    = $this->getParam('fileId',true);
+        $userId    = $this->getParam('manageId',true);
+
+        $project = AProject::find()
+            ->where(['id'=>$projectId])
+            ->andwhere(['<>','status',4])
+            ->exists();
+        if (!$project) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+        $projectExt = AProjectExt::find()
+            ->where(['project_id'=>$projectId,'uid'=>$userId,'is_manage'=>1])
+            ->exists();
+        if (!$projectExt) {
+            $this->Error(Constants::PROJECT_MANAGE_EXITS,Constants::$error_message[Constants::PROJECT_MANAGE_EXITS]);
+        }
+
+        $file = AFile::find()->where(['id'=>$fileId,'project_id'=>$projectId,'status'=>0])->one();
+
+        if (!$file) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $file->status='1';
         if ($file->save(false)) {
             $this->Success();
         } else {
