@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "{{%a_project}}".
+ * This is the model class for table "a_project".
  *
  * @property int $id
  * @property string $name 项目名称
@@ -14,14 +14,14 @@ use Yii;
  * @property int $create_time
  * @property int $update_time
  * @property int $allow_add 是否允许增加目录 0 不允许    1 允许
- * @property int $status 项目状态   0 未开始  1 进行中  2 已结束  3 暂停
+ * @property int $status 项目状态   0 未开始  1 进行中  2 已结束  3 暂停  4删除
  * @property string $description 项目描述
  * @property int $members 成员数量
  * @property int $create_uid 创建人
  * @property string $year 年份
  * @property int $sort 排序
- * @property string $join_uid 参与人id串
  * @property string $model_id 选中模版id
+ * @property int $finish_time 项目预计完成时间
  */
 class AProject extends \yii\db\ActiveRecord
 {
@@ -30,7 +30,7 @@ class AProject extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%a_project}}';
+        return 'a_project';
     }
 
     /**
@@ -39,13 +39,13 @@ class AProject extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['start_time', 'end_time', 'create_time', 'update_time', 'members', 'create_uid'], 'integer'],
+            [['start_time', 'end_time', 'create_time', 'update_time', 'members', 'create_uid', 'finish_time'], 'integer'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 50],
             [['allow_add'], 'string', 'max' => 2],
             [['status', 'sort'], 'string', 'max' => 3],
             [['year'], 'string', 'max' => 20],
-            [['join_uid', 'model_id'], 'string', 'max' => 200],
+            [['model_id'], 'string', 'max' => 200],
         ];
     }
 
@@ -68,8 +68,8 @@ class AProject extends \yii\db\ActiveRecord
             'create_uid' => 'Create Uid',
             'year' => 'Year',
             'sort' => 'Sort',
-            'join_uid' => 'Join Uid',
             'model_id' => 'Model ID',
+            'finish_time' => 'Finish Time',
         ];
     }
 }

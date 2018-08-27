@@ -30,15 +30,17 @@ class ProjectController extends BasicController
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
         //查询该用户创建的项目
-        $createProejct = AProject::find()->where(['create_uid'=>$uid,
-            'year'=>$time])
+        $createProejct = AProject::find()
+            ->where(['create_uid'=>$uid, 'year'=>$time])
             ->andWhere(['!=','status',4])
             ->orderBy('sort ASC,id DESC')->asArray()->all();
         //判断该用户是否有部门
         $isPosition = AUser::getUserIsPosition($uid);
         //查询该用户的参与项目
-        $joinProjectId = AProjectExt::find()->select('project_id')
-        ->where(['uid'=>$uid])->asArray()->column();
+        $joinProjectId = AProjectExt::find()
+            ->select('project_id')
+            ->where(['uid'=>$uid])
+            ->asArray()->column();
 
         $joinProject = [];
         if ($joinProjectId) {
@@ -53,7 +55,7 @@ class ProjectController extends BasicController
         $data = array_merge($createProejct,$joinProject);
         if ($data) {
             $nowTime = time();
-            foreach ($data as &$item){
+            foreach ($data as &$item) {
                 $usedTime = '';
                 if ($nowTime > $item['start_time']) {
                     $usedTime = helps::timediff($nowTime,$item['start_time']);
@@ -69,32 +71,30 @@ class ProjectController extends BasicController
 
                 $remark1 = [];
                 if ($projectAllStep) {
-                        $jihe = [];
-                        foreach ($projectAllStep as $key =>$value) {
-                            if ($value['level'] == 1 && !empty($value['describe'])){
-                                if (!in_array($value['id'],$jihe)){
-                                    $remark1[] = $value['describe'];
-                                    $jihe[] = $value['id'];
-                                }
-
+                    $jihe = [];
+                    foreach ($projectAllStep as $key =>$value) {
+                        if ($value['level'] == 1 && !empty($value['describe'])) {
+                            if (!in_array($value['id'], $jihe)) {
+                                $remark1[] = $value['describe'];
+                                $jihe[] = $value['id'];
                             }
-                            unset($projectAllStep[$key]);
+
                         }
+                        unset($projectAllStep[$key]);
+                    }
 
                 }
                 $remark2 = [];
                 if ($projectCreateMkdir) {
                     foreach ($projectCreateMkdir as $key =>$value) {
-                            if (!empty($value['remark'])) {
-                                $remark2[]=$value['remark'];
-                            }
-                            unset($projectCreateMkdir[$key]);
+                        if (!empty($value['remark'])) {
+                            $remark2[]=$value['remark'];
+                        }
+                        unset($projectCreateMkdir[$key]);
                     }
                 }
 
-
                 $item['remark'] = array_merge($remark1,$remark2);
-
             }
         }
 
@@ -114,6 +114,7 @@ class ProjectController extends BasicController
           $description  = $this->getParam('describe',false);
           $selectModuleIds  = $this->getParam('selectModuleIds',true);
           $selectUserIds  = $this->getParam('selectUserIds',true);
+          $finishTime  = $this->getParam('finish_time',true);
 
           $member = (explode(',',$selectUserIds));
 
@@ -132,7 +133,7 @@ class ProjectController extends BasicController
               $projectObj->year = date('Y',time());
               $projectObj->create_uid = $uid;
               $projectObj->model_id = $selectModuleIds;
-              $projectObj->join_uid = $selectUserIds;
+              $projectObj->finish_time = intval(strtotime($finishTime));
               if (!$projectObj->insert()) {
                   $this->Error(Constants::RET_ERROR,$projectObj->getErrors());
               }
@@ -403,12 +404,6 @@ class ProjectController extends BasicController
         try {
             $msg = '编辑项目:'.$project->name;
             if ($selectUserIds){
-
-                $joinUid = $project->join_uid;
-                $joinUid .= ','.$selectUserIds;
-                $members = count(explode(',',$joinUid));
-                $project->join_uid = $joinUid;
-                $project->members = $members;
                 $member = explode(',',$selectUserIds);
                 $msg.='添加人员：';
                 foreach ($member as $uid) {
@@ -420,17 +415,19 @@ class ProjectController extends BasicController
                         $this->Error(Constants::RET_ERROR,$projectExt->getErrors());
                     }
                 }
+
+                $count = AProjectExt::find()->where(['project_id'=>$projectId])->count();
+                $project->members = $count;
             }
             if ($projectStatus){
                 $msg.='设置项目状态：';
-                if ($projectStatus == 1){
+                if ($projectStatus == 1) {
                     $project->start_time = time();
                 }
 
                 $project->status = $projectStatus;
                 $msg .=Constants::$projectStatus[$projectStatus];
             }
-
 
             if ( !$project->save(false)){
                 $this->Error(Constants::RET_ERROR,$project->getErrors());
@@ -460,17 +457,22 @@ class ProjectController extends BasicController
         $createUid = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
 
-        $project = AProject::find()->select('status,join_uid')
+        $project = AProject::find()
+            ->select('status')
             ->where(['id'=>$projectId,'create_uid'=>$createUid])
+            ->andWhere(['<>','status',4])
             ->asArray()->one();
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        if (empty($project['join_uid'])){
+        $userArr = AProjectExt::find()
+            ->select('uid')
+            ->where(['project_id'=>$projectId,'is_manage'=>0])
+            ->column();
+        if (empty($userArr)) {
             $this->Success(['projectStatus'=>intval($project['status']),'data'=>[]]);
         }
-        $userArr = explode(',',$project['join_uid']);
 
         $user = $result =[];
 
@@ -511,12 +513,16 @@ class ProjectController extends BasicController
 
         $project = AProject::find()
             ->where(['id'=>$projectId,'create_uid'=>$userId])
+            ->andWhere(['<>','status',4])
             ->one();
         if (!$project){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        $memberArr = explode(',',$project['join_uid']);
+        $memberArr = AProjectExt::find()
+            ->select('uid')
+            ->where(['project_id'=>$projectId,'is_manage'=>0])
+            ->column();
 
         if (!in_array($memberId,$memberArr)){
             $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
@@ -531,13 +537,11 @@ class ProjectController extends BasicController
                 $num++;
             }
         }
-
-        $joinUid = implode(',',$memberArr);
-
+        
         $transaction= Yii::$app->db->beginTransaction();
         try {
-             AProjectExt::deleteAll(['project_id'=>$projectId]);
-             $project->join_uid = $joinUid;
+             AProjectExt::deleteAll(['project_id'=>$projectId,'is_manage'=>0]);
+
              $project->members = $num;
 
              foreach ($memberArr as $uid) {
@@ -573,7 +577,9 @@ class ProjectController extends BasicController
         $projectId = $this->getParam('projectId',true);
         $userId    = $this->getParam('userId',true);
 
-        $project = AProject::findOne(['id'=>$projectId,'create_uid'=>$userId]);
+        $project = AProject::find()
+            ->where(['id'=>$projectId,'create_uid'=>$userId])
+            ->one();
 
         if (!$project) {
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
@@ -593,43 +599,4 @@ class ProjectController extends BasicController
     }
 
 
-    /**
-     * 获取项目目录
-     * @return array
-
-
-    public function actionGetSubgradeRemarks()
-    {
-        $userId = $this->getParam('userId',true);
-        $projectId = $this->getParam('projectId',true);
-        $nodeId = $this->getParam('nodeId',true);
-
-        $project = AProject::find()->where(['id'=>$projectId])
-            ->andWhere(['<>','status',4])
-            ->exists();
-
-        if (!$project) {
-            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
-        }
-
-        //模版id 切割成数组
-        $modelIdArr = explode(',', $project['model_id']);
-        if (!$modelIdArr) {
-            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
-
-        }
-
-        $getAllModels = helps::allStep($projectId);
-
-        $result = [];
-        foreach ($getAllModels as $item){
-            if ($item[''])
-        }
-
-
-            $this->Success(['data'=>$model]);
-
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-
-    }*/
 }
