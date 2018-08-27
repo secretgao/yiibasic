@@ -627,4 +627,29 @@ class ProjectController extends BasicController
 
     }
 
+
+    /**
+     * 项目责任人获取项目所有待审核文件列表
+     * @return array
+     */
+    public function actionGetAuditList()
+    {
+        $projectId = $this->getParam('projectId',true);
+        $userId    = $this->getParam('userId',true);
+
+        $project = AProject::find()->select('status')
+            ->where(['id'=>$projectId])
+            ->asArray()->one();
+        if ($project['status'] == 4) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+        $projectInfo = AProjectExt::find()
+            ->where(['project_id'=>$projectId,'uid'=>$userId,'is_manage'=>0])
+            ->exists();
+        if (!$projectInfo) {
+            $this->Error(Constants::PROJECT_MANAGE_EXITS,Constants::$error_message[Constants::PROJECT_MANAGE_EXITS]);
+        }
+
+    }
 }
