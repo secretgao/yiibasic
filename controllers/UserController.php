@@ -12,7 +12,7 @@ use app\commond\helps;
 use yii\base\Exception;
 
 /**
- * 文件操作
+ * 用户操作
  * @author Administrator
  *
  */
