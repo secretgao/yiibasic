@@ -605,7 +605,7 @@ class ProjectController extends BasicController
     public function actionSetManage()
     {
         $projectId = $this->getParam('projectId',true);
-        $userId    = $this->getParam('manageId',true);
+        $userId    = $this->getParam('userId',true);
 
         $project = AProject::find()
             ->where(['id'=>$projectId])
