@@ -54,7 +54,7 @@ class RegisterController extends BasicController
         $userObj->weixin_id = $id;
         $userObj->group = $group == 0 ? '1' : '2';
 
-        if ( $userObj->insert() ) {
+        if ( $userObj->save(false) ) {
             $result = [
                 'userId'=> (string) $userObj->getAttribute('id'),
                 'avatar'=>$userObj->getAttribute('avatar'),
