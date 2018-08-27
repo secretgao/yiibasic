@@ -105,7 +105,6 @@ class ProjectController extends BasicController
     /**
      * 创建项目
      */
-    
     public function actionCreate()
     {
           $name         = $this->getParam('name',true);
@@ -166,7 +165,6 @@ class ProjectController extends BasicController
     }
     
 
-
     /**
      * 设置排序
      */
@@ -220,7 +218,6 @@ class ProjectController extends BasicController
         }
         $this->Success(['data'=>$parent]);       
     }
-    
 
     /**
      * 获取项目目录
@@ -238,7 +235,7 @@ class ProjectController extends BasicController
         if (!$project) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-        $fileColumns = 'id,name,path,type,uid,create_time,size';
+        $fileColumns = 'id,name,path,type,uid,create_time,size,status';
         //模版id 切割成数组
         $modelIdArr = explode(',', $project['model_id']);
         $result = [];
