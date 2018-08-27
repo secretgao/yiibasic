@@ -537,7 +537,7 @@ class ProjectController extends BasicController
                 $num++;
             }
         }
-        
+
         $transaction= Yii::$app->db->beginTransaction();
         try {
              AProjectExt::deleteAll(['project_id'=>$projectId,'is_manage'=>0]);

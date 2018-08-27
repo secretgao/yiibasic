@@ -284,7 +284,7 @@ class helps {
      * @param $projectId
      */
 
-    public static function getProjectAllFile($projectId){
+    public static function getProjectAllFile($projectId,$status = 0){
 
         $result = [];
 
@@ -293,7 +293,7 @@ class helps {
         }
 
         $file = AFile::find()->select('id,catalog_id as pid,type,FROM_UNIXTIME(create_time) as uploadTime,path,name ')
-            ->where(['status'=>0,'project_id'=>$projectId])
+            ->where(['status'=>$status,'project_id'=>$projectId])
             ->asArray()->all();
 
         if (empty($file)) {

@@ -104,7 +104,7 @@ class SendEmailController extends BasicController
         //获取所有模板
         $allStep = helps::allStep($projectId);
         //获取所有文件
-        $allfile = helps::getProjectAllFile($projectId);
+        $allfile = helps::getProjectAllFile($projectId,1);
 //echo '<pre>';print_r($allStep);
         //项目预览 复制到打包文件中
         $preview = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'tree';
