@@ -115,6 +115,7 @@ class ProjectController extends BasicController
           $selectModuleIds  = $this->getParam('selectModuleIds',true);
           $selectUserIds  = $this->getParam('selectUserIds',true);
           $finishTime  = $this->getParam('finish_time',true);
+          $positionId  = $this->getParam('position_id',true);
 
           $member = (explode(',',$selectUserIds));
 
@@ -134,6 +135,7 @@ class ProjectController extends BasicController
               $projectObj->create_uid = $uid;
               $projectObj->model_id = $selectModuleIds;
               $projectObj->finish_time = intval(strtotime($finishTime));
+              $projectObj->position_id = $positionId;
               if (!$projectObj->insert()) {
                   $this->Error(Constants::RET_ERROR,$projectObj->getErrors());
               }
