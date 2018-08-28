@@ -86,7 +86,7 @@ class LogController extends BasicController
      * 获取个人日志
      * @return array
      */
-    public function actionGetLog()
+    public function actionGetList()
     {
         $userId = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
