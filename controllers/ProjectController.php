@@ -466,9 +466,9 @@ class ProjectController extends BasicController
         }
 
         $userArr = AProjectExt::find()
-            ->select('uid')
-            ->where(['project_id'=>$projectId,'is_manage'=>0])
-            ->column();
+            ->select('uid,is_manage')
+            ->where(['project_id'=>$projectId])
+            ->all();
         if (empty($userArr)) {
             $this->Success(['projectStatus'=>intval($project['status']),'data'=>[]]);
         }
@@ -476,13 +476,19 @@ class ProjectController extends BasicController
         $user = $result =[];
 
         if ($userArr) {
-            foreach ($userArr as $uid) {
+            foreach ($userArr as $item) {
+                $isManager = false;
                 $userInfo = AUser::find()->select('true_name,position_id')
-                    ->where(['id'=>$uid,'status'=>0])->asArray()->one();
+                    ->where(['id'=>$item['uid'],'status'=>0])->asArray()->one();
                 if ($userInfo) {
+
+                    if ($item['is_manage'] == 1) {
+                        $isManager = true;
+                    }
                     $user[$userInfo['position_id']][] =[
-                        'userId'=>$uid,
+                        'userId'=>$item['uid'],
                         'trueName'=>$userInfo['true_name'],
+                        'isManager'=>$isManager,
                     ];
                 }
             }
