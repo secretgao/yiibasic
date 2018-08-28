@@ -50,7 +50,36 @@ class LogController extends BasicController
 
     }
 
+    /**
+     * 设置个人日志状态
+     *
+     */
+    public function actionEdit()
+    {
+        $userId = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+        $logContent = $this->getParam('log_content',false);
+        $log_id = $this->getParam('log_id',true);
+        $state = $this->getParam('state',true);
 
+        $perLog = APersonalLog::findOne(['id'=>$log_id,'uid'=>$userId,'project_id'=>$projectId]);
+
+        if (empty($perLog) || $perLog->status == 1) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $perLog->status = $state;
+        if ($logContent){
+            $perLog->content = $logContent;
+        } else {
+            $perLog->status = 2;
+        }
+        $perLog->update_time = time();
+        if ($perLog->save(false)){
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
 
 
 }
