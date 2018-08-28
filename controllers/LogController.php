@@ -34,17 +34,13 @@ class LogController extends BasicController
     {
         $userId = $this->getParam('userId',true);
         $projectId = $this->getParam('projectId',true);
-        $title = $this->getParam('title',true);
         $logContent = $this->getParam('log_content',true);
-
-
+        
         $perObj = new APersonalLog();
         $perObj->uid = $userId;
         $perObj->project_id = $projectId;
-        $perObj->title = $title;
         $perObj->content = $logContent;
         $perObj->create_time = time();
-
 
         if ($perObj->save()) {
             $this->Success();
