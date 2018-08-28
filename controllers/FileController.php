@@ -250,7 +250,11 @@ class FileController extends BasicController
         $projectId = $this->getParam('projectId',true);
         $fileId    = $this->getParam('fileId',true);
         $userId    = $this->getParam('manageId',true);
+        $status    = $this->getParam('state',true); //审核状态 2拒绝 1通过
 
+        if (!in_array($status,[1,2])){
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        }
         $project = AProject::find()
             ->where(['id'=>$projectId])
             ->andwhere(['<>','status',4])
@@ -272,7 +276,7 @@ class FileController extends BasicController
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        $file->status='1';
+        $file->status= $status;
         if ($file->save(false)) {
             $this->Success();
         } else {
