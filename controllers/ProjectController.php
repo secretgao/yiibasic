@@ -29,10 +29,12 @@ class ProjectController extends BasicController
 
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
+        $postionId= $this->getParam('postionId',false,null);
         //查询该用户创建的项目
         $createProejct = AProject::find()
             ->where(['create_uid'=>$uid, 'year'=>$time])
             ->andWhere(['!=','status',4])
+            ->andFilterWhere(['position_id',$postionId])
             ->orderBy('sort ASC,id DESC')->asArray()->all();
         //判断该用户是否有部门
         $isPosition = AUser::getUserIsPosition($uid);
@@ -49,6 +51,7 @@ class ProjectController extends BasicController
                 ->andWhere(['year'=>$time])
                 ->andWhere(['!=','status',4])
                 ->andWhere(['!=','create_uid',$uid])
+                ->andFilterWhere(['position_id',$postionId])
                 ->orderBy('sort ASC,id DESC')
                 ->asArray()->all();
         }
