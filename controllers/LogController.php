@@ -82,4 +82,24 @@ class LogController extends BasicController
     }
 
 
+    /**
+     * 获取个人日志
+     * @return array
+     */
+    public function actionGetLog()
+    {
+        $userId = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+
+        $data = APersonalLog::find()
+            ->select('id as log_id,content as log_content')
+            ->where(['uid'=>$userId,'project_id'=>$projectId])
+            ->asArray()->all();
+
+        if (!$data) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $this->Success(['data'=>$data]);
+    }
 }
