@@ -651,11 +651,54 @@ class ProjectController extends BasicController
         }
 
         $projectInfo = AProjectExt::find()
-            ->where(['project_id'=>$projectId,'uid'=>$userId,'is_manage'=>0])
+            ->where(['project_id'=>$projectId,'uid'=>$userId,'is_manage'=>1])
             ->exists();
         if (!$projectInfo) {
             $this->Error(Constants::PROJECT_MANAGE_EXITS,Constants::$error_message[Constants::PROJECT_MANAGE_EXITS]);
         }
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState';
+        $fileData = AFile::find()->select($columns)
+            ->where(['project_id'=>$projectId])->asArray()->all();
+
+        if (empty($fileData)){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $data = [];
+        foreach ($fileData as &$item){
+            $item['creater'] = AUser::getName($item['uid']);
+            $item['time'] =date('Y-m-d H:i:s',$item['create_time']);
+            //按照目录分组
+            if (array_key_exists($item['catalog_id'],$data)){
+                $data[$item['catalog_id']][] = $item;
+            } else {
+                $data[$item['catalog_id']][] = $item;
+            }
+        }
+
+        $result = [];
+        foreach ($data as $key=>$value) {
+            if ($key == 0) {
+                $foler = $key;
+            } else {
+                //查出所属目录的所有直属上级
+                $title = helps::getParents($key);
+                $tmp = [];
+                foreach ($title as $v){
+                    $tmp[$v['id']]=$v['name'];
+                }
+                sort($tmp);
+                //把数组上级 分隔成字符串
+                $foler = implode('/',$tmp);
+            }
+
+            $result[]=[
+                'foler'=>$foler,
+                'files'=>$value,
+            ];
+        }
+        $this->Success(['data'=>$result]);
 
     }
+
 }
