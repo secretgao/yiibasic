@@ -43,7 +43,7 @@ final class Constants
         self::RET_SUCCESS => '操作成功',
         self::DATA_NOT_FOUND =>'数据不存在',
         self::FILES_ALREADY_EXIST =>'文件已经存在',
-        self::MEMBER_NO_EXITS =>'要删除的人员不在此项目里',
+        self::MEMBER_NO_EXITS =>'人员不在此项目里',
         self::USER_NOT_FOUND =>'用户不存在',
         self::POSITIONS_NOT_FOUND =>'部门不存在',
         self::PASSWORD_ERROR  => '密码错误',

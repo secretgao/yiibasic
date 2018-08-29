@@ -624,24 +624,19 @@ class ProjectController extends BasicController
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
         }
         //删除之前的项目负责人
-        AProjectExt::deleteAll(['project_id'=>$projectId,'is_manage'=>1]);
+        AProjectExt::updateAll(['is_manage'=>0],['project_id'=>$projectId,'is_manage'=>1]);
 
         $obj = AProjectExt::findOne(['project_id'=>$projectId,'uid'=>$userId]);
-        if ($obj) {
-            $obj->is_manage = '1';
-            if ($obj->save(false)) {
-                $this->Success();
-            }
-        } else {
-            $set = new AProjectExt();
-            $set->project_id = $projectId;
-            $set->uid = $userId;
-            $set->is_manage = '1';
-            if ($set->save(false)) {
-                $this->Success();
-            }
+
+        if (!$obj) {
+            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
 
+        $obj->is_manage = '1';
+        if ($obj->save(false)) {
+            $this->Success();
+        }
+        
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }
