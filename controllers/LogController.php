@@ -92,7 +92,7 @@ class LogController extends BasicController
         $projectId = $this->getParam('projectId',true);
 
         $data = APersonalLog::find()
-            ->select('id as log_id,content as log_content')
+            ->select('id as log_id,content as log_content,status as state')
             ->where(['uid'=>$userId,'project_id'=>$projectId])
             ->asArray()->all();
 
