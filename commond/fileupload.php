@@ -6,6 +6,8 @@
  */
 
 namespace app\commond;
+use app\models\AFile;
+
 class fileupload
 {
     const SUCCESS_CODE = 0;
@@ -137,6 +139,17 @@ class fileupload
                             mkdir($fileUploadDir,0777,true);
                         }
 
+                        $name = $fileInfoArr[$key]['name'];
+                        //查询文件名是否存在 如果存在 重新定义文件名为xxx(1).ext
+                        $fileRenameNum = AFile::find()->where(['true_name'=>$name])->count();
+                        if ($fileRenameNum && $name) {
+                            $fileInfoArr[$key]['true_name'] = $name;
+                            $ext = pathinfo($fileInfoArr[$key]['name'], PATHINFO_EXTENSION);
+                            $start = strlen($ext) + 1;
+                            $name =  substr($fileInfoArr[$key]['name'],0,-$start);
+                            $fileInfoArr[$key]['name'] = $name.'('.$fileRenameNum.')'.'.'.$ext;
+                        }
+
                         $uploadFileName = $fileUploadDir .DIRECTORY_SEPARATOR. "_{$fileInfoArr[$key]['name']}";//重新命名文件名称
 
                         $fileInfoArr[$key]['path'] = $uploadFileName;//文件存储路径
@@ -159,12 +172,16 @@ class fileupload
                     }
                 }
 
+                //获取真实的文件名称,不带后缀名
+
+
                 $fileNewArr['userId'] = $userId;
                 $fileNewArr['name'] = !empty($fileInfoArr['file']['name']) ? $fileInfoArr['file']['name'] : '';
+                $fileNewArr['true_name'] = !empty($fileInfoArr['file']['true_name']) ? $fileInfoArr['file']['true_name'] : '';
                 $fileNewArr['path'] = !empty($fileInfoArr['file']['path']) ? $fileInfoArr['file']['path'] : '';
                 $fileNewArr['type'] = !empty($fileInfoArr['file']['type']) ? $fileInfoArr['file']['type'] : '';
                 $fileNewArr['size'] = !empty($fileInfoArr['file']['size']) ? $fileInfoArr['file']['size'] : '';
-                $fileNewArr['ext']  =  pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION) ;
+                $fileNewArr['ext']  =  pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION);
 
                 return array('status'=>0, 'fileInfo'=>$fileNewArr, 'uploadSucc' => $uploadSucc, 'uploadFail' => $uploadFail);
             } else {

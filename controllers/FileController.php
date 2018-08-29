@@ -123,12 +123,13 @@ class FileController extends BasicController
         $comments = $this->getParam('comments',true);
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId);
-       
+
         if (isset($fileInfo['status'])) {
             $file = new AFile();
             $file->uid = $userId;
             $file->type = $type;
             $file->name = $fileInfo['fileInfo']['name'];
+            $file->true_name = $fileInfo['fileInfo']['true_name'];
             $file->ext = $fileInfo['fileInfo']['ext'];
             $file->create_time = time();
             $file->path = $fileInfo['fileInfo']['path'];
@@ -141,7 +142,7 @@ class FileController extends BasicController
             $file->gps_latitude = $gpsLatitude;
             $file->gps_longitude = $gpsLongitude;
             $file->remark = $comments;
-            if ($file->save()) {
+            if ($file->save(false)) {
                 $msg = '上传文件:'.$fileInfo['fileInfo']['name'];
                 helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
                 $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId)));
