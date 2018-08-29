@@ -257,13 +257,13 @@ class FileController extends BasicController
         $fileId = $this->getParam('fileId',true);
         $userId = $this->getParam('userId',true);
         $file = AFile::find()->where(['id'=>$fileId,'uid'=>$userId])
-            ->andWhere(['<>','status',2])
+            ->andWhere(['<>','status',3])
             ->one();
         if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        $file->status = '2';
+        $file->status = '3';
         if ($file->save(false)) {
             $this->Success();
         } else {

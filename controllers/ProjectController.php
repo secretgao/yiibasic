@@ -304,7 +304,7 @@ class ProjectController extends BasicController
                     $file = AFile::find()->select($fileColumns)
                         ->where([
                             'project_id'=>$projectId,
-                            'status'=>0,
+                           // 'status'=>0,
                             'catalog_id'=>$cata['pid']
                         ])
                         ->asArray()->all();
@@ -352,7 +352,7 @@ class ProjectController extends BasicController
             $file = AFile::find()->select($fileColumns)
                 ->where([
                     'project_id'=>$projectId,
-                    'status'=>0,
+                  //  'status'=>0,
                     'catalog_id'=>$parentId
                 ])
                 ->asArray()->all();
@@ -659,9 +659,9 @@ class ProjectController extends BasicController
         if (!$projectInfo) {
             $this->Error(Constants::PROJECT_MANAGE_EXITS,Constants::$error_message[Constants::PROJECT_MANAGE_EXITS]);
         }
-        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState';
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,path';
         $fileData = AFile::find()->select($columns)
-            ->where(['project_id'=>$projectId])->asArray()->all();
+            ->where(['project_id'=>$projectId,'status'=>0])->asArray()->all();
 
         if (empty($fileData)){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
