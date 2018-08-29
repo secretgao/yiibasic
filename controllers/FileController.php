@@ -315,4 +315,18 @@ class FileController extends BasicController
         }
     }
 
+    /*
+    public function actionA()
+    {
+
+            $data = AFile::find()->all();
+            foreach ($data as $item) {
+
+                $item->true_name = $item->name;
+                $item->save(false);
+            }
+        echo '<pre>';print_r($data);
+        exit();
+    }
+*/
 }
