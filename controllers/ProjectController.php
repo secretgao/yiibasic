@@ -626,14 +626,22 @@ class ProjectController extends BasicController
         //删除之前的项目负责人
         AProjectExt::deleteAll(['project_id'=>$projectId,'is_manage'=>1]);
 
-        $set = new AProjectExt();
-        $set->project_id = $projectId;
-        $set->uid = $userId;
-        $set->is_manage = '1';
-
-        if ($set->save(false)) {
-            $this->Success();
+        $obj = AProjectExt::findOne(['project_id'=>$projectId,'uid'=>$userId]);
+        if ($obj) {
+            $obj->is_manage = '1';
+            if ($obj->save(false)) {
+                $this->Success();
+            }
+        } else {
+            $set = new AProjectExt();
+            $set->project_id = $projectId;
+            $set->uid = $userId;
+            $set->is_manage = '1';
+            if ($set->save(false)) {
+                $this->Success();
+            }
         }
+
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }
