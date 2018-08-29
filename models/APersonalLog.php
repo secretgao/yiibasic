@@ -52,13 +52,4 @@ class APersonalLog extends \yii\db\ActiveRecord
             'update_time' => Yii::t('app', '更新时间'),
         ];
     }
-
-    /**
-     * @inheritdoc
-     * @return APersonalLogQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new APersonalLogQuery(get_called_class());
-    }
 }
