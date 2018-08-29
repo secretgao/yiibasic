@@ -63,12 +63,15 @@ class ProjectController extends BasicController
                 if ($nowTime > $item['start_time']) {
                     $usedTime = helps::timediff($nowTime,$item['start_time']);
                 }
+                $manage_uid = AProjectExt::find()->select('uid')
+                    ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
                 $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                 $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                 $item['status'] = intval($item['status']);
                 $item['members'] = intval($item['members']);
                 $item['describe'] = $item['description'];
                 $item['used_time']  = $usedTime;
+                $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
                 $projectAllStep = helps::allStep($item['id']);
                 $projectCreateMkdir = helps::getProjectCateLog($item['id']);
 
@@ -81,11 +84,9 @@ class ProjectController extends BasicController
                                 $remark1[] = $value['describe'];
                                 $jihe[] = $value['id'];
                             }
-
                         }
                         unset($projectAllStep[$key]);
                     }
-
                 }
                 $remark2 = [];
                 if ($projectCreateMkdir) {
