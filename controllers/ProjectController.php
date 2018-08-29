@@ -344,7 +344,7 @@ class ProjectController extends BasicController
                 foreach ($cata as &$value) {
                     $value['type'] = '0';
                     $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])->andWhere(['<>','remark',''])
-                        ->asArray()->column();
+                        ->asArray()->scalar();
                     $value['remark'] = $son;
                 }
                 $result = array_merge($result,$cata);
@@ -623,6 +623,8 @@ class ProjectController extends BasicController
         if (!$project) {
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
         }
+        //删除之前的项目负责人
+        AProjectExt::deleteAll(['project_id'=>$projectId,'is_manage'=>1]);
 
         $set = new AProjectExt();
         $set->project_id = $projectId;
@@ -664,7 +666,7 @@ class ProjectController extends BasicController
             ->where(['project_id'=>$projectId,'status'=>0])->asArray()->all();
 
         if (empty($fileData)){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+            $this->Success(['data'=>[]]);
         }
 
         $data = [];
