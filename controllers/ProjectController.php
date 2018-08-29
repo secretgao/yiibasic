@@ -296,9 +296,9 @@ class ProjectController extends BasicController
                     $file = AFile::find()->select($fileColumns)
                         ->where([
                             'project_id'=>$projectId,
-                            'status'=>0,
+                           // 'status'=>0,
                             'catalog_id'=>0
-                        ])
+                        ])->andWhere(['<>','status',3])
                         ->asArray()->all();
                 } else {
                     $file = AFile::find()->select($fileColumns)
@@ -306,7 +306,7 @@ class ProjectController extends BasicController
                             'project_id'=>$projectId,
                            // 'status'=>0,
                             'catalog_id'=>$cata['pid']
-                        ])
+                        ])->andWhere(['<>','status',3])
                         ->asArray()->all();
                 }
 
@@ -354,7 +354,7 @@ class ProjectController extends BasicController
                     'project_id'=>$projectId,
                   //  'status'=>0,
                     'catalog_id'=>$parentId
-                ])
+                ])->andWhere(['<>','status',3])
                 ->asArray()->all();
             if ($file) {
                 foreach ($file as &$item) {
