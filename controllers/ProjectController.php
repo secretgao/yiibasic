@@ -65,6 +65,13 @@ class ProjectController extends BasicController
                 }
                 $manage_uid = AProjectExt::find()->select('uid')
                     ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
+                $model_num = 0;
+                $file_agree_num = (int)helps::getProjectAgreeFileNum($item['id']);   //项目通过文件数量
+                $finish_progress = 0;
+                if ($file_agree_num > 0) {
+                    $model_num = helps::getProjectModelTotalNum($item['model_id']); //项目所选模板数量
+                    $finish_progress = intval($model_num) / intval($model_num) * 100;
+                }
                 $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                 $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                 $item['status'] = intval($item['status']);
@@ -72,6 +79,9 @@ class ProjectController extends BasicController
                 $item['describe'] = $item['description'];
                 $item['used_time']  = $usedTime;
                 $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
+                $item['model_num'] = $model_num;
+                $item['file_agree_num'] = $file_agree_num;
+                $item['finish_progress'] = $finish_progress;
                 $projectAllStep = helps::allStep($item['id']);
                 $projectCreateMkdir = helps::getProjectCateLog($item['id']);
 
@@ -263,9 +273,9 @@ class ProjectController extends BasicController
                     }
                 }
             }
-           //  echo '<pre>';print_r($modelIdArr);exit();
+
             $data = helps::getson($temp,0,1);  //附上层级
-           // echo '<pre>';print_r($data);exit();
+
             if ($data) {
                 foreach ($data as $value) {
                     if ($value['pid'] == $parentId){
@@ -297,7 +307,6 @@ class ProjectController extends BasicController
                     $file = AFile::find()->select($fileColumns)
                         ->where([
                             'project_id'=>$projectId,
-                           // 'status'=>0,
                             'catalog_id'=>0
                         ])->andWhere(['<>','status',3])
                         ->asArray()->all();
@@ -305,7 +314,6 @@ class ProjectController extends BasicController
                     $file = AFile::find()->select($fileColumns)
                         ->where([
                             'project_id'=>$projectId,
-                           // 'status'=>0,
                             'catalog_id'=>$cata['pid']
                         ])->andWhere(['<>','status',3])
                         ->asArray()->all();
@@ -332,7 +340,6 @@ class ProjectController extends BasicController
                     $value['type'] = '0';
                     $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])->andWhere(['<>','remark',''])
                         ->asArray()->column();
-
                     $value['remark'] = $son;
                 }
                 $result = array_merge($result,$cata);
@@ -353,7 +360,6 @@ class ProjectController extends BasicController
             $file = AFile::find()->select($fileColumns)
                 ->where([
                     'project_id'=>$projectId,
-                  //  'status'=>0,
                     'catalog_id'=>$parentId
                 ])->andWhere(['<>','status',3])
                 ->asArray()->all();
@@ -775,6 +781,16 @@ class ProjectController extends BasicController
             ];
         }
         $this->Success(['data'=>$result]);
+    }
+
+    public function actionAs()
+    {
+        $p = AProject::find()->where(['id'=>170])->asArray()->one();
+
+        $r = helps::getProjectAgreeFileNum(170);
+
+        var_dump($r);
+
     }
 
 }

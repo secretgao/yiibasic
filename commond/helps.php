@@ -214,18 +214,6 @@ class helps {
         $log->insert();
     }
 
-    /**
-     * 根据控制器和方法 获取操作类型
-     * @param $cName
-     * @param $aName
-     */
-
-    public static function operationType($cName,$aName){
-
-
-
-    }
-
 
     /**获取所有模版
      * @param $projectId
@@ -444,4 +432,63 @@ class helps {
     }
 
 
+    /**
+     * 根据顶级id 获取所有模板数量
+     * @param $res
+     * @return array
+     */
+    public static function recursionTotal($res)
+    {
+        $output = array();
+        foreach ($res as $k => $v)
+        {
+            $tmpRes = AModel::find()->select('id')
+                ->where(['pid'=>$v['id'],'project_id'=>0,'status'=>0])
+                ->asArray()->all();
+            $output []= $v;
+            if (!empty($tmpRes))
+            {
+                $output = array_merge($output, self::recursionTotal($tmpRes));
+            }
+        }
+        return $output;
+    }
+
+    /**
+     * 获取项目所选模板总数
+     */
+    public static function getProjectModelTotalNum($modelId){
+
+        $total = 0;
+        if (empty($modelId)) {
+            return $total;
+        }
+
+        $modelArr = explode(',',$modelId);
+        $mode = [];
+        foreach ($modelArr as $modeId) {
+            $model[] = AModel::find()->select('id')->where(['id'=>$modeId])->asArray()->one();
+            $num = self::recursionTotal($model);
+            $total = $total + count($num);
+            unset($num,$mode);
+        }
+        return $total;
+    }
+
+    /**
+     * 获取项目所属文件已通过的数量
+     */
+    public static  function getProjectAgreeFileNum($projectId){
+        $total = 0;
+        if (empty($projectId)) {
+            return $total;
+        }
+
+        $all = AFile::find()
+            ->select('id')
+            ->where(['project_id'=>$projectId,'status'=>0])
+            ->andWhere(['>','catalog_id',1])
+            ->groupBy('catalog_id')->count();
+        return $all;
+    }
 }
