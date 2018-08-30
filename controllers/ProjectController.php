@@ -58,6 +58,7 @@ class ProjectController extends BasicController
         $data = array_merge($createProejct,$joinProject);
         if ($data) {
             $nowTime = time();
+            $model_num_arr =[];
             foreach ($data as &$item) {
                 $usedTime = '';
                 if ($nowTime > $item['start_time']) {
@@ -65,11 +66,18 @@ class ProjectController extends BasicController
                 }
                 $manage_uid = AProjectExt::find()->select('uid')
                     ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
-                $model_num = 0;
-                $file_agree_num = (int)helps::getProjectAgreeFileNum($item['id']);   //项目通过文件数量
+                //项目通过文件数量
+                $file_agree_num = (int)helps::getProjectAgreeFileNum($item['id']);
+                if (!in_array($item['model_id'],$model_num_arr)){
+                    //项目所选模板数量
+                    $model_num = helps::getProjectModelTotalNum($item['model_id']);
+                    $model_num_arr[$item['model_id']] = $model_num;
+                } else {
+                    $model_num = $model_num_arr[$item['model_id']];
+                }
                 $finish_progress = 0;
+                //项目进度
                 if ($file_agree_num > 0) {
-                    $model_num = helps::getProjectModelTotalNum($item['model_id']); //项目所选模板数量
                     $finish_progress = intval($model_num) / intval($model_num) * 100;
                 }
                 $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
