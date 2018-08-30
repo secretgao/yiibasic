@@ -94,6 +94,7 @@ class LogController extends BasicController
         $data = APersonalLog::find()
             ->select('id as log_id,content as log_content,status as state')
             ->where(['uid'=>$userId,'project_id'=>$projectId])
+            ->andWhere(['<>','status',2])
             ->asArray()->all();
         if (empty($data)){
             $this->Success(['data'=>[]]);
