@@ -486,7 +486,7 @@ class helps {
 
         $all = AFile::find()
             ->select('id')
-            ->where(['project_id'=>$projectId,'status'=>0])
+            ->where(['project_id'=>$projectId,'status'=>1])
             ->andWhere(['>','catalog_id',1])
             ->groupBy('catalog_id')->count();
         return $all;
