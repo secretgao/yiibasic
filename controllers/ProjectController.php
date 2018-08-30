@@ -66,20 +66,23 @@ class ProjectController extends BasicController
                 }
                 $manage_uid = AProjectExt::find()->select('uid')
                     ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
-                //项目通过文件数量
-                $file_agree_num = (int)helps::getProjectAgreeFileNum($item['id']);
-                if (!in_array($item['model_id'],$model_num_arr)){
-                    //项目所选模板数量
-                    $model_num = helps::getProjectModelTotalNum($item['model_id']);
-                    $model_num_arr[$item['model_id']] = $model_num;
-                } else {
-                    $model_num = $model_num_arr[$item['model_id']];
-                }
+
+
+                //项目所选模板数量
+                $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
+                $file_agree_num = 0;
                 $finish_progress = 0;
-                //项目进度
-                if ($file_agree_num > 0) {
-                    $finish_progress = intval($model_num) / intval($model_num) * 100;
+                $model_num = count($catalog_id_arr);
+                if ($model_num) {
+                    //项目通过文件数量
+                    $file_agree_num = (int)helps::getProjectAgreeFileNum
+                    ($item['id'],$catalog_id_arr);
+                    //项目进度
+                    if ($file_agree_num > 0) {
+                        $finish_progress = intval($file_agree_num) / intval($model_num) * 100;
+                    }
                 }
+
                 $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                 $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                 $item['status'] = intval($item['status']);
@@ -169,6 +172,10 @@ class ProjectController extends BasicController
                       $this->Error(Constants::RET_ERROR,$projectExtObj->getErrors());
                   }
               }
+
+              //添加项目模版
+              helps::CreateProjectModel($selectModuleIds,$projectObjId);
+
               $transaction->commit();
 
               $result = [
@@ -192,7 +199,6 @@ class ProjectController extends BasicController
      */
     public function actionSettingSort()
     {
-        
         $this->ispost();
         $uid = $this->getParam('userId',true);
         $ids = $this->getParam('ids',true);
@@ -793,12 +799,18 @@ class ProjectController extends BasicController
 
     public function actionAs()
     {
-        $p = AProject::find()->where(['id'=>170])->asArray()->one();
 
-        $r = helps::getProjectAgreeFileNum(171);
-
-        var_dump($r);
-
+        //项目所选模板数量
+        $catalog_id_arr = helps::getProjectModelBottomNum(171);
+        echo '<pre>';print_r($catalog_id_arr);
+      //  $r = helps::getChildren(17230,[]);
+       // $model = AModel::find()->where(['id'=>17230])->asArray()->all();
+       // $res = helps::recursion($model);
+        //$s = helps::CreateProjectModel(17230,171);
+        exit();
+        //echo '<pre>';print_r($res);exit();
+       // $a = helps::getProjectModelBottomNum(170);
+       // var_dump($a);
     }
 
 }

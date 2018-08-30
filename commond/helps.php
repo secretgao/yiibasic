@@ -5,6 +5,7 @@ use app\models\AFile;
 use app\models\ALog;
 use app\models\AModel;
 use app\models\AProject;
+use app\models\AProjectModel;
 use app\models\AUser;
 class helps {
     
@@ -356,13 +357,10 @@ class helps {
      */
     public  static  function xCopy($source, $destination, $child = 1){
 
-
-
         if (!is_dir($source)) {
              echo("Error:the $source is not a direction!");
              return 0;
         }
-
 
         if (!is_dir($destination)) {
            mkdir($destination,0777);
@@ -432,63 +430,109 @@ class helps {
     }
 
 
+
     /**
-     * 根据顶级id 获取所有模板数量
-     * @param $res
-     * @return array
+     * 获取项目所选模板
      */
-    public static function recursionTotal($res)
+    public static function CreateProjectRecursion($res)
     {
         $output = array();
         foreach ($res as $k => $v)
         {
-            $tmpRes = AModel::find()->select('id')
+            $tmpRes = AModel::find()->select('id,name,pid,level')
                 ->where(['pid'=>$v['id'],'project_id'=>0,'status'=>0])
                 ->asArray()->all();
             $output []= $v;
             if (!empty($tmpRes))
             {
-                $output = array_merge($output, self::recursionTotal($tmpRes));
+                $output = array_merge($output, self::CreateProjectRecursion($tmpRes));
             }
         }
         return $output;
     }
 
-    /**
-     * 获取项目所选模板总数
-     */
-    public static function getProjectModelTotalNum($modelId){
-
-        $total = 0;
-        if (empty($modelId)) {
-            return $total;
-        }
-
-        $modelArr = explode(',',$modelId);
-        $mode = [];
-        foreach ($modelArr as $modeId) {
-            $model[] = AModel::find()->select('id')->where(['id'=>$modeId])->asArray()->one();
-            $num = self::recursionTotal($model);
-            $total = $total + count($num);
-            unset($num,$mode);
-        }
-        return $total;
-    }
 
     /**
-     * 获取项目所属文件已通过的数量
+     * 获取项目最底层模版所属文件已通过的数量
+     * @param $projectId
+     * @param $catalog_id_arr
+     * @return int|string
      */
-    public static  function getProjectAgreeFileNum($projectId){
+    public static  function getProjectAgreeFileNum($projectId,$catalog_id_arr){
         $total = 0;
-        if (empty($projectId)) {
+        if (empty($projectId) || empty($catalog_id_arr)) {
             return $total;
         }
 
         $all = AFile::find()
             ->select('id')
             ->where(['project_id'=>$projectId,'status'=>1])
-            ->andWhere(['>','catalog_id',1])
+            ->andWhere(['catalog_id'=>$catalog_id_arr])
             ->groupBy('catalog_id')->count();
         return $all;
+    }
+
+
+    /**
+     * 创建项目时把所选模板重新添加到项目扩展表里
+     *
+     */
+    public static function CreateProjectModel($modelId,$projectId){
+
+        if (empty($modelId)) {
+            return false;
+        }
+        $modelArr = explode(',',$modelId);
+        $model = AModel::find()->select('id,name,pid,level')
+            ->where(['id'=>$modelArr,'status'=>0,'pid'=>0])->asArray()->all();
+
+        $insertData = self::CreateProjectRecursion($model);
+
+        foreach ($insertData as $item) {
+            $exits = AProjectModel::find()
+                ->where([
+                    'project_id'=>$projectId,
+                    'model_id'=>$item['id'],
+                    'model_pid'=>$item['pid'],
+                    'level'=>$item['level']
+                ])->exists();
+            if ($exits){
+                continue;
+            }
+            $projectModel = new AProjectModel();
+            $projectModel->project_id = $projectId;
+            $projectModel->model_id = $item['id'];
+            $projectModel->model_pid = $item['pid'];
+            $projectModel->level  = $item['level'];
+            $projectModel->create_time = time();
+            if (!$projectModel->save()) {
+                throwException($projectModel->getErrors());
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * 根据项目id获取项目最底层模版数量
+     * @param $projectId
+     */
+    public static function getProjectModelBottomNum($projectId){
+
+        $total = 0;
+        if (empty($projectId)) {
+            return $total;
+        }
+        //获取项目最底层级层数
+        $maxLevel = AProjectModel::find()->select('max(level) as level')
+            ->where(['project_id'=>$projectId])->scalar();
+
+        //获取最底层所有模板id
+        $result = AProjectModel::find()
+            ->where(['project_id'=>$projectId,'level'=>$maxLevel])->all();
+
+        return $result;
+
     }
 }
