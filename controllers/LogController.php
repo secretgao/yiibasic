@@ -95,11 +95,6 @@ class LogController extends BasicController
             ->select('id as log_id,content as log_content,status as state')
             ->where(['uid'=>$userId,'project_id'=>$projectId])
             ->asArray()->all();
-
-        if (!$data) {
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-        }
-
         $this->Success(['data'=>$data]);
     }
 }
