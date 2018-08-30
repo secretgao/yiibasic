@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 
+use app\models\AAppVersion;
 use app\models\APosition;
 use app\models\APositionApply;
 use app\models\AUser;
@@ -23,7 +24,6 @@ class UserController extends BasicController
     public function init(){
        parent::init();
     }
-
 
     /**
      * 登录
@@ -189,6 +189,36 @@ class UserController extends BasicController
             $this->Success();
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
+
+    /**
+     * 检测系统版本
+     * @return array
+     */
+    public function actionCheckVersion()
+    {
+        $this->isPost();
+        $version = $this->getParam('version',true);
+        $type = $this->getParam('type',true);
+        //1: iOS， 2: Android
+        if (!in_array($type,[1,2])) {
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        }
+        $newVersion = Yii::$app->params['version'];
+        $systemVersion = $newVersion[$type];
+
+        //只要 接口传过来的版本号比系统定义的小  就返回 提示更新
+        $res = helps::versionCompare($version,$systemVersion);
+        if ($res === 2) {
+           $verObj = new AAppVersion();
+           $verObj->version = $version;
+           $verObj->system = $type;
+           $verObj->create_time = time();
+           $verObj->save(false);
+           $this->Success(['needUpdate'=>true]);
+        } else {
+            $this->Success(['needUpdate'=>false]);
+        }
     }
 
 }
