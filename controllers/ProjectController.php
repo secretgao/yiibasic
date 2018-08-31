@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\commond\Constants;
 use app\models\AFile;
+use app\models\APersonalLog;
 use app\models\APosition;
 use app\models\AProjectExt;
 use app\models\AProjectModel;
@@ -897,15 +898,29 @@ class ProjectController extends BasicController
     public function actionAs()
     {
 
+        $path = '';
+        //生成个人工作日志
+$log = APersonalLog::find()->select('uid,content')->where(['project_id'=>184])->asArray()->all();
+
+        foreach ($log as &$item) {
+            $item['user'] = AUser::getName($item['uid']);
+            if (file_exists($item['user'])) {
+                $fh = fopen($item['user'], "a");
+                fwrite($fh, $item['content']);
+                fclose($fh);
+            }
+            file_put_contents($item['user'], $item['content'].PHP_EOL, FILE_APPEND);
+        }
+echo '<pre>';print_r($log);
         //获取所有模板和目录
        // $allStep = helps::allStep(171);
 
-        $catalog_id_arr = helps::getProjectModelBottomNum(183);
-        echo '<pre>';print_r($catalog_id_arr);
+      //  $catalog_id_arr = helps::getProjectModelBottomNum(183);
+      //  echo '<pre>';print_r($catalog_id_arr);
 
         //项目通过文件数量
-        $file_agree_num = helps::getProjectAgreeFileNum(183,$catalog_id_arr);
-        echo '<pre>';print_r($file_agree_num);
+     //   $file_agree_num = helps::getProjectAgreeFileNum(183,$catalog_id_arr);
+      //  echo '<pre>';print_r($file_agree_num);
             //项目进度
       //  $r = helps::getChildren(17230,[]);
        // $model = AModel::find()->where(['id'=>17230])->asArray()->all();

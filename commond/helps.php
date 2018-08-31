@@ -4,6 +4,7 @@ namespace app\commond;
 use app\models\AFile;
 use app\models\ALog;
 use app\models\AModel;
+use app\models\APersonalLog;
 use app\models\AProject;
 use app\models\AProjectModel;
 use app\models\AUser;
@@ -249,7 +250,7 @@ class helps {
 
         foreach ($param as $key=>$item) {
             if ($item['pid'] == $pid) {
-              //  $item['name'] = iconv("UTF-8", "GBK", $item['name']);
+                $item['name'] = iconv("UTF-8", "GBK", $item['name']);
                //汉字转码 防止乱码
                 $newPath = $path.DIRECTORY_SEPARATOR.$item['name'];
                // echo '<pre>';print_r($newPath).PHP_EOL;
@@ -500,5 +501,30 @@ class helps {
             ->where(['pm.project_id'=>$projectId])
             ->all();
         return $result;
+    }
+
+    /**
+     * 生成个人工作日志
+     * @param $path
+     * @param $projectId
+     */
+    public static function createUserDiary($path,$projectId){
+        $path = $path.DIRECTORY_SEPARATOR.'个人工作日志'.DIRECTORY_SEPARATOR;
+        //创建项目个人工作日志目录
+        if (!is_dir($path)) {
+            mkdir($path,0777,true);
+        }
+
+        $log = APersonalLog::find()
+            ->select('uid,content')
+            ->where(['project_id'=>$projectId,'status'=>1])
+            ->asArray()->all();
+
+        foreach ($log as &$item) {
+            $item['user'] = AUser::getName($item['uid']);
+            $filename = $path.$item['user'];
+            file_put_contents($filename, $item['content'].PHP_EOL, FILE_APPEND);
+        }
+        return true;
     }
 }
