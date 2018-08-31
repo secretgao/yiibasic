@@ -60,7 +60,6 @@ class ProjectController extends BasicController
         $data = array_merge($createProejct,$joinProject);
         if ($data) {
             $nowTime = time();
-            $model_num_arr =[];
             foreach ($data as &$item) {
                 $usedTime = '';
                 if ($nowTime > $item['start_time']) {
@@ -901,9 +900,13 @@ class ProjectController extends BasicController
     public function actionAs()
     {
 
-        //项目所选模板数量
-        $catalog_id_arr = helps::getProjectModelBottomNum(171);
+        $catalog_id_arr = helps::getProjectModelBottomNum(182);
         echo '<pre>';print_r($catalog_id_arr);
+
+        //项目通过文件数量
+        $file_agree_num = helps::getProjectAgreeFileNum(182,$catalog_id_arr);
+        echo '<pre>';print_r($file_agree_num);
+            //项目进度
       //  $r = helps::getChildren(17230,[]);
        // $model = AModel::find()->where(['id'=>17230])->asArray()->all();
        // $res = helps::recursion($model);

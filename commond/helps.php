@@ -529,8 +529,9 @@ class helps {
             ->where(['project_id'=>$projectId])->scalar();
 
         //获取最底层所有模板id
-        $result = AProjectModel::find()
-            ->where(['project_id'=>$projectId,'level'=>$maxLevel])->all();
+        $result = AProjectModel::find()->select('model_id')
+            ->where(['project_id'=>$projectId,'level'=>$maxLevel])
+            ->asArray()->column();
 
         return $result;
 
