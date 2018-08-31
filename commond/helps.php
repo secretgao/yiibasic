@@ -487,7 +487,8 @@ class helps {
 
         $log = APersonalLog::find()
             ->select('uid,content')
-            ->where(['project_id'=>$projectId,'status'=>1])
+            ->where(['project_id'=>$projectId])
+            ->andWhere(['<>','status',3])
             ->asArray()->all();
 
         foreach ($log as &$item) {
