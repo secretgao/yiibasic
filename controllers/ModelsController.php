@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\commond\Constants;
 use app\commond\helps;
+use app\models\AProjectModel;
 use app\models\AUser;
 use Yii;
 use app\models\AModel;
@@ -60,18 +61,50 @@ class ModelsController extends BasicController
                 ->where(['id'=>$pid,'type'=>0,'status'=>0])->scalar();
             $level = intval($level) + 1;
         }
+        $transaction= Yii::$app->db->beginTransaction();
+        try {
+            //创建模板
+            if ($type == 0) {
+                $Obj = new AModel();
+                $Obj->name = $name;
+                $Obj->create_time = time();
+                $Obj->project_id =  0 ;
+                $Obj->create_uid = $createUid;
+                $Obj->type = '0' ;
+                $Obj->pid = empty($pid) ? 0 : $pid;
+                $Obj->level = $level;
+                $Obj->remark = $remark;
+                if (!$Obj->save(false)) {
+                    $this->Error(Constants::RET_ERROR,$Obj->getErrors());
+                }
+            } else {
+            //创建目录
+                //创建项目所属目录不是模板
+                $Obj = new AModel();
+                $Obj->name = $name;
+                $Obj->create_time = time();
+                $Obj->project_id = $projectId;
+                $Obj->create_uid = $createUid;
+                $Obj->type = '1';
+                $Obj->pid = empty($pid) ? 0 : $pid;
+                $Obj->level = $level;
+                $Obj->remark = $remark;
+                if (!$Obj->save(false)) {
+                    $this->Error(Constants::RET_ERROR,$Obj->getErrors());
+                }
+                $projectModel = new AProjectModel();
+                $projectModel->project_id = $projectId;
+                $projectModel->model_id = $Obj->attributes['id'];
+                $projectModel->model_pid = $Obj->pid;
+                $projectModel->create_time = time();
+                $projectModel->level = $level;
+                $projectModel->type = '1';
+                if (!$projectModel->save(false)) {
+                    $this->Error(Constants::RET_ERROR,$projectModel->getErrors());
+                }
+            }
 
-        $Obj = new AModel();
-        $Obj->name = $name;
-        $Obj->create_time = time();
-        $Obj->project_id = empty($projectId) ? 0 : $projectId;
-        $Obj->create_uid = $createUid;
-        $Obj->type = empty($type) ? '0' : (string)$type;
-        $Obj->pid = empty($pid) ? 0 : $pid;
-        $Obj->level = $level;
-        $Obj->remark = $remark;
-
-        if ($Obj->insert()) {
+            $transaction->commit();
             if ($type == 0) {
                 $msg = '创建模板:'.$name;
                 helps::writeLog(Constants::OPERATION_MODEL,$msg,$createUid);
@@ -79,10 +112,13 @@ class ModelsController extends BasicController
                 $msg = '创建目录:'.$name;
                 helps::writeLog(Constants::OPERATION_CATE,$msg,$createUid);
             }
-
             $this->Success(['id'=>$Obj->attributes['id']]);
+        } catch (\Exception $e) {
+            //如果操作失败, 数据回滚
+            $transaction->rollback();
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
         }
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
     }
 
     /**

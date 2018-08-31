@@ -13,6 +13,7 @@ use Yii;
  * @property int $model_pid 模型pid
  * @property int $create_time
  * @property int $level 层级
+ * @property int $type 区分 0是 模版  1是目录 
  */
 class AProjectModel extends \yii\db\ActiveRecord
 {
@@ -31,6 +32,7 @@ class AProjectModel extends \yii\db\ActiveRecord
     {
         return [
             [['project_id', 'model_id', 'model_pid', 'create_time', 'level'], 'integer'],
+            [['type'], 'string', 'max' => 2],
         ];
     }
 
@@ -40,12 +42,13 @@ class AProjectModel extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'project_id' => 'Project ID',
-            'model_id' => 'Model ID',
-            'model_pid' => 'Model Pid',
-            'create_time' => 'Create Time',
-            'level' => 'Level',
+            'id' => Yii::t('app', 'ID'),
+            'project_id' => Yii::t('app', '项目id'),
+            'model_id' => Yii::t('app', '模型id'),
+            'model_pid' => Yii::t('app', '模型pid'),
+            'create_time' => Yii::t('app', 'Create Time'),
+            'level' => Yii::t('app', '层级'),
+            'type' => Yii::t('app', '区分 0是 模版  1是目录 '),
         ];
     }
 }

@@ -6,11 +6,13 @@ use app\commond\Constants;
 use app\models\AFile;
 use app\models\APosition;
 use app\models\AProjectExt;
+use app\models\AProjectModel;
 use app\models\AUser;
 use Yii;
 use app\models\AModel;
 use app\models\AProject;
 use app\commond\helps;
+use yii\db\Query;
 
 
 class ProjectController extends BasicController
@@ -250,6 +252,7 @@ class ProjectController extends BasicController
     /**
      * 获取项目目录
      */
+   /*
     public function actionGetProjectCatalog()
     {
         $userId = $this->getParam('userId',true);
@@ -407,7 +410,105 @@ class ProjectController extends BasicController
         $this->Success(['data'=>$data]);
        
     }
+*/
+    public function actionGetProjectCatalog()
+    {
+        $userId = $this->getParam('userId',true);
+        $projectId = $this->getParam('projectId',true);
+        $parentId = $this->getParam('parentId',true);
 
+        //获取项目创建人员
+        $project = AProject::find()->select('create_uid,model_id')
+            ->where(['id'=>$projectId])
+            ->andWhere(['<>','status',4])
+            ->asArray()->one();
+
+        if (!$project) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        //获取项目参与人员
+        $member = AProjectExt::find()->select('uid')->where(['project_id'=>$projectId])->asArray()->column();
+        $allMember = array_merge($member,$project);
+        //判断uid 在不在 创建人和参与人的集合里
+        if (!in_array($userId,$allMember)){
+           $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
+        }
+
+        $fileColumns = 'id,name,path,type,uid,create_time,size,status';
+
+        /**
+         *    [id] => 17230
+        [name] => 灞曟紨绫�
+        [pid] => 0
+        [describe] =>
+        [level] => 1
+        [type] => 0
+         */
+        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
+        $result = (new Query())
+            ->select($modelColumns)
+            ->from('a_project_model as pm')
+            ->leftJoin('a_model as am','pm.model_id = am.id')
+            ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId])
+            ->all();
+        //根据最后返回信息 遍历 是否存在文件
+//echo '<pre>';print_r($result);exit();
+        $fileId = [];
+        if (empty($result)) {
+            $this->Success(['data'=>[]]);
+        }
+
+        foreach ($result as $k=>$cata) {
+            $result[$k]['type'] = '0';
+            $son  = AModel::find()->select('remark')->where(['pid'=>$cata['id'],'status'=>0])->andWhere(['<>','remark',''])
+                ->asArray()->column();
+            $result[$k]['remark'] = $son;
+            if ($parentId == 0) {
+                $file = AFile::find()->select($fileColumns)
+                    ->where([
+                        'project_id'=>$projectId,
+                        'catalog_id'=>0
+                    ])->andWhere(['<>','status',3])
+                    ->asArray()->all();
+            } else {
+                $file = AFile::find()->select($fileColumns)
+                    ->where([
+                        'project_id'=>$projectId,
+                        'catalog_id'=>$cata['pid']
+                    ])->andWhere(['<>','status',3])
+                    ->asArray()->all();
+            }
+
+            if ($file) {
+                foreach ($file as $item) {
+                    if (!in_array($item['id'],$fileId)) {
+                        $fileId[] = $item['id'];
+                        $item['path'] = trim($item['path'],'.');
+                        $item['creater'] = AUser::getName($item['uid']);
+                        $item['time'] = date('Y-m-d',$item['create_time']);
+                        array_push($result,$item);
+                    }
+                }
+            }
+        }
+
+        //首先显示目录 然后显示文件
+        $data = [];
+        if ($result) {
+            $files = $chapter = [];
+            foreach ($result as $item) {
+                if ($item['type'] == 0) {
+                    $chapter[] = $item;
+                } else {
+                    $files[]=$item;
+                }
+            }
+            $data = array_merge($chapter,$files);
+        }
+
+        $this->Success(['data'=>$data]);
+
+    }
     /**
      * 设置项目状态和编辑人员
      */
