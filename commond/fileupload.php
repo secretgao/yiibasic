@@ -91,12 +91,14 @@ class fileupload
         return array('errorId'=>$errorId, 'errorMsg'=>$errorMsg);
     }
 
+
     /**
      * 处理上传文件并获取图片基本信息
-     * @param string $userId
+     * @param int $userId
+     * @param int $projectId 根据项目id 筛选 文件是否有重复
      * @return array
      */
-    public function getFileInfo($userId='')
+    public function getFileInfo($userId = 0,$projectId = 0)
     {
         $fileInfoArr = array();//多维数组
         $fileNewArr = array();
@@ -141,7 +143,7 @@ class fileupload
 
                         $name = $fileInfoArr[$key]['name'];
                         //查询文件名是否存在 如果存在 重新定义文件名为xxx(1).ext
-                        $fileRenameNum = AFile::find()->where(['true_name'=>$name])->count();
+                        $fileRenameNum = AFile::find()->where(['true_name'=>$name,'project_id'=>$projectId])->count();
                         if ($fileRenameNum && $name) {
                             $fileInfoArr[$key]['true_name'] = $name;
                             $ext = pathinfo($fileInfoArr[$key]['name'], PATHINFO_EXTENSION);
