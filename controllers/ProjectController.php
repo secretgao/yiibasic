@@ -898,9 +898,11 @@ class ProjectController extends BasicController
     public function actionAs()
     {
 
-        $fil = AFile::find()->where(['id'=>464])->asArray()->one();
-        $p ='./uploads\11\2018\08\31\10\_0117e2571b8b246ac72538120dd8a4.jpg@xxxx.jpg';
-        helps::img_create_small($fil['path'],100,100,$p);
+      $commond = "./usr/local/ffmpeg -i /tmp/_VID_20180730_221548.mp4 -y -f mjpeg -ss 3 -t 0.001 -s 320*240 /tmp/test.jpg";
+       $res = shell_exec($commond);
+
+       echo '<pre>';print_r($res);
+        exit();
       //  var_dump($fil);
         //获取所有模板和目录
        // $allStep = helps::allStep(171);

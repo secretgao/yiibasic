@@ -125,12 +125,17 @@ class FileController extends BasicController
         $fileInfo = $fileUpload->getFileInfo($userId,$projectId);
 
         if (isset($fileInfo['status'])) {
-
+            $commond = '';
             $small_img = '';
             //生成图片缩略图
             if ($type == 1) {
                 $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.'.$fileInfo['fileInfo']['ext'];
                 helps::img_create_small($fileInfo['fileInfo']['path'],50,50,$small_img);
+            } elseif ($type == 2) {
+               //生成视频 缩略图
+                $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.jpg';
+                $commond = "/usr/local/ffmpeg/bin/ffmpeg -i {$fileInfo['fileInfo']['path']} -y -f mjpeg -ss 2 -t 0.001 -s 320*240 {$small_img}";
+                shell_exec($commond);
             }
             $file = new AFile();
             $file->uid = $userId;
@@ -153,7 +158,7 @@ class FileController extends BasicController
             if ($file->save(false)) {
                 $msg = '上传文件:'.$fileInfo['fileInfo']['name'];
                 helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
-                $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId),array('smail'=>$file->getAttribute('small_path'))));
+                $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId),array('commond'=>$commond)));
             } else {
                 $this->Error(Constants::RET_ERROR,$file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
             }

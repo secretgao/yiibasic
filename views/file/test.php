@@ -18,7 +18,7 @@
     <input type="hidden" name="exif_longitude" value="11" />
     <input type="hidden" name="gps_latitude" value="11" />
     <input type="hidden" name="gps_longitude" value="11" />
-    <input type="hidden" name="type" value="11" />
+    <input type="hidden" name="type" value="2" />
 
     <input type="submit" value="上传文件" />
 </form>
