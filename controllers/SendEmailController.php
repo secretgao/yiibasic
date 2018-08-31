@@ -73,15 +73,15 @@ class SendEmailController extends BasicController
      */
     public function actionPack()
     {
-/*
+
         $sendEmail = ASendEmail::find()
             ->where(['status'=>0])->orderBy('id ASC')->one();
 
         if (empty($sendEmail)){
             exit('not found send email ');
         }
-*/
-        $projectId = 184;//$sendEmail->project_id;
+
+        $projectId = $sendEmail->project_id;
         $project = AProject::find()->select('name,create_time')
             ->where(['id'=>$projectId])->asArray()->one();
 
@@ -130,8 +130,7 @@ class SendEmailController extends BasicController
         if (!file_exists($zipName)){
             $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
         }
-        var_dump($zipName);
-exit();
+
         $sendEmail->status = 1;
         $sendEmail->pack_time = time();
         $sendEmail->project_file = $zipName;
