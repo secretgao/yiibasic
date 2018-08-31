@@ -493,7 +493,7 @@ class helps {
 
         foreach ($log as &$item) {
             $item['user'] = AUser::getName($item['uid']);
-            $filename = $path.$item['user'];
+            $filename = $path.$item['user'].'.txt';
             file_put_contents($filename, $item['content'].PHP_EOL, FILE_APPEND);
         }
         return true;
