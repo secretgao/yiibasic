@@ -7,6 +7,8 @@ use app\models\AModel;
 use app\models\AProject;
 use app\models\AProjectModel;
 use app\models\AUser;
+use yii\db\Query;
+
 class helps {
     
    static function make_tree($arr)
