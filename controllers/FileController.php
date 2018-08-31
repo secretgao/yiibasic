@@ -130,7 +130,7 @@ class FileController extends BasicController
             //生成图片缩略图
             if ($type == 1) {
                 $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.'.$fileInfo['fileInfo']['ext'];
-                helps::img_create_small($fileInfo['fileInfo']['path'],120,150,
+                helps::img_create_small($fileInfo['fileInfo']['path'],150,120,
                     $small_img);
             } elseif ($type == 2) {
                //生成视频 缩略图
