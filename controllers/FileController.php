@@ -135,7 +135,7 @@ class FileController extends BasicController
             } elseif ($type == 2) {
                //生成视频 缩略图
                 $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.jpg';
-                $commond = "/usr/local/ffmpeg/bin/ffmpeg -i {$fileInfo['fileInfo']['path']} -y -f mjpeg -ss 2 -t 0.001 -s 320*240 {$small_img}";
+                $commond = "/usr/local/ffmpeg/bin/ffmpeg -i {$fileInfo['fileInfo']['path']} -y -f mjpeg -ss 2 -t 0.001 -s 150*120 {$small_img}";
                 shell_exec($commond);
             }
             $file = new AFile();
