@@ -12,6 +12,12 @@ return [
 
     'version' =>[
         1=>'1.5.2',   //ios
-        2=>'1.1.0',   //安卓
+        2=>[
+            'num'=> '1.1.0',   //安卓
+            'url'=> 'http://www.baidu.com',
+            'message'=>'更新bug',
+        ]
     ],
+
+
 ];

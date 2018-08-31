@@ -899,20 +899,12 @@ class ProjectController extends BasicController
 
         //获取所有模板和目录
        // $allStep = helps::allStep(171);
-        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
-        $result = (new Query())
-            ->select($modelColumns)
-            ->from('a_project_model as pm')
-            ->leftJoin('a_model as am','pm.model_id = am.id')
-            ->where(['pm.project_id'=>171])
-            ->all();
-        echo '<pre>';print_r($result);
-        exit();
-        $catalog_id_arr = helps::getProjectModelBottomNum(182);
+
+        $catalog_id_arr = helps::getProjectModelBottomNum(183);
         echo '<pre>';print_r($catalog_id_arr);
 
         //项目通过文件数量
-        $file_agree_num = helps::getProjectAgreeFileNum(182,$catalog_id_arr);
+        $file_agree_num = helps::getProjectAgreeFileNum(183,$catalog_id_arr);
         echo '<pre>';print_r($file_agree_num);
             //项目进度
       //  $r = helps::getChildren(17230,[]);

@@ -205,7 +205,11 @@ class UserController extends BasicController
             $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
         }
         $newVersion = Yii::$app->params['version'];
-        $systemVersion = $newVersion[$type];
+        if ($type == 1){
+            $systemVersion = $newVersion[$type];
+        } else {
+            $systemVersion = $newVersion[$type]['num'];
+        }
 
         //只要 接口传过来的版本号比系统定义的小  就返回 提示更新
         $res = helps::versionCompare($version,$systemVersion);
@@ -215,7 +219,7 @@ class UserController extends BasicController
            $verObj->system = $type;
            $verObj->create_time = time();
            $verObj->save(false);
-           $this->Success(['needUpdate'=>true]);
+           $this->Success(['needUpdate'=>true,'data'=>$newVersion[$type]]);
         } else {
             $this->Success(['needUpdate'=>false]);
         }
