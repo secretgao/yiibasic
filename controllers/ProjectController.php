@@ -783,7 +783,7 @@ class ProjectController extends BasicController
         if (!$projectInfo) {
             $this->Error(Constants::PROJECT_MANAGE_EXITS,Constants::$error_message[Constants::PROJECT_MANAGE_EXITS]);
         }
-        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,path';
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,path,small_path';
         $fileData = AFile::find()->select($columns)
             ->where(['project_id'=>$projectId,'status'=>0])->asArray()->all();
 
@@ -851,7 +851,7 @@ class ProjectController extends BasicController
         if (!$projectInfo) {
             $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
-        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,path';
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,path,small_path';
         $fileData = AFile::find()->select($columns)
             ->where(['project_id'=>$projectId,'uid'=>$userId])->asArray()->all();
 
