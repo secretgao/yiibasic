@@ -94,33 +94,22 @@ class ProjectController extends BasicController
                 $item['model_num'] = $model_num;
                 $item['file_agree_num'] = $file_agree_num;
                 $item['finish_progress'] = $finish_progress;
-                $projectAllStep = helps::allStep($item['id']);
-                $projectCreateMkdir = helps::getProjectCateLog($item['id']);
-
-                $remark1 = [];
+                $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
+                $remark = [];
                 if ($projectAllStep) {
                     $jihe = [];
                     foreach ($projectAllStep as $key =>$value) {
                         if ($value['level'] == 1 && !empty($value['describe'])) {
                             if (!in_array($value['id'], $jihe)) {
-                                $remark1[] = $value['describe'];
+                                $remark[] = $value['describe'];
                                 $jihe[] = $value['id'];
                             }
                         }
                         unset($projectAllStep[$key]);
                     }
                 }
-                $remark2 = [];
-                if ($projectCreateMkdir) {
-                    foreach ($projectCreateMkdir as $key =>$value) {
-                        if (!empty($value['remark'])) {
-                            $remark2[]=$value['remark'];
-                        }
-                        unset($projectCreateMkdir[$key]);
-                    }
-                }
 
-                $item['remark'] = array_merge($remark1,$remark2);
+                $item['remark'] = $remark;
             }
         }
 
@@ -434,15 +423,6 @@ class ProjectController extends BasicController
         }
 
         $fileColumns = 'id,name,path,type,uid,create_time,size,status';
-
-        /**
-         *    [id] => 17230
-        [name] => 灞曟紨绫�
-        [pid] => 0
-        [describe] =>
-        [level] => 1
-        [type] => 0
-         */
         $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
         $result = (new Query())
             ->select($modelColumns)
@@ -454,6 +434,23 @@ class ProjectController extends BasicController
 //echo '<pre>';print_r($result);exit();
         $fileId = [];
         if (empty($result)) {
+            // result 为空 可能是最底层
+            $file = AFile::find()->select($fileColumns)
+                ->where([
+                    'project_id'=>$projectId,
+                    'catalog_id'=>$parentId
+                ])->andWhere(['<>','status',3])
+                ->asArray()->all();
+            if ($file) {
+                foreach ($file as &$item) {
+                    $fileId[] = $item['id'];
+                    $item['path'] = trim($item['path'],'.');
+                    $item['creater'] = AUser::getName($item['uid']);
+                    $item['time'] = date('Y-m-d',$item['create_time']);
+
+                }
+                $this->Success(['data'=>$file]);
+            }
             $this->Success(['data'=>[]]);
         }
 
@@ -900,6 +897,17 @@ class ProjectController extends BasicController
     public function actionAs()
     {
 
+        //获取所有模板和目录
+       // $allStep = helps::allStep(171);
+        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
+        $result = (new Query())
+            ->select($modelColumns)
+            ->from('a_project_model as pm')
+            ->leftJoin('a_model as am','pm.model_id = am.id')
+            ->where(['pm.project_id'=>171])
+            ->all();
+        echo '<pre>';print_r($result);
+        exit();
         $catalog_id_arr = helps::getProjectModelBottomNum(182);
         echo '<pre>';print_r($catalog_id_arr);
 

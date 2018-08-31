@@ -68,8 +68,6 @@ class SendEmailController extends BasicController
     }
 
 
-
-
     /**
      * 打包项目
      */
@@ -87,10 +85,8 @@ class SendEmailController extends BasicController
         $project = AProject::find()->select('name,create_time')
             ->where(['id'=>$projectId])->asArray()->one();
 
-
         $projectName = $project['name'].'-'.date('YmdHis',$project['create_time']);
-       // $dir = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR
-        //.'project';
+
         //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
         //$projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
         $projectPath = '.'.DIRECTORY_SEPARATOR.$projectName;
@@ -101,11 +97,11 @@ class SendEmailController extends BasicController
             mkdir($projectPath,0777,true);
         }
 
-        //获取所有模板
-        $allStep = helps::allStep($projectId);
+        //获取项目所有的模板和目录
+        $allStep = helps::getProjectModelAndCateLog($projectId);
         //获取所有文件
         $allfile = helps::getProjectAllFile($projectId,1);
-//echo '<pre>';print_r($allStep);
+        //echo '<pre>';print_r($allStep);
         //项目预览 复制到打包文件中
         $preview = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'tree';
         helps::xCopy($preview, $projectPath);

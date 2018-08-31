@@ -215,60 +215,6 @@ class helps {
         $log->insert();
     }
 
-
-    /**获取所有模版
-     * @param $projectId
-     * @return array
-     */
-
-    public static function allStep($projectId){
-        $project = AProject::find()->select('model_id')
-            ->where(['id'=>$projectId])->asArray()->one();
-        $modelIdArr = explode(',', $project['model_id']);
-        $top = $step = [];
-        //说明是顶级返回所有子集
-        if (count($modelIdArr) == 1) {
-            $top = self::getParents($project['model_id']);
-        } else {
-            $modelArr = [];
-            foreach ($modelIdArr as $id) {
-                $catalog = helps::getParents($id);
-                if (!$catalog) {
-                    continue;
-                }
-                foreach ($catalog as $item) {
-                    //去除重复
-                    if (!in_array($item['id'], $modelArr)) {
-                        $top[] = $item;
-                        $modelArr[]= $item['id'];
-                    }
-                }
-            }
-        }
-
-        $toparr = [];
-        if ($top) {
-            foreach ($top as $item){
-                if ($item['pid'] == 0){
-                    $toparr[] = $item;
-                }
-            }
-
-            $all = self::recursion($toparr);
-            $step  = self::getson($all,0,1);
-        }
-
-        return $step;
-    }
-
-    public static function getProjectCateLog($projectId){
-          $data = AModel::find()->select('remark')
-              ->where(['project_id'=>$projectId,'status'=>0,'level'=>1,'pid'=>0])
-              ->asArray()->all();
-
-          return $data;
-    }
-
     /**获取项目中的所有文件
      * @param $projectId
      */
@@ -276,7 +222,6 @@ class helps {
     public static function getProjectAllFile($projectId,$status = 0){
 
         $result = [];
-
         if (empty($projectId)) {
             return $result;
         }
@@ -288,7 +233,6 @@ class helps {
         if (empty($file)) {
             return $result;
         }
-
         return $file;
     }
 
@@ -535,5 +479,24 @@ class helps {
 
         return $result;
 
+    }
+
+    /**
+     * 获取项目所有的模板和目录
+     */
+    public static function getProjectModelAndCateLog($projectId){
+
+        if (empty($projectId)) {
+            return false;
+        }
+
+        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
+        $result = (new Query())
+            ->select($modelColumns)
+            ->from('a_project_model as pm')
+            ->leftJoin('a_model as am','pm.model_id = am.id')
+            ->where(['pm.project_id'=>$projectId])
+            ->all();
+        return $result;
     }
 }
