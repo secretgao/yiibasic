@@ -16,6 +16,7 @@ use Yii;
  * @property int $status 文件状态 0带审核  1正常  2拒绝 3删除
  * @property int $create_time 创建时间
  * @property string $path 文件路径
+ * @property string $small_path 图片和视频缩略图地址
  * @property int $project_id 项目id
  * @property int $catalog_id 目录id
  * @property string $size 文件大小
@@ -49,6 +50,7 @@ class AFile extends \yii\db\ActiveRecord
             [['name', 'true_name'], 'string', 'max' => 100],
             [['ext'], 'string', 'max' => 5],
             [['path', 'size'], 'string', 'max' => 200],
+            [['small_path'], 'string', 'max' => 255],
             [['exif_date'], 'string', 'max' => 30],
             [['exif_latitude', 'exif_longitude', 'gps_latitude', 'gps_longitude'], 'string', 'max' => 60],
         ];
@@ -69,6 +71,7 @@ class AFile extends \yii\db\ActiveRecord
             'status' => Yii::t('app', '文件状态 0带审核  1正常  2拒绝 3删除'),
             'create_time' => Yii::t('app', '创建时间'),
             'path' => Yii::t('app', '文件路径'),
+            'small_path' => Yii::t('app', '图片和视频缩略图地址'),
             'project_id' => Yii::t('app', '项目id'),
             'catalog_id' => Yii::t('app', '目录id'),
             'size' => Yii::t('app', '文件大小'),

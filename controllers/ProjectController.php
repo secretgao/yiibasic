@@ -898,20 +898,10 @@ class ProjectController extends BasicController
     public function actionAs()
     {
 
-        $path = '';
-        //生成个人工作日志
-$log = APersonalLog::find()->select('uid,content')->where(['project_id'=>184])->asArray()->all();
-
-        foreach ($log as &$item) {
-            $item['user'] = AUser::getName($item['uid']);
-            if (file_exists($item['user'])) {
-                $fh = fopen($item['user'], "a");
-                fwrite($fh, $item['content']);
-                fclose($fh);
-            }
-            file_put_contents($item['user'], $item['content'].PHP_EOL, FILE_APPEND);
-        }
-echo '<pre>';print_r($log);
+        $fil = AFile::find()->where(['id'=>464])->asArray()->one();
+        $p ='./uploads\11\2018\08\31\10\_0117e2571b8b246ac72538120dd8a4.jpg@xxxx.jpg';
+        helps::img_create_small($fil['path'],100,100,$p);
+      //  var_dump($fil);
         //获取所有模板和目录
        // $allStep = helps::allStep(171);
 
@@ -926,7 +916,7 @@ echo '<pre>';print_r($log);
        // $model = AModel::find()->where(['id'=>17230])->asArray()->all();
        // $res = helps::recursion($model);
         //$s = helps::CreateProjectModel(17230,171);
-        exit();
+       // exit();
         //echo '<pre>';print_r($res);exit();
        // $a = helps::getProjectModelBottomNum(170);
        // var_dump($a);

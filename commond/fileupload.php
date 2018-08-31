@@ -107,6 +107,8 @@ class fileupload
             $uploadSucc = 0;
             $uploadFail = 0;
             $chinese = array();
+            //判断指定上传文件存储目录是否存在  /uploads/用户id/年/月/日/时
+            $fileUploadDir = $this->uploadDir.DIRECTORY_SEPARATOR.$userId.DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
 
             if (!empty($_FILES)) {
                 foreach ($_FILES as $key => $val) {
@@ -134,8 +136,6 @@ class fileupload
                             $fileInfoArr[$key] = array_merge($fileInfoArr[$key], $imageInfo);
                         }
 
-                        //判断指定上传文件存储目录是否存在  /uploads/用户id/年/月/日/时
-                        $fileUploadDir = $this->uploadDir.DIRECTORY_SEPARATOR.$userId.DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
 
                         if (!file_exists($fileUploadDir)){
                             mkdir($fileUploadDir,0777,true);
@@ -174,9 +174,6 @@ class fileupload
                     }
                 }
 
-                //获取真实的文件名称,不带后缀名
-
-
                 $fileNewArr['userId'] = $userId;
                 $fileNewArr['name'] = !empty($fileInfoArr['file']['name']) ? $fileInfoArr['file']['name'] : '';
                 $fileNewArr['true_name'] = !empty($fileInfoArr['file']['true_name']) ? $fileInfoArr['file']['true_name'] : '';
@@ -184,6 +181,7 @@ class fileupload
                 $fileNewArr['type'] = !empty($fileInfoArr['file']['type']) ? $fileInfoArr['file']['type'] : '';
                 $fileNewArr['size'] = !empty($fileInfoArr['file']['size']) ? $fileInfoArr['file']['size'] : '';
                 $fileNewArr['ext']  =  pathinfo($fileInfoArr['file']['name'], PATHINFO_EXTENSION);
+                $fileNewArr['uploadDir']  =  $fileUploadDir;
 
                 return array('status'=>0, 'fileInfo'=>$fileNewArr, 'uploadSucc' => $uploadSucc, 'uploadFail' => $uploadFail);
             } else {
