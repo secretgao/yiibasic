@@ -110,38 +110,7 @@ class helps {
         return $output;
     }
     
-    /**
-     * 根据多个底层目录id 返回整个目录结构
-     */
-    public static function accordingCatalogToAllHierarchy($selectModuleIds)
-    {
-        
-        $result = $temp = [];
-        if (empty($selectModuleIds)){
-            return  $result;
-        }
-        //目录id 切割成数组
-        $catalogIdArr = explode(',', $selectModuleIds);
-        
-        $catalogArr = [];  //去除重复目录用
-        foreach ($catalogIdArr as $id){
-            $catalog = self::getParents($id);
-            foreach ($catalog as $item){
-                //去除重复
-                if (!in_array($item['id'], $catalogArr)) {
-                    $temp[] = $item;
-                    $catalogArr[]= $item['id'];
-                }
-            }
-        }
-        
-        $level = self::getson($temp,0,1);  //附上层级
-        $result = self::make_tree($level);
-        return  $result;
-    }
-    
-    
-    
+
     /**
      * @param $strParam
      * @return mixed
