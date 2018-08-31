@@ -69,11 +69,13 @@ class LogController extends BasicController
         }
 
         $perLog->status = $state;
-        if ($logContent){
-            $perLog->content = $logContent;
-        } else {
+
+        if ($logContent == '') {
             $perLog->status = 2;
+        } else {
+            $perLog->content = $logContent;
         }
+
         $perLog->update_time = time();
         if ($perLog->save(false)){
             $this->Success();
