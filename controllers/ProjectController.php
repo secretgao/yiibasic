@@ -423,7 +423,7 @@ class ProjectController extends BasicController
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
 
-        $fileColumns = 'id,name,path,type,uid,create_time,size,status';
+        $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path';
         $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
         $result = (new Query())
             ->select($modelColumns)
