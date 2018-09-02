@@ -528,6 +528,14 @@ class ProjectController extends BasicController
                 $member = explode(',',$selectUserIds);
                 $msg.='添加人员：';
                 foreach ($member as $uid) {
+                    $exists = AProjectExt::find()
+                        ->where(['project_id'=>$projectId])
+                        ->where(['uid'=>$uid])
+                        ->exists();
+                    //不用重复添加
+                    if ($exists) {
+                        continue;
+                    }
                     $projectExt = new AProjectExt();
                     $projectExt->project_id = $projectId;
                     $projectExt->uid = $uid;
