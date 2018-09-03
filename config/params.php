@@ -15,7 +15,10 @@ return [
         2=>[
             'num'=> '1.5.0',   //安卓
             'url'=> 'http://118.190.199.43/uploads/install/app-release_150_1_360应用平台_sign.apk.1',
-            'message'=>'更新bug',
+            'message'=>'首页Ui优化
+                        创建项目流程优化
+                        新增审核文件，上传记录功能
+                        新增项目日志功能',
         ]
     ],
 
