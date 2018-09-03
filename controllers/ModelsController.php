@@ -56,7 +56,7 @@ class ModelsController extends BasicController
         $level = 1;
 
         //模型带上层级
-        if (!empty($pid) && $type == 0) {
+        if (!empty($pid)) {
             $level = AModel::find()->select('level')
                 ->where(['id'=>$pid,'type'=>0,'status'=>0])->scalar();
             $level = intval($level) + 1;
