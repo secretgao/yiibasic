@@ -508,6 +508,7 @@ class ProjectController extends BasicController
     }
     /**
      * 设置项目状态和编辑人员
+     *  `status` '项目状态   0 未开始  1 进行中  2 已结束  3 暂停 4删除',
      */
     public function actionSetStatusUser()
     {
@@ -515,7 +516,7 @@ class ProjectController extends BasicController
         $projectId = $this->getParam('projectId',true);
         $projectStatus = $this->getParam('status',false);
         $selectUserIds  = $this->getParam('selectUserIds',false);
-        // `status` '项目状态   0 未开始  1 进行中  2 已结束  3 暂停 4删除',
+
         $project = AProject::findOne(['id'=>$projectId,'create_uid'=>$userId]);
 
         if (!$project){
@@ -527,10 +528,10 @@ class ProjectController extends BasicController
             if ($selectUserIds){
                 $member = explode(',',$selectUserIds);
                 $msg.='添加人员：';
+
                 foreach ($member as $uid) {
                     $exists = AProjectExt::find()
-                        ->where(['project_id'=>$projectId])
-                        ->where(['uid'=>$uid])
+                        ->where(['project_id'=>$projectId,'uid'=>$uid])
                         ->exists();
                     //不用重复添加
                     if ($exists) {
