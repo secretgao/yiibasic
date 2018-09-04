@@ -449,6 +449,7 @@ class ProjectController extends BasicController
                 foreach ($file as &$item) {
                     $fileId[] = $item['id'];
                     $item['path'] = trim($item['path'],'.');
+                    $item['small_path'] = trim($item['small_path'],'.');
                     $item['creater'] = AUser::getName($item['uid']);
                     $item['time'] = date('Y-m-d',$item['create_time']);
 
@@ -484,6 +485,7 @@ class ProjectController extends BasicController
                     if (!in_array($item['id'],$fileId)) {
                         $fileId[] = $item['id'];
                         $item['path'] = trim($item['path'],'.');
+                        $item['small_path'] = trim($item['small_path'],'.');
                         $item['creater'] = AUser::getName($item['uid']);
                         $item['time'] = date('Y-m-d',$item['create_time']);
                         array_push($result,$item);
@@ -807,6 +809,8 @@ class ProjectController extends BasicController
         foreach ($fileData as &$item){
             $item['creater'] = AUser::getName($item['uid']);
             $item['time'] =date('Y-m-d H:i:s',$item['create_time']);
+            $item['path'] = trim($item['path'],'.');
+            $item['small_path'] = trim($item['small_path'],'.');
             //按照目录分组
             if (array_key_exists($item['catalog_id'],$data)){
                 $data[$item['catalog_id']][] = $item;
@@ -875,6 +879,8 @@ class ProjectController extends BasicController
         foreach ($fileData as &$item){
             $item['creater'] = AUser::getName($item['uid']);
             $item['time'] =date('Y-m-d H:i:s',$item['create_time']);
+            $item['path'] = trim($item['path'],'.');
+            $item['small_path'] = trim($item['small_path'],'.');
             //按照目录分组
             if (array_key_exists($item['catalog_id'],$data)){
                 $data[$item['catalog_id']][] = $item;

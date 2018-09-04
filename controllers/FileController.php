@@ -12,6 +12,8 @@ use app\models\AProjectExt;
 use Yii;
 use app\commond\Constants;
 use app\commond\fileupload;
+use yii\db\Query;
+
 /**
  * 文件操作
  * @author Administrator
@@ -345,11 +347,43 @@ class FileController extends BasicController
     public function actionSf()
     {
 
-        $source =  './uploads/11/2018/09/04/06/_0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg';//原图片名称
-        $dst_img = './uploads/11/2018/09/04/06/_sssssss.jpg';//压缩后图片的名称
-        $percent = 1;  #原图压缩，不缩放，但体积大大降低
-        $image = (new Imgcompress($source,$percent))->compressImg($dst_img);
+        $pages = $this->getParam('p',1);
+        $page = ($pages- 1) * 5;
+        $file = (new Query())->select('id,uid,name,path,ext')
+            ->from('a_file')->where(['type'=>1])
+            ->andWhere(['<>','compress_path',''])
+            ->orderBy('id desc')
+            ->offset($page)
+            ->limit(5)
+            ->all();
 
+
+        foreach ($file as $item) {
+            $dir = './uploads'.DIRECTORY_SEPARATOR.$item['uid'].DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
+            $compress_img =  $dir.DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$item['uid'].'.'.$item['ext'];
+
+            $percent = 1;  #原图压缩，不缩放，但体积大大降低
+            $image = (new Imgcompress($item['path'],$percent))->compressImg($compress_img);
+            echo '<pre>';print_r($dir);
+            echo '<pre>';print_r($compress_img);
+            $fileobj = AFile::findOne(['id'=>$item['id']]);
+            $fileobj->compress_path = $compress_img;
+
+            $fileobj->save(false);
+            //  $item->compress_path = 1;
+           // $item->save(false);
+        }
+         echo '<pre>';var_dump($file);
+        exit();
+
+      
+
+        //生成压缩图
+        $compress_img =  $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$userId.'.'.$fileInfo['fileInfo']['ext'];;
+        $source = $fileInfo['fileInfo']['path'];//原图片名称
+        $dst_img = $compress_img;//压缩后图片的名称
+        $percent = 1;  #原图压缩，不缩放，但体积大大降低
+        (new Imgcompress($source,$percent))->compressImg($dst_img);
         var_dump($image);
     }
 
