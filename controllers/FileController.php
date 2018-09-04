@@ -160,7 +160,7 @@ class FileController extends BasicController
             $file->small_path = $small_img;
             $file->project_id = $projectId;
             $file->catalog_id = $catalogId;
-            $file->compress_path = $type == 2 ? $small_img : $compress_img;
+            $file->compress_path = $compress_img;
             $file->size = (string)$fileInfo['fileInfo']['size'];
             $file->exif_date = $exifDate;
             $file->exif_latitude = $exifLatitude;

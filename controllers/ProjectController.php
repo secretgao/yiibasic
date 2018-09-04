@@ -426,7 +426,7 @@ class ProjectController extends BasicController
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
 
-        $fileColumns = 'id,name,compress_path as path,type,uid,create_time,size,status,small_path';
+        $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
         $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
         $result = (new Query())
             ->select($modelColumns)
@@ -486,6 +486,7 @@ class ProjectController extends BasicController
                         $fileId[] = $item['id'];
                         $item['path'] = trim($item['path'],'.');
                         $item['small_path'] = trim($item['small_path'],'.');
+                        $item['compress_path'] = trim($item['compress_path'],'.');
                         $item['creater'] = AUser::getName($item['uid']);
                         $item['time'] = date('Y-m-d',$item['create_time']);
                         array_push($result,$item);
@@ -797,7 +798,7 @@ class ProjectController extends BasicController
         if (!$projectInfo) {
             $this->Error(Constants::PROJECT_MANAGE_EXITS,Constants::$error_message[Constants::PROJECT_MANAGE_EXITS]);
         }
-        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,compress_path as path,small_path';
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,compress_path,path,small_path';
         $fileData = AFile::find()->select($columns)
             ->where(['project_id'=>$projectId,'status'=>0])->asArray()->all();
 
@@ -811,6 +812,7 @@ class ProjectController extends BasicController
             $item['time'] =date('Y-m-d H:i:s',$item['create_time']);
             $item['path'] = trim($item['path'],'.');
             $item['small_path'] = trim($item['small_path'],'.');
+            $item['compress_path'] = trim($item['compress_path'],'.');
             //按照目录分组
             if (array_key_exists($item['catalog_id'],$data)){
                 $data[$item['catalog_id']][] = $item;
@@ -867,7 +869,7 @@ class ProjectController extends BasicController
         if (!$projectInfo) {
             $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
-        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,compress_path as path,small_path';
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,compress_path,path,small_path';
         $fileData = AFile::find()->select($columns)
             ->where(['project_id'=>$projectId,'uid'=>$userId])->asArray()->all();
 
@@ -881,6 +883,7 @@ class ProjectController extends BasicController
             $item['time'] =date('Y-m-d H:i:s',$item['create_time']);
             $item['path'] = trim($item['path'],'.');
             $item['small_path'] = trim($item['small_path'],'.');
+            $item['compress_path'] = trim($item['compress_path'],'.');
             //按照目录分组
             if (array_key_exists($item['catalog_id'],$data)){
                 $data[$item['catalog_id']][] = $item;
