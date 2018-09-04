@@ -361,6 +361,12 @@ class FileController extends BasicController
 
         foreach ($file as $item) {
             $dir = './uploads'.DIRECTORY_SEPARATOR.$item['uid'].DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
+
+
+            if (!file_exists($dir)){
+                mkdir($dir,0777,true);
+            }
+
             $compress_img =  $dir.DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$item['uid'].'.'.$item['ext'];
             if (!file_exists($item['path'])){
                 continue;
