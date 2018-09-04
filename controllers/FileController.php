@@ -349,15 +349,20 @@ class FileController extends BasicController
 
 
         $pages = $this->getParam('p',1);
-        $page = ($pages- 1) * 5;
+        $page = ($pages- 1) * 10;
+
+        $sql = "SELECT id,uid,name,path,ext FROM a_file WHERE  `type`=1 and compress_path <> '' limit {$page},20";
+        echo $sql;
+        $rows = Yii::$app->db->createCommand($sql)->queryAll();
         $file = (new Query())->select('id,uid,name,path,ext')
             ->from('a_file')->where(['type'=>1])
             ->andWhere(['<>','compress_path',''])
             ->orderBy('id desc')
-            ->offset($page)
-            ->limit(5)
+            ->offset(10)
+            ->limit($page)
             ->all();
-
+        echo '<pre>';var_dump($rows);
+        exit();
 
         foreach ($file as $item) {
             $dir = './uploads'.DIRECTORY_SEPARATOR.$item['uid'].DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');

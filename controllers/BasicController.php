@@ -44,7 +44,7 @@ class BasicController extends Controller
      */
     public function getParam($key, $is_need = true, $default_value = NULL)
     {
-        $notCheck = ['file','url','log_content'];
+        $notCheck = ['file','url','log_content','email'];
 
         if (in_array($key,$notCheck)){
             $val = self::$request->get($key);
