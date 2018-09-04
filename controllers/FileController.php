@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\commond\helps;
+use app\commond\Imgcompress;
 use app\components\Aliyunoss;
 
 use app\models\AFile;
@@ -125,13 +126,21 @@ class FileController extends BasicController
         $fileInfo = $fileUpload->getFileInfo($userId,$projectId);
 
         if (isset($fileInfo['status'])) {
-            $commond = '';
             $small_img = '';
+            $compress_img = '';
             //生成图片缩略图
             if ($type == 1) {
                 $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.'.$fileInfo['fileInfo']['ext'];
                 helps::img_create_small($fileInfo['fileInfo']['path'],150,120,
                     $small_img);
+
+                //生成压缩图
+                $compress_img =  $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$userId.'.'.$fileInfo['fileInfo']['ext'];;
+                $source = $fileInfo['fileInfo']['path'];//原图片名称
+                $dst_img = $compress_img;//压缩后图片的名称
+                $percent = 1;  #原图压缩，不缩放，但体积大大降低
+                (new Imgcompress($source,$percent))->compressImg($dst_img);
+
             } elseif ($type == 2) {
                //生成视频 缩略图
                 $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.jpg';
@@ -149,6 +158,7 @@ class FileController extends BasicController
             $file->small_path = $small_img;
             $file->project_id = $projectId;
             $file->catalog_id = $catalogId;
+            $file->compress_path = $compress_img;
             $file->size = (string)$fileInfo['fileInfo']['size'];
             $file->exif_date = $exifDate;
             $file->exif_latitude = $exifLatitude;
@@ -237,7 +247,7 @@ class FileController extends BasicController
         $fileId = $this->getParam('fileId',true);
         $userId = $this->getParam('userId',true);
         $file = AFile::find()->select('*')
-            ->where(['id'=>$fileId,'status'=>0,'uid'=>$userId])
+            ->where(['id'=>$fileId,'uid'=>$userId])
             ->asArray()->one();
 
         if (!$file) {
@@ -327,6 +337,20 @@ class FileController extends BasicController
         } else {
             $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
         }
+    }
+
+    /**
+     * 缩放
+     */
+    public function actionSf()
+    {
+
+        $source =  './uploads/11/2018/09/04/06/_0117e2571b8b246ac72538120dd8a4.jpg@1280w_1l_2o_100sh.jpg';//原图片名称
+        $dst_img = './uploads/11/2018/09/04/06/_sssssss.jpg';//压缩后图片的名称
+        $percent = 1;  #原图压缩，不缩放，但体积大大降低
+        $image = (new Imgcompress($source,$percent))->compressImg($dst_img);
+
+        var_dump($image);
     }
 
 }
