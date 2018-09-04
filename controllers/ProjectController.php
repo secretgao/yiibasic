@@ -426,7 +426,7 @@ class ProjectController extends BasicController
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
 
-        $fileColumns = 'id,name,compress_path as path,type,uid,create_time,size,status,small_path';
+        $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path';
         $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
         $result = (new Query())
             ->select($modelColumns)
@@ -797,7 +797,7 @@ class ProjectController extends BasicController
         if (!$projectInfo) {
             $this->Error(Constants::PROJECT_MANAGE_EXITS,Constants::$error_message[Constants::PROJECT_MANAGE_EXITS]);
         }
-        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,compress_path as path,small_path';
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,path,small_path';
         $fileData = AFile::find()->select($columns)
             ->where(['project_id'=>$projectId,'status'=>0])->asArray()->all();
 
@@ -867,7 +867,7 @@ class ProjectController extends BasicController
         if (!$projectInfo) {
             $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
-        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,compress_path as path,small_path';
+        $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,path,small_path';
         $fileData = AFile::find()->select($columns)
             ->where(['project_id'=>$projectId,'uid'=>$userId])->asArray()->all();
 
