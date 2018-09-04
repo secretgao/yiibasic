@@ -351,7 +351,7 @@ class FileController extends BasicController
         $pages = $this->getParam('p',1);
         $page = ($pages- 1) * 20;
 
-       $sql = "SELECT id,uid,name,path,ext FROM a_file WHERE  `type`=1  limit {$page},20";
+       $sql = "SELECT id,uid,name,path,ext,compress_path FROM a_file WHERE  `type`=1  limit {$page},20";
         echo $sql;
         $file = Yii::$app->db->createCommand($sql)->queryAll();
        /* $file = (new Query())->select('id,uid,name,path,ext,compress_path')
