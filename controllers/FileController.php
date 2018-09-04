@@ -347,6 +347,7 @@ class FileController extends BasicController
     public function actionSf()
     {
 
+
         $pages = $this->getParam('p',1);
         $page = ($pages- 1) * 5;
         $file = (new Query())->select('id,uid,name,path,ext')
@@ -361,7 +362,9 @@ class FileController extends BasicController
         foreach ($file as $item) {
             $dir = './uploads'.DIRECTORY_SEPARATOR.$item['uid'].DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
             $compress_img =  $dir.DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$item['uid'].'.'.$item['ext'];
-
+            if (!file_exists($item['path'])){
+                continue;
+            }
             $percent = 1;  #原图压缩，不缩放，但体积大大降低
             $image = (new Imgcompress($item['path'],$percent))->compressImg($compress_img);
             echo '<pre>';print_r($dir);
@@ -370,8 +373,7 @@ class FileController extends BasicController
             $fileobj->compress_path = $compress_img;
 
             $fileobj->save(false);
-            //  $item->compress_path = 1;
-           // $item->save(false);
+
         }
          echo '<pre>';var_dump($file);
         exit();
