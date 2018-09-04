@@ -160,7 +160,7 @@ class FileController extends BasicController
             $file->small_path = $small_img;
             $file->project_id = $projectId;
             $file->catalog_id = $catalogId;
-            $file->compress_path = $compress_img;
+            $file->compress_path = $type == 2 ? $small_img : $compress_img;
             $file->size = (string)$fileInfo['fileInfo']['size'];
             $file->exif_date = $exifDate;
             $file->exif_latitude = $exifLatitude;
@@ -400,6 +400,25 @@ class FileController extends BasicController
         $percent = 1;  #原图压缩，不缩放，但体积大大降低
         (new Imgcompress($source,$percent))->compressImg($dst_img);
         var_dump($image);
+    }
+
+    public function actionSs()
+    {
+        $pages = $this->getParam('p',1);
+        $page = ($pages- 1) * 10;
+        $sql = "SELECT id,uid,name,path,small_path FROM a_file WHERE  `type`=2  limit {$page},10";
+        echo $sql;
+        $file = Yii::$app->db->createCommand($sql)->queryAll();
+
+        foreach ($file as $item) {
+
+            $fileobj = AFile::findOne(['id'=>$item['id']]);
+            $fileobj->compress_path = $item['small_path'];
+
+            $fileobj->save(false);
+
+        }
+       var_dump($file);
     }
 
 }

@@ -142,10 +142,10 @@ class fileupload
                         }
 
                         $name = $fileInfoArr[$key]['name'];
+                        $fileInfoArr[$key]['true_name'] = $name;
                         //查询文件名是否存在 如果存在 重新定义文件名为xxx(1).ext
                         $fileRenameNum = AFile::find()->where(['true_name'=>$name,'project_id'=>$projectId])->count();
                         if ($fileRenameNum && $name) {
-                            $fileInfoArr[$key]['true_name'] = $name;
                             $ext = pathinfo($fileInfoArr[$key]['name'], PATHINFO_EXTENSION);
                             $start = strlen($ext) + 1;
                             $name =  substr($fileInfoArr[$key]['name'],0,-$start);
