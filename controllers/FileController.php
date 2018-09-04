@@ -354,9 +354,9 @@ class FileController extends BasicController
       /*  $sql = "SELECT id,uid,name,path,ext FROM a_file WHERE  `type`=1 and compress_path == '' limit {$page},20";
         echo $sql;*/
        // $rows = Yii::$app->db->createCommand($sql)->queryAll();
-        $file = (new Query())->select('id,uid,name,path,ext')
+        $file = (new Query())->select('id,uid,name,path,ext,compress_path')
             ->from('a_file')->where(['type'=>1])
-            ->andWhere(['compress_path'=>null])
+            //->andWhere(['compress_path'=>null])
             ->orderBy('id desc')
             ->offset(20)
             ->limit($page)
@@ -367,6 +367,9 @@ class FileController extends BasicController
             $dir = './uploads'.DIRECTORY_SEPARATOR.$item['uid'].DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
 
 
+            if ($item['compress_path'] !== null){
+                continue;
+            }
             if (!file_exists($dir)){
                 mkdir($dir,0777,true);
             }
