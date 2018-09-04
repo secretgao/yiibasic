@@ -374,7 +374,7 @@ class FileController extends BasicController
                 mkdir($dir,0777,true);
             }
 
-        /*    $compress_img =  $dir.DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$item['uid'].'.'.$item['ext'];
+           $compress_img =  $dir.DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$item['uid'].'.'.$item['ext'];
             if (!file_exists($item['path'])){
                 continue;
             }
@@ -385,7 +385,7 @@ class FileController extends BasicController
             $fileobj = AFile::findOne(['id'=>$item['id']]);
             $fileobj->compress_path = $compress_img;
 
-            $fileobj->save(false);*/
+            $fileobj->save(false);
 
         }
          echo '<pre>';var_dump($file);
