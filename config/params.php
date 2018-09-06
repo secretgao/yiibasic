@@ -11,7 +11,7 @@ return [
 
 
     'version' =>[
-        1=>'1.5.2',   //ios
+        1=>'1.5.4',   //ios
         2=>[
             'num'=> '1.5.1',   //安卓
             'url'=> 'http://118.190.199.43/uploads/install/360.apk.1',
