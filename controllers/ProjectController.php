@@ -32,7 +32,7 @@ class ProjectController extends BasicController
 
         $uid = $this->getParam('userId',true);
         $time = $this->getParam('time',true);
-        $postionId= $this->getParam('postionId',false,null);
+        $postionId= $this->getParam('positionId',false,null);
         //查询该用户创建的项目
         $createProejct = AProject::find()
             ->where(['create_uid'=>$uid, 'year'=>$time])
