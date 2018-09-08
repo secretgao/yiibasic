@@ -85,4 +85,13 @@ class APosition extends  \yii\db\ActiveRecord
             ->where(['status'=>0,'id'=>$id])->asArray()->one();
 
     }
+
+    /**
+     * 获取所有部门
+     */
+    public static function getAllPosition(){
+
+
+    }
+
 }

@@ -51,4 +51,19 @@ class AProjectModel extends \yii\db\ActiveRecord
             'type' => Yii::t('app', '区分 0是 模版  1是目录 '),
         ];
     }
+
+    /**
+     * 根据一级模版id查询项目
+     *
+     */
+    public static function accordingToModelIdGetProjectId($modelId){
+
+        if (empty($modelId)) {
+            return false;
+        }
+        return self::find()->select('project_id')
+            ->where(['model_id'=>$modelId])
+            ->asArray()->column();
+
+    }
 }

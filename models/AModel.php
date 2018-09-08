@@ -61,4 +61,19 @@ class AModel extends \yii\db\ActiveRecord
             'remark' => 'Remark',
         ];
     }
+
+    /**
+     * 获取模版一级
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public static function getFirstModels(){
+
+        return self::find()->select('id,name')
+            ->where([
+                'status'=>0,
+                'type'=>0,
+                'level'=>1
+            ])
+            ->asArray()->all();
+    }
 }

@@ -4,6 +4,7 @@ namespace app\controllers;
 
 
 use app\models\AAppVersion;
+use app\models\AMessage;
 use app\models\APosition;
 use app\models\APositionApply;
 use app\models\AUser;
@@ -223,6 +224,37 @@ class UserController extends BasicController
         } else {
             $this->Success(['needUpdate'=>false]);
         }
+    }
+
+    /**
+     *用户添加意见反馈
+     * @return array
+     */
+    public function actionMessage()
+    {
+        $uid = $this->getParam('userId');
+        $content = $this->getParam('content');
+
+        $obj = new AMessage();
+        $obj->uid = $uid;
+        $obj->content = $content;
+        $obj->create_time = time();
+        if ($obj->save()){
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
+
+    /**
+     * 获取用户意见反馈
+     * @return array
+     */
+    public function actionGetMessage()
+    {
+
+        $data = AMessage::find()->select('*,FROM_UNIXTIME(create_time) as create_time')->orderBy('id desc')
+            ->asArray()->all();
+        $this->Success(['data'=>$data]);
     }
 
 }

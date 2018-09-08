@@ -213,4 +213,15 @@ class ModelsController extends BasicController
 
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
+
+    /**
+     * 获取一级分类
+     * @return array
+     */
+    public function actionFirstIndex()
+    {
+         $data = AModel::getFirstModels();
+         $this->Success(['data'=>$data]);
+
+    }
 }
