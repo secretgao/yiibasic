@@ -91,7 +91,9 @@ class APosition extends  \yii\db\ActiveRecord
      */
     public static function getAllPosition(){
 
-
+        return self::find()->select('id,name')
+            ->where(['status'=>0,'pid'=>0])
+            ->asArray()->all();
     }
 
 }
