@@ -33,9 +33,6 @@ class ProjectController extends BasicController
         $uid = $this->getParam('userId',true);
         $time = substr($this->getParam('time',true),0,4);
         $postionId = $this->getParam('positionId',false,null);
-        if (empty($postionId)) {
-            $postionId = $this->getParam('postionId',false,null);
-        }
         $modelId  = $this->getParam('modelId',false,0);
         $projectId = null;
         if ($modelId) {
