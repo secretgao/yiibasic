@@ -36,7 +36,7 @@ class ProjectController extends BasicController
         $modelId  = $this->getParam('modelId',false,null);
         $projectId = null;
         if ($modelId) {
-            $projectId = AProject::accordingToModelIdGetProjectId($modelId);
+            $projectId = AProjectModel::accordingToModelIdGetProjectId($modelId);
         }
 
         //查询该用户创建的项目
