@@ -741,6 +741,8 @@ class ProjectController extends BasicController
 
         $project->status = '4';
         if ($project->save(false)){
+            AProjectModel::deleteAll(['project_id'=>$projectId]);
+            AProjectExt::deleteAll(['project_id'=>$projectId]);
             $msg = '删除项目:'.$project->name;
             helps::writeLog(Constants::OPERATION_PROJECT,$msg,$userId);
             $this->Success();

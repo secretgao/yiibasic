@@ -220,7 +220,16 @@ class ModelsController extends BasicController
      */
     public function actionFirstIndex()
     {
+        // header("Content-type: text/html; charset=utf-8");
+         //获取一级分类
          $data = AModel::getFirstModels();
+         //查询所属一级分类的项目
+         foreach ($data as $key=>$item) {
+
+          $projectId = AProjectModel::accordingToModelIdGetProjectId($item['id']);
+          $data[$key]['projects'] = count($projectId);
+         }
+         //echo '<pre>';print_r($data);exit();
          $this->Success(['data'=>$data]);
 
     }
