@@ -46,8 +46,7 @@ class ProjectController extends BasicController
             ->andFilterWhere(['position_id'=>$postionId])
             ->andFilterWhere(['id'=>$projectId])
             ->orderBy('sort ASC,id DESC')->asArray()->all();
-        //判断该用户是否有部门
-        $isPosition = AUser::getUserIsPosition($uid);
+
         //查询该用户的参与项目
         $joinProjectId = AProjectExt::find()
             ->select('project_id')
@@ -122,7 +121,7 @@ class ProjectController extends BasicController
             }
         }
 
-        $this->Success(['data'=>$data,'isCertified'=>$isPosition]);
+        $this->Success(['data'=>$data]);
     }
 
 

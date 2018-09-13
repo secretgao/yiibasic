@@ -27,6 +27,7 @@ class RegisterController extends BasicController
 
         $idExits = AUser::find()->where(['status'=>0,'weixin_id'=>$id])
                 ->asArray()->one();
+
         if ($idExits) {
             $isCertified = true;
             if (empty($idExits['position_id'])) {
@@ -62,6 +63,7 @@ class RegisterController extends BasicController
                 'nickName'=>$userObj->getAttribute('nick_name'),
                 'realName'=> '',
                 'group' => $userObj->getAttribute('group'),
+                'isCertified'=>false
             ];
             $this->Success($result);
         }
