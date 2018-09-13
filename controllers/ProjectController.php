@@ -434,6 +434,11 @@ class ProjectController extends BasicController
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
 
+        if ($parentId == 0 ) {
+            $parentId = AProjectModel::find()->select('model_id')
+                ->where(['project_id'=>$projectId,'model_pid'=>0])
+                ->scalar();
+        }
         $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
         $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
         $result = (new Query())
