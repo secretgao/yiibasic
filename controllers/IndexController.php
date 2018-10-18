@@ -48,4 +48,14 @@ class IndexController extends BasicController
         }
         $this->Success(['data'=>$data]);
     }
+
+    /**
+     * 隐私政策
+     * @return string
+     */
+    public function actionPrivacyPolicy()
+    {
+        $this->layout=false;
+        return $this->render('privacy-policy');
+    }
 }
