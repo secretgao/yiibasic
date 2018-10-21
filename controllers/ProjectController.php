@@ -245,169 +245,6 @@ class ProjectController extends BasicController
         }
         $this->Success(['data'=>$parent]);       
     }
-
-    /**
-     * 获取项目目录
-     */
-   /*
-    public function actionGetProjectCatalog()
-    {
-        $userId = $this->getParam('userId',true);
-        $projectId = $this->getParam('projectId',true);
-        $parentId = $this->getParam('parentId',true);
-        
-        $project = AProject::find()
-            ->select('model_id')->where(['id'=>$projectId])
-            ->andWhere(['<>','status',4])->asArray()->one();
-        
-        if (!$project) {
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-        }
-        $fileColumns = 'id,name,path,type,uid,create_time,size,status';
-        //模版id 切割成数组
-        $modelIdArr = explode(',', $project['model_id']);
-        $result = [];
-        //说明是顶级返回所有子集
-        if ($project['model_id'] == $parentId  || in_array($parentId,$modelIdArr)){
-            $result = AModel::find()->select('id,name,pid,level,remark as describe')
-                ->where(['pid'=>$parentId,'status'=>0,'project_id'=>0])->asArray()->all();
-
-        } else {
-            $modelArr =  $temp =  [];  //去除重复目录用
-            foreach ($modelIdArr as $id) {
-                $catalog = helps::getParents($id);
-                if (!$catalog) {
-                    continue;
-                }
-                foreach ($catalog as $item) {
-                    //去除重复
-                    if (!in_array($item['id'], $modelArr)) {
-                        $temp[] = $item;
-                        $modelArr[]= $item['id'];
-                    }
-                }
-            }
-
-            $data = helps::getson($temp,0,1);  //附上层级
-
-            if ($data) {
-                foreach ($data as $value) {
-                    if ($value['pid'] == $parentId){
-                        $result[] = $value;
-                    }
-                }
-            }
-            //特殊情况 要把所有层级找出来然后筛选
-            if (empty($result)) {
-                $allstep = helps::allStep($projectId);
-                foreach ($allstep as $item) {
-                    if ($parentId == $item['pid']) {
-                        $result[] = $item;
-                    }
-                }
-            }
-        }
-
-        //根据最后返回信息 遍历 是否存在文件
-//echo '<pre>';print_r($result);exit();
-        $fileId = [];
-        if ($result) {
-            foreach ($result as $k=>$cata) {
-                $result[$k]['type'] = '0';
-                $son  = AModel::find()->select('remark')->where(['pid'=>$cata['id'],'status'=>0])->andWhere(['<>','remark',''])
-                    ->asArray()->column();
-                $result[$k]['remark'] = $son;
-                if ($parentId == 0) {
-                    $file = AFile::find()->select($fileColumns)
-                        ->where([
-                            'project_id'=>$projectId,
-                            'catalog_id'=>0
-                        ])->andWhere(['<>','status',3])
-                        ->asArray()->all();
-                } else {
-                    $file = AFile::find()->select($fileColumns)
-                        ->where([
-                            'project_id'=>$projectId,
-                            'catalog_id'=>$cata['pid']
-                        ])->andWhere(['<>','status',3])
-                        ->asArray()->all();
-                }
-
-                if ($file) {
-                    foreach ($file as $item) {
-                        if (!in_array($item['id'],$fileId)) {
-                            $fileId[] = $item['id'];
-                            $item['path'] = trim($item['path'],'.');
-                            $item['creater'] = AUser::getName($item['uid']);
-                            $item['time'] = date('Y-m-d',$item['create_time']);
-                            array_push($result,$item);
-                        }
-                    }
-                }
-            }
-
-            //项目目录
-            $cata = AModel::find()->select('id,name,type,remark as describe')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
-            if ($cata) {
-
-                foreach ($cata as &$value) {
-                    $value['type'] = '0';
-                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])->andWhere(['<>','remark',''])
-                        ->asArray()->column();
-                    $value['remark'] = $son;
-                }
-                $result = array_merge($result,$cata);
-            }
-
-        } else {
-            //项目目录
-            $cata = AModel::find()->select('id,name,type,remark as describe')->where(['project_id'=>$projectId,'pid'=>$parentId,'type'=>1])->asArray()->all();
-            if ($cata) {
-                foreach ($cata as &$value) {
-                    $value['type'] = '0';
-                    $son  = AModel::find()->select('remark')->where(['pid'=>$value['id'],'status'=>0])->andWhere(['<>','remark',''])
-                        ->asArray()->scalar();
-                    $value['remark'] = $son;
-                }
-                $result = array_merge($result,$cata);
-            }
-            $file = AFile::find()->select($fileColumns)
-                ->where([
-                    'project_id'=>$projectId,
-                    'catalog_id'=>$parentId
-                ])->andWhere(['<>','status',3])
-                ->asArray()->all();
-            if ($file) {
-                foreach ($file as &$item) {
-                    if (!in_array($item['id'],$fileId)) {
-                        $fileId[] = $item['id'];
-                        $item['path'] = trim($item['path'],'.');
-                        $item['creater'] = AUser::getName($item['uid']);
-                        $item['time'] = date('Y-m-d',$item['create_time']);
-                        array_push($result,$item);
-                    }
-                }
-            }
-        }
-
-        //首先显示目录 然后显示文件
-        $data = [];
-        if ($result) {
-            $files = $chapter = [];
-            foreach ($result as $item) {
-                if ($item['type'] == 0) {
-                    $chapter[] = $item;
-                } else {
-                    $files[]=$item;
-                }
-            }
-            $data = array_merge($chapter,$files);
-        }
-
-        $this->Success(['data'=>$data]);
-       
-    }
-*/
     /**
      * 获取项目目录
      */
@@ -958,6 +795,69 @@ class ProjectController extends BasicController
         //echo '<pre>';print_r($res);exit();
        // $a = helps::getProjectModelBottomNum(170);
        // var_dump($a);
+    }
+
+
+    /**
+     * 设置项目 书记标签
+     * @return mixed
+     */
+
+    public function actionSetSecretaryTag()
+    {
+
+        $projectId = $this->getParam('projectId',true);
+        $userId    = $this->getParam('userId',true);
+        $SecretaryTagId = $this->getParam('secretarytagId',true);
+
+        $project = AProject::find()
+            ->where(['id'=>$projectId,'create_uid'=>$userId])
+            ->one();
+        if ($project['status'] == 4) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+        $project->secretary_tag_id = intval($SecretaryTagId);
+
+        if ($project->save(false)) {
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
+    }
+
+    /***
+     *设置项目财政编号
+     *
+     * @return array
+     */
+    public function actionSetProjectFinancial()
+    {
+        $projectId = $this->getParam('projectId',true);
+        $userId    = $this->getParam('userId',true);
+        $number = $this->getParam('number',true);
+
+        $existsFinancial = AProject::find()->where(['financial_number'=>$number])
+        ->exists();
+        if ($existsFinancial) {
+            $this->Error(Constants::PROJECT_FINANCIAL_EXITS,Constants::$error_message[Constants::PROJECT_FINANCIAL_EXITS]);
+
+        }
+
+        $project = AProject::find()
+            ->where(['id'=>$projectId,'create_uid'=>$userId])
+            ->one();
+        if ($project['status'] == 4) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+        $project->financial_number = $number;
+
+        if ($project->save(false)) {
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
     }
 
 }

@@ -23,6 +23,8 @@ use Yii;
  * @property string $model_id 选中模版id
  * @property int $finish_time 项目预计完成时间
  * @property int $position_id 项目所属部门id
+ * @property int $secretary_tag_id 项目书记标签id
+ * @property string $financial_number 项目财政编号
  */
 class AProject extends \yii\db\ActiveRecord
 {
@@ -40,12 +42,12 @@ class AProject extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['start_time', 'end_time', 'create_time', 'update_time', 'members', 'create_uid', 'finish_time', 'position_id'], 'integer'],
+            [['start_time', 'end_time', 'create_time', 'update_time', 'members', 'create_uid', 'finish_time', 'position_id', 'secretary_tag_id'], 'integer'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 50],
             [['allow_add'], 'string', 'max' => 2],
             [['status', 'sort'], 'string', 'max' => 3],
-            [['year'], 'string', 'max' => 20],
+            [['year', 'financial_number'], 'string', 'max' => 20],
             [['model_id'], 'string', 'max' => 200],
         ];
     }
@@ -72,6 +74,8 @@ class AProject extends \yii\db\ActiveRecord
             'model_id' => 'Model ID',
             'finish_time' => 'Finish Time',
             'position_id' => 'Position ID',
+            'secretary_tag_id' => 'Secretary Tag ID',
+            'financial_number' => 'Financial Number',
         ];
     }
 }

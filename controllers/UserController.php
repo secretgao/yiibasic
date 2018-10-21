@@ -7,6 +7,7 @@ use app\models\AAppVersion;
 use app\models\AMessage;
 use app\models\APosition;
 use app\models\APositionApply;
+use app\models\ASecretaryTag;
 use app\models\AUser;
 use Yii;
 use app\commond\Constants;
@@ -254,6 +255,36 @@ class UserController extends BasicController
 
         $data = AMessage::find()->select('*,FROM_UNIXTIME(create_time) as create_time')->orderBy('id desc')
             ->asArray()->all();
+        $this->Success(['data'=>$data]);
+    }
+
+    /**
+     * 创建书记标签
+     */
+    public function actionCreateSecretaryTag(){
+
+        $uid = $this->getParam('userId');
+        $name = $this->getParam('name');
+
+        $obj = new ASecretaryTag();
+        $obj->name = $name;
+        $obj->create_uid = intval($uid);
+        $obj->create_time = time();
+
+        if ($obj->save()){
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
+
+    /**
+     * 获取书记标签
+     *
+     */
+    public function actionGetSecretaryList()
+    {
+        $data = ASecretaryTag::find()->select('id,name')->asArray()->all();
+
         $this->Success(['data'=>$data]);
     }
 

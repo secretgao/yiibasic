@@ -30,6 +30,7 @@ final class Constants
     const PROJECT_PACK_FAIL         = 1014;
     const NOT_SYS_POSITION          = 1015;
     const PROJECT_MANAGE_EXITS      = 1016;
+    const PROJECT_FINANCIAL_EXITS   = 1017;
 
     const REQUSET_NO_POST           = 2000;
     const REQUSET_NO_GET            = 2001;
@@ -55,6 +56,7 @@ final class Constants
         self::PROJECT_PACK_FAIL =>'项目压缩失败，可能是网络原因，请重试',
         self::NOT_SYS_POSITION =>'不是系统职位',
         self::PROJECT_MANAGE_EXITS =>'项目负责人不存在',
+        self::PROJECT_FINANCIAL_EXITS=>'项目财政编号已经存在',
     ];
 
     //操作日志相关
