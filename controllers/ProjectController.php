@@ -33,6 +33,7 @@ class ProjectController extends BasicController
         $uid = $this->getParam('userId',true);
         $time = substr($this->getParam('time',true),0,4);
         $postionId = $this->getParam('positionId',false,null);
+        $secretarytagId = $this->getParam('secretarytagId',false,null);
         $modelId  = $this->getParam('modelId',false,null);
         $projectId = null;
         if ($modelId) {
@@ -44,6 +45,7 @@ class ProjectController extends BasicController
             ->where(['create_uid'=>$uid, 'year'=>$time])
             ->andWhere(['!=','status',4])
             ->andFilterWhere(['position_id'=>$postionId])
+            ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
             ->andFilterWhere(['id'=>$projectId])
             ->orderBy('sort ASC,id DESC')->asArray()->all();
         //判断该用户是否有部门
@@ -63,6 +65,7 @@ class ProjectController extends BasicController
                 ->andWhere(['!=','create_uid',$uid])
                 ->andFilterWhere(['position_id'=>$postionId])
                 ->andFilterWhere(['id'=>$projectId])
+                ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
                 ->orderBy('sort ASC,id DESC')
                 ->asArray()->all();
         }
