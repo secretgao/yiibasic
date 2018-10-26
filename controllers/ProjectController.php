@@ -48,7 +48,7 @@ class ProjectController extends BasicController
             ->andFilterWhere(['position_id'=>$postionId])
             ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
             ->andFilterWhere(['id'=>$projectId])
-            ->orderBy('sort ASC,id DESC')->asArray()->column()->all();
+            ->orderBy('sort ASC,id DESC')->asArray()->all();
         //判断该用户是否有部门
         $isPosition = AUser::getUserIsPosition($uid);
         //查询该用户的参与项目
