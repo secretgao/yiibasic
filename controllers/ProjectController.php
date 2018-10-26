@@ -276,7 +276,7 @@ class ProjectController extends BasicController
 
         if ($parentId == 0 ) {
             $parentId = AProjectModel::find()->select('model_id')
-                ->where(['project_id'=>$projectId,'model_pid'=>0])
+                ->where(['project_id'=>$projectId,'model_pid'=>0,'status'=>0])
                 ->scalar();
         }
         $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
@@ -285,7 +285,7 @@ class ProjectController extends BasicController
             ->select($modelColumns)
             ->from('a_project_model as pm')
             ->leftJoin('a_model as am','pm.model_id = am.id')
-            ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId])
+            ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId,'pm.status'=>0])
             ->all();
         //根据最后返回信息 遍历 是否存在文件
 //echo '<pre>';print_r($result);exit();
