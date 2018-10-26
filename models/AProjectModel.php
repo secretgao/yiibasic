@@ -14,6 +14,7 @@ use Yii;
  * @property int $create_time
  * @property int $level 层级
  * @property int $type 区分 0是 模版  1是目录 
+ * @property int $status 0 正常  -1 删除
  */
 class AProjectModel extends \yii\db\ActiveRecord
 {
@@ -32,7 +33,7 @@ class AProjectModel extends \yii\db\ActiveRecord
     {
         return [
             [['project_id', 'model_id', 'model_pid', 'create_time', 'level'], 'integer'],
-            [['type'], 'string', 'max' => 2],
+            [['type', 'status'], 'string', 'max' => 2],
         ];
     }
 
@@ -49,8 +50,10 @@ class AProjectModel extends \yii\db\ActiveRecord
             'create_time' => Yii::t('app', 'Create Time'),
             'level' => Yii::t('app', '层级'),
             'type' => Yii::t('app', '区分 0是 模版  1是目录 '),
+            'status' => Yii::t('app', '0 正常  -1 删除'),
         ];
     }
+
 
     /**
      * 根据一级模版id查询项目
@@ -62,7 +65,7 @@ class AProjectModel extends \yii\db\ActiveRecord
             return false;
         }
         return self::find()->select('project_id')
-            ->where(['model_id'=>$modelId])
+            ->where(['model_id'=>$modelId,'status'=>0])
             ->asArray()->column();
 
     }

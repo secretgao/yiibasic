@@ -443,11 +443,11 @@ class helps {
         }
         //获取项目最底层级层数
         $maxLevel = AProjectModel::find()->select('max(level) as level')
-            ->where(['project_id'=>$projectId,'type'=>0])->scalar();
+            ->where(['project_id'=>$projectId,'type'=>0,'status'=>0])->scalar();
 
         //获取最底层所有模板id
         $result = AProjectModel::find()->select('model_id')
-            ->where(['project_id'=>$projectId,'level'=>$maxLevel])
+            ->where(['project_id'=>$projectId,'level'=>$maxLevel,'status'=>0])
             ->asArray()->column();
 
         return $result;

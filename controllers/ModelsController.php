@@ -233,4 +233,28 @@ class ModelsController extends BasicController
          $this->Success(['data'=>$data]);
 
     }
+
+
+    /**
+     * 删除项目目录或者模板
+     */
+    public function actionDelProjectModel()
+    {
+        $this->isPost();
+        $id  = $this->getParam('id',true);
+        $projectId  = $this->getParam('projectId',true);
+        $Obj = AProjectModel::findOne(['project_id'=>$projectId,'model_id'=>$id,'status'=>0]);
+
+        if (!$Obj) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $Obj->status = -1;
+        if ($Obj->save(false)) {
+
+            $this->Success();
+        }
+
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
 }

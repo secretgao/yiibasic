@@ -277,7 +277,7 @@ class ProjectController extends BasicController
 
         if ($parentId == 0 ) {
             $parentId = AProjectModel::find()->select('model_id')
-                ->where(['project_id'=>$projectId,'model_pid'=>0])
+                ->where(['project_id'=>$projectId,'model_pid'=>0,'status'=>0])
                 ->scalar();
         }
         $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
