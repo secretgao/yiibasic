@@ -8,6 +8,7 @@ use app\models\APersonalLog;
 use app\models\APosition;
 use app\models\AProjectExt;
 use app\models\AProjectModel;
+use app\models\ASecretaryTag;
 use app\models\AUser;
 use Yii;
 use app\models\AModel;
@@ -47,7 +48,7 @@ class ProjectController extends BasicController
             ->andFilterWhere(['position_id'=>$postionId])
             ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
             ->andFilterWhere(['id'=>$projectId])
-            ->orderBy('sort ASC,id DESC')->asArray()->all();
+            ->orderBy('sort ASC,id DESC')->asArray()->column()->all();
         //判断该用户是否有部门
         $isPosition = AUser::getUserIsPosition($uid);
         //查询该用户的参与项目
@@ -447,7 +448,7 @@ class ProjectController extends BasicController
         $projectId = $this->getParam('projectId',true);
 
         $project = AProject::find()
-            ->select('status')
+            ->select('status,secretary_tag_id as tag_id')
             ->where(['id'=>$projectId,'create_uid'=>$createUid])
             ->andWhere(['<>','status',4])
             ->asArray()->one();
@@ -465,6 +466,12 @@ class ProjectController extends BasicController
 
         $user = $result =[];
 
+        $secretary = '';
+        if (!empty($project['tag_id'])) {
+            $tag = ASecretaryTag::find()->select('name')
+                ->where(['id'=>$project['tag_id']])->asArray()->scalar();
+            $secretary = isset($tag) ? $tag : '';
+        }
         if ($userArr) {
             foreach ($userArr as $item) {
                 $isManager = false;
@@ -493,8 +500,13 @@ class ProjectController extends BasicController
                 ];
             }
         }
-
-        $this->Success(['projectStatus'=>intval($project['status']),'data'=>$result,'create_uid'=>$createUid]);
+        $ret = [
+            'projectStatus'=>intval($project['status']),
+            'data'=>$result,
+            'create_uid'=>$createUid,
+            'secretary'=>$secretary
+        ];
+        $this->Success($ret);
     }
 
     /**
