@@ -7,6 +7,7 @@ use app\models\AAppVersion;
 use app\models\AMessage;
 use app\models\APosition;
 use app\models\APositionApply;
+use app\models\AProject;
 use app\models\ASecretaryTag;
 use app\models\AUser;
 use Yii;
@@ -284,6 +285,15 @@ class UserController extends BasicController
     public function actionGetSecretaryList()
     {
         $data = ASecretaryTag::find()->select('id,name')->asArray()->all();
+
+        if (empty($data)) {
+            $this->Success(['data'=>[]]);
+        }
+
+        foreach ($data as $key=>$item) {
+            $projects = AProject::find()->where(['secretary_tag_id'=>$item['id']])->count();
+            $data[$key]['projects'] = intval($projects);
+        }
 
         $this->Success(['data'=>$data]);
     }
