@@ -786,21 +786,6 @@ class ProjectController extends BasicController
     public function actionAs()
     {
 
-        $mode = AProjectModel::find()->where(['id'=>605])->asArray()->one();
-        var_dump($mode);
-        $res = AModel::find()->where(['pid'=>$mode['model_id']])->asArray()->all();
-       // echo '<pre>';print_r($res);
-
-       helps::CreateProjectRecursion($res);
-        $modelId = [];
-        foreach ($res as $item){
-            $modelId[]= $item['id'];
-        }
-
-        echo '<pre>';print_r($modelId);
-
-        AProjectModel::updateAll(['status'=>-1],['project_id'=>190,'model_id'=>$modelId]);
-        exit();
       //  var_dump($fil);
         //获取所有模板和目录
        // $allStep = helps::allStep(171);
