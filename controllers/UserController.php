@@ -284,6 +284,7 @@ class UserController extends BasicController
      */
     public function actionGetSecretaryList()
     {
+        $userId = $this->getParam('userId',true);
         $data = ASecretaryTag::find()->select('id,name')->asArray()->all();
 
         if (empty($data)) {
@@ -292,7 +293,7 @@ class UserController extends BasicController
 
         foreach ($data as $key=>$item) {
             $projects = AProject::find()
-                ->where(['secretary_tag_id'=>$item['id']])
+                ->where(['secretary_tag_id'=>$item['id'],'create_uid'=>$userId])
                 ->andWhere(['!=','status',4])
                 ->count();
             $data[$key]['projects'] = intval($projects);

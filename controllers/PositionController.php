@@ -293,6 +293,7 @@ class PositionController extends BasicController
      */
     public function actionProjectIndex()
     {
+        $userId = $this->getParam('userId',true);
         //获取所有部门
         $data = APosition::getAllPosition();
 
@@ -300,7 +301,7 @@ class PositionController extends BasicController
         foreach ($data as $key=>$item) {
             $data[$key]['projects'] = 0;
             $projectNum = AProject::find()
-                ->where(['position_id'=>$item['id']])
+                ->where(['position_id'=>$item['id'],'create_uid'=>$userId])
                 ->andWhere(['<>','status',4])
                 ->count();
             if ($projectNum) {
