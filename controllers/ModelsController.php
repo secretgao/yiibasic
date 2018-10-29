@@ -248,10 +248,18 @@ class ModelsController extends BasicController
         if (!$Obj) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-
+        $type = $Obj->type;
         $Obj->status = -1;
         if ($Obj->save(false)) {
-
+            if ($type == 0) {
+                $res = AModel::find()->where(['pid'=>$id])->asArray()->all();
+                helps::CreateProjectRecursion($res);
+                $modelId = [];
+                foreach ($res as $item){
+                    $modelId[]= $item['id'];
+                }
+                AProjectModel::updateAll(['status'=>-1],['project_id'=>$projectId,'model_id'=>$modelId]);
+            }
             $this->Success();
         }
 
