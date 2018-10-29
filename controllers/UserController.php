@@ -291,7 +291,10 @@ class UserController extends BasicController
         }
 
         foreach ($data as $key=>$item) {
-            $projects = AProject::find()->where(['secretary_tag_id'=>$item['id']])->count();
+            $projects = AProject::find()
+                ->where(['secretary_tag_id'=>$item['id']])
+                ->andWhere(['!=','status',4])
+                ->count();
             $data[$key]['projects'] = intval($projects);
         }
 
