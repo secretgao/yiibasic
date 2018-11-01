@@ -11,7 +11,7 @@ return [
 
 
     'version' =>[
-        1=>'1.5.8',   //ios
+        1=>'1.6.0',   //ios
         2=>[
             'num'=> '1.6.0',   //安卓
             'url'=> 'http://118.190.199.43/uploads/install/app-160_sign.apk.1',
