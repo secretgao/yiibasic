@@ -41,6 +41,12 @@ class ProjectController extends BasicController
             $projectId = AProjectModel::accordingToModelIdGetProjectId($modelId);
         }
 
+        //小程序访问
+        if (!is_numeric($uid) && is_string($uid)){
+            $uid = AUser::find()->select('id')->where(['weixin_id'=>$uid,'status'=>0])->asArray()->scalar();
+        }
+
+
         //查询该用户创建的项目
         $createProejct = AProject::find()
             ->where(['create_uid'=>$uid, 'year'=>$time])
