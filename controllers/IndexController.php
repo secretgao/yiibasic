@@ -58,4 +58,16 @@ class IndexController extends BasicController
         $this->layout=false;
         return $this->render('privacy-policy');
     }
+
+    /**
+     * http://www.bjwxapp.cn
+     * tnes  项目 征文启事
+     * @return array
+     *
+     */
+    public function actionMessage()
+    {
+        $this->layout=false;
+        return $this->render('message');
+    }
 }
