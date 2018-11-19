@@ -30,9 +30,16 @@ class ProjectController extends BasicController
      */
     public function actionGetlist()
     {
+        $mobile = $this->getParam('mobile',false,0);
+        $time = date('Y');
+        if  (isset($mobile) && !empty($mobile)){
+            $uid = AUser::find()->select('id')->where(['phone'=>$mobile,'status'=>0])->asArray()->scalar();
+        } else {
+            $uid = $this->getParam('userId',true);
+            $time = substr($this->getParam('time',true),0,4);
+        }
 
-        $uid = $this->getParam('userId',true);
-        $time = substr($this->getParam('time',true),0,4);
+
         $postionId = $this->getParam('positionId',false,null);
         $secretarytagId = $this->getParam('secretarytagId',false,null);
         $modelId  = $this->getParam('modelId',false,null);
@@ -49,11 +56,12 @@ class ProjectController extends BasicController
 
         //查询该用户创建的项目
         $createProejct = AProject::find()
-            ->where(['create_uid'=>$uid, 'year'=>$time])
+            ->where(['create_uid'=>$uid])
             ->andWhere(['!=','status',4])
             ->andFilterWhere(['position_id'=>$postionId])
             ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
             ->andFilterWhere(['id'=>$projectId])
+            ->andFilterWhere(['year'=>$time])
             ->orderBy('sort ASC,id DESC')->asArray()->all();
         //判断该用户是否有部门
         $isPosition = AUser::getUserIsPosition($uid);
@@ -67,12 +75,13 @@ class ProjectController extends BasicController
         if ($joinProjectId) {
             $joinProject = AProject::find()
                 ->where(['in','id',$joinProjectId])
-                ->andWhere(['year'=>$time])
+
                 ->andWhere(['!=','status',4])
                 ->andWhere(['!=','create_uid',$uid])
                 ->andFilterWhere(['position_id'=>$postionId])
                 ->andFilterWhere(['id'=>$projectId])
                 ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
+                ->andFilterWhere(['year'=>$time])
                 ->orderBy('sort ASC,id DESC')
                 ->asArray()->all();
         }
