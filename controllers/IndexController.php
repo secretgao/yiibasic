@@ -3,9 +3,11 @@
 namespace app\controllers;
 
 use app\commond\Constants;
+use app\commond\helps;
 use app\models\ALog;
 use app\models\AUser;
 use Yii;
+use yii\db\Query;
 
 
 class IndexController extends BasicController
@@ -57,5 +59,27 @@ class IndexController extends BasicController
     {
         $this->layout=false;
         return $this->render('privacy-policy');
+    }
+
+
+    /**
+     * 修复数据
+     */
+    public function actionHasFile()
+    {
+
+        $pages = $this->getParam('p');
+        $pageSize = 3;
+        $page = $pageSize * ( $pages-1 );
+        $data = (new Query())->select('project_id,catalog_id')
+            ->from('a_file')->where(['status'=>1])
+            ->offset($page)->limit($pageSize)->all();
+        if (empty($data)){
+            $this->Success(['data'=>'empty']);
+        }
+        foreach ($data as $item){
+           $re = helps::uploadFileUpdateProjectModel($item['project_id'],$item['catalog_id']);
+        }
+      //  echo '<pre>';print_r($data);
     }
 }

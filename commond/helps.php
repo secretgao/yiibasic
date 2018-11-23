@@ -556,6 +556,7 @@ class helps {
         }
         $arr = [];
         $parentsId = helps::getParentsId($projectId,$id,$arr);
+       // var_dump($parentsId);
         if (empty($parentsId)){
             return false;
         }
@@ -563,7 +564,7 @@ class helps {
         foreach ($parentsId as $item){
             $projectModelId[]=$item['id'];
         }
-
+      //  echo '<pre>';print_r($projectModelId);
         AProjectModel::updateAll(['is_file'=>1],['id'=>$projectModelId]);
         return true;
 
