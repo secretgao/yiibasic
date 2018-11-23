@@ -334,9 +334,11 @@ class FileController extends BasicController
         if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-
+        $catalog_id = $file->catalog_id;
         $file->status= $status;
         if ($file->save(false)) {
+            $arr = [];
+            helps::uploadFileUpdateProjectModel($projectId,$catalog_id,$arr);
             $this->Success();
         } else {
             $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
