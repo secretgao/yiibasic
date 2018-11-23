@@ -169,6 +169,8 @@ class FileController extends BasicController
             $file->gps_longitude = $gpsLongitude;
             $file->remark = $comments;
             if ($file->save(false)) {
+                $arr = [];
+                helps::uploadFileUpdateProjectModel($projectId,$catalogId,$arr);
                 $msg = '上传文件:'.$fileInfo['fileInfo']['name'];
                 helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
                 $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId),array('commond'=>$commond)));

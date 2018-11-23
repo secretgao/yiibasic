@@ -296,12 +296,13 @@ class ProjectController extends BasicController
                 ->scalar();
         }
         $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
-        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type';
+        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
         $result = (new Query())
             ->select($modelColumns)
             ->from('a_project_model as pm')
             ->leftJoin('a_model as am','pm.model_id = am.id')
             ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId,'pm.status'=>0])
+            //->andWhere('case pm.is_file when 0 then false when 1 then true end')
             ->all();
         //根据最后返回信息 遍历 是否存在文件
 //echo '<pre>';print_r($result);exit();
@@ -330,6 +331,7 @@ class ProjectController extends BasicController
 
         foreach ($result as $k=>$cata) {
             $result[$k]['type'] = '0';
+            $result[$k]['hasFile'] = $cata['hasFile'] == 1 ? true : false;
             $son  = AModel::find()->select('remark')->where(['pid'=>$cata['id'],'status'=>0])->andWhere(['<>','remark',''])
                 ->asArray()->column();
             $result[$k]['remark'] = $son;
@@ -367,14 +369,18 @@ class ProjectController extends BasicController
         //首先显示目录 然后显示文件
         $data = [];
         if ($result) {
+          //  echo '<pre>';print_r($result);
             $files = $chapter = [];
-            foreach ($result as $item) {
+            foreach ($result as &$item) {
                 if ($item['type'] == 0) {
+                   // $item['hasFile'] = helps::getHasFile($projectId,$item['id']);
                     $chapter[] = $item;
+
                 } else {
                     $files[]=$item;
                 }
             }
+//            exit();
             $data = array_merge($chapter,$files);
         }
 
@@ -801,7 +807,10 @@ class ProjectController extends BasicController
     public function actionAs()
     {
 
-      //  var_dump($fil);
+
+       // echo '<pre>';var_dump($fil);
+     //   echo '<pre>';var_dump($projectModelId);
+
         //获取所有模板和目录
        // $allStep = helps::allStep(171);
 

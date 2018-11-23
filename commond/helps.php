@@ -523,4 +523,49 @@ class helps {
         imagecopyresampled($tn, $im, 0, 0, 0, 0, $width, $height, $src_W, $src_H); //复制图像并改变大小
         imagejpeg($tn, $small_img); //输出图像
     }
+
+
+    /**
+     * 根据子目录查找 父级id
+     * @param unknown $id
+     */
+    public static  function getParentsId($projectId,$id,$arr = [])
+    {
+        if (empty($id)){
+            return $arr;
+        }
+        $data = AProjectModel::find()->select('id,model_pid')
+            ->where(['project_id'=>$projectId,'model_id'=>$id,'status'=>0])->asArray()->one();
+
+        if (!$data) {
+            return false;
+        }
+        $arr[] = $data;
+        if ($data['model_pid'] == 0){
+            return  $arr;
+        }
+        return self::getParentsId($projectId,$data['model_pid'],$arr);
+    }
+
+
+
+    public static function uploadFileUpdateProjectModel($projectId,$id){
+
+        if (!$projectId || !$id){
+            return false;
+        }
+        $arr = [];
+        $parentsId = helps::getParentsId($projectId,$id,$arr);
+        if (empty($parentsId)){
+            return false;
+        }
+        $projectModelId = [];
+        foreach ($parentsId as $item){
+            $projectModelId[]=$item['id'];
+        }
+
+        AProjectModel::updateAll(['is_file'=>1],['id'=>$projectModelId]);
+        return true;
+
+    }
 }
