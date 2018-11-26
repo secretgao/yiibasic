@@ -201,14 +201,18 @@ class ProjectController extends BasicController
                 }
             }
         }
+        $maxPage = 0;
         if (!empty($page) && !empty($size)){
             $data  = $newData;
+            $maxPage = ceil($size/$projects);
         }
         $this->Success(['data'=>$data,
             'isCertified'=>$isPosition,
             'totalSize'=>$projects,
-            'pageNum'=>$page,
-            'rp'=>$size]);
+            'pageNum'=>intval($page),
+            'rp'=>intval($size),
+            'maxPage'=>$maxPage
+        ]);
     }
 
 
@@ -308,7 +312,8 @@ class ProjectController extends BasicController
             'isCertified'=>$isPosition,
             'totalSize'=>$projects,
             'pageNum'=>intval($page),
-            'rp'=>intval($size)
+            'rp'=>intval($size),
+            'maxPage'=>$projects ==0 ? 0: ceil($size/$projects)
         ]);
     }
 
