@@ -222,11 +222,13 @@ class ProjectController extends BasicController
         $time = substr($this->getParam('time',true),0,4);
         $page  = $this->getParam('pageNum',true,null);
         $size  = $this->getParam('rp',true,null);
+        $keyword = $this->getParam('keywords',true);
 
         //查询该用户创建的项目
         $createProejct = AProject::find()
             ->where(['create_uid'=>$uid])
             ->andWhere(['!=','status',4])
+            ->andWhere(['like','name',$keyword])
             ->andFilterWhere(['year'=>$time])
             ->orderBy('sort ASC,id DESC')->asArray()->all();
         //判断该用户是否有部门
@@ -243,6 +245,7 @@ class ProjectController extends BasicController
                 ->where(['in','id',$joinProjectId])
                 ->andWhere(['!=','status',4])
                 ->andWhere(['!=','create_uid',$uid])
+                ->andWhere(['like','name',$keyword])
                 ->andFilterWhere(['year'=>$time])
                 ->orderBy('sort ASC,id DESC')
                 ->asArray()->all();
