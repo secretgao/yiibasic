@@ -43,6 +43,8 @@ class ProjectController extends BasicController
         $postionId = $this->getParam('positionId',false,null);
         $secretarytagId = $this->getParam('secretarytagId',false,null);
         $modelId  = $this->getParam('modelId',false,null);
+        $page  = $this->getParam('page',false,null);
+        $size  = $this->getParam('size',false,null);
         $projectId = null;
         if ($modelId) {
             $projectId = AProjectModel::accordingToModelIdGetProjectId($modelId);
@@ -86,62 +88,123 @@ class ProjectController extends BasicController
                 ->asArray()->all();
         }
         $data = array_merge($createProejct,$joinProject);
+        $projects = 0;
         if ($data) {
+            $projects = count($data);
             $nowTime = time();
-            foreach ($data as &$item) {
-                $usedTime = '';
-                if ($nowTime > $item['start_time']) {
-                    $usedTime = helps::timediff($nowTime,$item['start_time']);
-                }
-                $manage_uid = AProjectExt::find()->select('uid')
-                    ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
+            $newData = [];
+            foreach ($data as $key=>&$item) {
+
+                if (!empty($page) && !empty($size)){
+
+                    if ( (($page-1)*$size) <= $key && $key <= ($size*$page-1) ){
+                        $usedTime = '';
+                        if ($nowTime > $item['start_time']) {
+                            $usedTime = helps::timediff($nowTime,$item['start_time']);
+                        }
+                        $manage_uid = AProjectExt::find()->select('uid')
+                            ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
 
 
-                //项目所选模板数量
-                $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
-                $file_agree_num = 0;
-                $finish_progress = 0;
-                $model_num = count($catalog_id_arr);
-                if ($model_num) {
-                    //项目通过文件数量
-                    $file_agree_num = (int)helps::getProjectAgreeFileNum
-                    ($item['id'],$catalog_id_arr);
-                    //项目进度
-                    if ($file_agree_num > 0) {
-                        $finish_progress = intval($file_agree_num) / intval($model_num) * 100;
-                    }
-                }
-
-                $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
-                $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
-                $item['status'] = intval($item['status']);
-                $item['members'] = intval($item['members']);
-                $item['describe'] = $item['description'];
-                $item['used_time']  = $usedTime;
-                $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
-                $item['model_num'] = $model_num;
-                $item['file_agree_num'] = $file_agree_num;
-                $item['finish_progress'] = $finish_progress;
-                $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
-                $remark = [];
-                if ($projectAllStep) {
-                    $jihe = [];
-                    foreach ($projectAllStep as $key =>$value) {
-                        if ($value['level'] == 1 && !empty($value['describe'])) {
-                            if (!in_array($value['id'], $jihe)) {
-                                $remark[] = $value['describe'];
-                                $jihe[] = $value['id'];
+                        //项目所选模板数量
+                        $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
+                        $file_agree_num = 0;
+                        $finish_progress = 0;
+                        $model_num = count($catalog_id_arr);
+                        if ($model_num) {
+                            //项目通过文件数量
+                            $file_agree_num = (int)helps::getProjectAgreeFileNum
+                            ($item['id'],$catalog_id_arr);
+                            //项目进度
+                            if ($file_agree_num > 0) {
+                                $finish_progress = intval($file_agree_num) / intval($model_num) * 100;
                             }
                         }
-                        unset($projectAllStep[$key]);
-                    }
-                }
 
-                $item['remark'] = $remark;
+
+                        $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
+                        $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
+                        $item['status'] = intval($item['status']);
+                        $item['members'] = intval($item['members']);
+                        $item['describe'] = $item['description'];
+                        $item['used_time']  = $usedTime;
+                        $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
+                        $item['model_num'] = $model_num;
+                        $item['file_agree_num'] = $file_agree_num;
+                        $item['finish_progress'] = $finish_progress;
+                        $newData[] = $item;
+                        $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
+                        $remark = [];
+                        if ($projectAllStep) {
+                            $jihe = [];
+                            foreach ($projectAllStep as $k =>$value) {
+                                if ($value['level'] == 1 && !empty($value['describe'])) {
+                                    if (!in_array($value['id'], $jihe)) {
+                                        $remark[] = $value['describe'];
+                                        $jihe[] = $value['id'];
+                                    }
+                                }
+                                unset($projectAllStep[$k]);
+                            }
+                        }
+                        $item['remark'] = $remark;
+                    }
+                } else {
+                    $usedTime = '';
+                    if ($nowTime > $item['start_time']) {
+                        $usedTime = helps::timediff($nowTime,$item['start_time']);
+                    }
+                    $manage_uid = AProjectExt::find()->select('uid')
+                        ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
+
+
+                    //项目所选模板数量
+                    $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
+                    $file_agree_num = 0;
+                    $finish_progress = 0;
+                    $model_num = count($catalog_id_arr);
+                    if ($model_num) {
+                        //项目通过文件数量
+                        $file_agree_num = (int)helps::getProjectAgreeFileNum
+                        ($item['id'],$catalog_id_arr);
+                        //项目进度
+                        if ($file_agree_num > 0) {
+                            $finish_progress = intval($file_agree_num) / intval($model_num) * 100;
+                        }
+                    }
+
+                    $data[$key]['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
+                    $data[$key]['allow_add'] = $item['allow_add'] == 1 ?  true : false;
+                    $data[$key]['status'] = intval($item['status']);
+                    $data[$key]['members'] = intval($item['members']);
+                    $data[$key]['describe'] = $item['description'];
+                    $data[$key]['used_time']  = $usedTime;
+                    $data[$key]['manage_uid']  = $manage_uid ? $manage_uid : 0;
+                    $data[$key]['model_num'] = $model_num;
+                    $data[$key]['file_agree_num'] = $file_agree_num;
+                    $data[$key]['finish_progress'] = $finish_progress;
+                    $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
+                    $remark = [];
+                    if ($projectAllStep) {
+                        $jihe = [];
+                        foreach ($projectAllStep as $k =>$value) {
+                            if ($value['level'] == 1 && !empty($value['describe'])) {
+                                if (!in_array($value['id'], $jihe)) {
+                                    $remark[] = $value['describe'];
+                                    $jihe[] = $value['id'];
+                                }
+                            }
+                            unset($projectAllStep[$k]);
+                        }
+                    }
+                    $item['remark'] = $remark;
+                }
             }
         }
-
-        $this->Success(['data'=>$data,'isCertified'=>$isPosition]);
+        if (!empty($page) && !empty($size)){
+            $data  = $newData;
+        }
+        $this->Success(['data'=>$data,'isCertified'=>$isPosition,'projects'=>$projects]);
     }
 
 
