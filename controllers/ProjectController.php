@@ -43,8 +43,8 @@ class ProjectController extends BasicController
         $postionId = $this->getParam('positionId',false,null);
         $secretarytagId = $this->getParam('secretarytagId',false,null);
         $modelId  = $this->getParam('modelId',false,null);
-        $page  = $this->getParam('page',false,null);
-        $size  = $this->getParam('size',false,null);
+        $page  = $this->getParam('pageNum',false,null);
+        $size  = $this->getParam('rp',false,null);
         $projectId = null;
         if ($modelId) {
             $projectId = AProjectModel::accordingToModelIdGetProjectId($modelId);
@@ -204,9 +204,113 @@ class ProjectController extends BasicController
         if (!empty($page) && !empty($size)){
             $data  = $newData;
         }
-        $this->Success(['data'=>$data,'isCertified'=>$isPosition,'projects'=>$projects]);
+        $this->Success(['data'=>$data,
+            'isCertified'=>$isPosition,
+            'totalSize'=>$projects,
+            'pageNum'=>$page,
+            'rp'=>$size]);
     }
 
+
+    public function actionSearch()
+    {
+        $uid = $this->getParam('userId',true);
+        $time = substr($this->getParam('time',true),0,4);
+        $page  = $this->getParam('pageNum',true,null);
+        $size  = $this->getParam('rp',true,null);
+
+        //查询该用户创建的项目
+        $createProejct = AProject::find()
+            ->where(['create_uid'=>$uid])
+            ->andWhere(['!=','status',4])
+            ->andFilterWhere(['year'=>$time])
+            ->orderBy('sort ASC,id DESC')->asArray()->all();
+        //判断该用户是否有部门
+        $isPosition = AUser::getUserIsPosition($uid);
+        //查询该用户的参与项目
+        $joinProjectId = AProjectExt::find()
+            ->select('project_id')
+            ->where(['uid'=>$uid])
+            ->asArray()->column();
+
+        $joinProject = [];
+        if ($joinProjectId) {
+            $joinProject = AProject::find()
+                ->where(['in','id',$joinProjectId])
+                ->andWhere(['!=','status',4])
+                ->andWhere(['!=','create_uid',$uid])
+                ->andFilterWhere(['year'=>$time])
+                ->orderBy('sort ASC,id DESC')
+                ->asArray()->all();
+        }
+        $data = array_merge($createProejct,$joinProject);
+        $projects = 0;
+        $newData = [];
+        if ($data) {
+            $projects = count($data);
+            $nowTime = time();
+            foreach ($data as $key=>&$item) {
+
+                if ( (($page-1)*$size) <= $key && $key <= ($size*$page-1) ){
+                    $usedTime = '';
+                    if ($nowTime > $item['start_time']) {
+                        $usedTime = helps::timediff($nowTime,$item['start_time']);
+                    }
+                    $manage_uid = AProjectExt::find()->select('uid')
+                        ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
+
+                    //项目所选模板数量
+                    $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
+                    $file_agree_num = 0;
+                    $finish_progress = 0;
+                    $model_num = count($catalog_id_arr);
+                    if ($model_num) {
+                        //项目通过文件数量
+                        $file_agree_num = (int)helps::getProjectAgreeFileNum
+                        ($item['id'],$catalog_id_arr);
+                        //项目进度
+                        if ($file_agree_num > 0) {
+                            $finish_progress = intval($file_agree_num) / intval($model_num) * 100;
+                        }
+                    }
+                    $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
+                    $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
+                    $item['status'] = intval($item['status']);
+                    $item['members'] = intval($item['members']);
+                    $item['describe'] = $item['description'];
+                    $item['used_time']  = $usedTime;
+                    $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
+                    $item['model_num'] = $model_num;
+                    $item['file_agree_num'] = $file_agree_num;
+                    $item['finish_progress'] = $finish_progress;
+                    $newData[] = $item;
+                    $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
+                    $remark = [];
+                    if ($projectAllStep) {
+                        $jihe = [];
+                        foreach ($projectAllStep as $k =>$value) {
+                            if ($value['level'] == 1 && !empty($value['describe'])) {
+                                if (!in_array($value['id'], $jihe)) {
+                                    $remark[] = $value['describe'];
+                                    $jihe[] = $value['id'];
+                                }
+                            }
+                            unset($projectAllStep[$k]);
+                        }
+                    }
+                    $item['remark'] = $remark;
+                }
+            }
+        }
+
+
+        $this->Success(['data'=>$newData,
+            'isCertified'=>$isPosition,
+            'totalSize'=>$projects,
+            'pageNum'=>intval($page),
+            'rp'=>intval($size)
+        ]);
+    }
 
     /**
      * 创建项目
