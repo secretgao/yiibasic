@@ -204,7 +204,7 @@ class ProjectController extends BasicController
         $maxPage = 0;
         if (!empty($page) && !empty($size)){
             $data  = $newData;
-            $maxPage = ceil($size/$projects);
+            $maxPage = ceil($projects/$size);
         }
         $this->Success(['data'=>$data,
             'isCertified'=>$isPosition,
@@ -313,7 +313,7 @@ class ProjectController extends BasicController
             'totalSize'=>$projects,
             'pageNum'=>intval($page),
             'rp'=>intval($size),
-            'maxPage'=>$projects ==0 ? 0: ceil($size/$projects)
+            'maxPage'=>$projects ==0 ? 0: ceil($projects/$size)
         ]);
     }
 
