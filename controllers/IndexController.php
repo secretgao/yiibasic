@@ -62,6 +62,7 @@ class IndexController extends BasicController
     }
 
 
+
     /**
      * 修复数据
      */
@@ -81,5 +82,17 @@ class IndexController extends BasicController
            $re = helps::uploadFileUpdateProjectModel($item['project_id'],$item['catalog_id']);
         }
       //  echo '<pre>';print_r($data);
+
+    /**
+     * http://www.bjwxapp.cn
+     * tnes  项目 征文启事
+     * @return array
+     *
+     */
+    public function actionMessage()
+    {
+        $this->layout=false;
+        return $this->render('message');
+
     }
 }
