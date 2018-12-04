@@ -35,6 +35,10 @@ class HelloController extends Controller
         error_log('contab----'.PHP_EOL,3,'/tmp/crontab.log');
     }
 
-   
+
+    public function actionFixBugHasFile(){
+
+
+    }
 
 }
