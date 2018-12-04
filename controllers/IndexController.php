@@ -71,18 +71,18 @@ class IndexController extends BasicController
 
         $pages = $this->getParam('p');
         $pageSize = 3;
-        $page = $pageSize * ( $pages-1 );
+        $page = $pageSize * ($pages - 1);
         $data = (new Query())->select('project_id,catalog_id')
-            ->from('a_file')->where(['status'=>1])
+            ->from('a_file')->where(['status' => 1])
             ->offset($page)->limit($pageSize)->all();
-        if (empty($data)){
-            $this->Success(['data'=>'empty']);
+        if (empty($data)) {
+            $this->Success(['data' => 'empty']);
         }
-        foreach ($data as $item){
-           $re = helps::uploadFileUpdateProjectModel($item['project_id'],$item['catalog_id']);
+        foreach ($data as $item) {
+            $re = helps::uploadFileUpdateProjectModel($item['project_id'], $item['catalog_id']);
         }
-      //  echo '<pre>';print_r($data);
-
+        //  echo '<pre>';print_r($data);
+    }
     /**
      * http://www.bjwxapp.cn
      * tnes  项目 征文启事
