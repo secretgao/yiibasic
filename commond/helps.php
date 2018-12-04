@@ -441,14 +441,24 @@ class helps {
         if (empty($projectId)) {
             return $total;
         }
-        //获取项目最底层级层数
-        $maxLevel = AProjectModel::find()->select('max(level) as level')
-            ->where(['project_id'=>$projectId,'type'=>0,'status'=>0])->scalar();
 
-        //获取最底层所有模板id
-        $result = AProjectModel::find()->select('model_id')
-            ->where(['project_id'=>$projectId,'level'=>$maxLevel,'status'=>0])
-            ->asArray()->column();
+        //获取这个项目的所有模版
+        $all = AProjectModel::find()
+            ->select('model_id,model_pid,level')
+            ->where(['project_id'=>$projectId,'type'=>0,'status'=>0])
+            ->asArray()->all();
+
+        $result = [];
+        foreach ($all as $item){
+            //查询这个模版下是否还有子集
+            $exists = AProjectModel::find()->select('id')
+                ->where(['project_id'=>$projectId,'type'=>0,'status'=>0,'model_pid'=>$item['model_id']])
+                ->exists();
+            //如果没有证明这个模板就是底层
+            if (!$exists){
+                $result[]=$item['model_id'];
+            }
+        }
 
         return $result;
 
