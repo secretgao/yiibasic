@@ -218,7 +218,17 @@ class ProjectController extends BasicController
 
     public function actionSearch()
     {
-        $uid = $this->getParam('userId',true);
+
+
+        $mobile = $this->getParam('mobile',false,0);
+
+        if  (isset($mobile) && !empty($mobile)){
+            $uid = AUser::find()->select('id')->where(['phone'=>$mobile,'status'=>0])->asArray()->scalar();
+        } else {
+            $uid = $this->getParam('userId',true);
+           
+        }
+
         $time = substr($this->getParam('time',true),0,4);
         $page  = $this->getParam('pageNum',true,null);
         $size  = $this->getParam('rp',true,null);
@@ -1073,9 +1083,5 @@ class ProjectController extends BasicController
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
 
     }
-
-
-
-
 
 }
