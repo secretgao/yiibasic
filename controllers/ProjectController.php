@@ -228,9 +228,9 @@ class ProjectController extends BasicController
             'pageNum'=>intval($page),
             'rp'=>intval($size),
             'maxPage'=>$maxPage,
-            'completion-low'=>$low,
-            'completion-middle'=>$middle,
-            'completion-high'=>$high,
+            'completion_low'=>$low,
+            'completion_middle'=>$middle,
+            'completion_high'=>$high,
         ]);
     }
 
