@@ -89,10 +89,12 @@ class ProjectController extends BasicController
         }
         $data = array_merge($createProejct,$joinProject);
         $projects = 0;
+        $low = $middle = $high = 0;
         if ($data) {
             $projects = count($data);
             $nowTime = time();
             $newData = [];
+
             foreach ($data as $key=>&$item) {
 
                 if (!empty($page) && !empty($size)){
@@ -121,6 +123,13 @@ class ProjectController extends BasicController
                             }
                         }
 
+                        if ($finish_progress >= 0 && $finish_progress<20){
+                            $low++;
+                        } else if($finish_progress >= 20 && $finish_progress<80){
+                            $middle++;
+                        } else if ($finish_progress >= 80 ){
+                            $high++;
+                        }
 
                         $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                         $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
@@ -173,6 +182,13 @@ class ProjectController extends BasicController
                         }
                     }
 
+                    if ($finish_progress >= 0 && $finish_progress<20){
+                        $low++;
+                    } else if($finish_progress >= 20 && $finish_progress<80){
+                        $middle++;
+                    } else if ($finish_progress >= 80 ){
+                        $high++;
+                    }
                     $data[$key]['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                     $data[$key]['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                     $data[$key]['status'] = intval($item['status']);
@@ -211,7 +227,10 @@ class ProjectController extends BasicController
             'totalSize'=>$projects,
             'pageNum'=>intval($page),
             'rp'=>intval($size),
-            'maxPage'=>$maxPage
+            'maxPage'=>$maxPage,
+            'completion-low'=>$low,
+            'completion-middle'=>$middle,
+            'completion-high'=>$high,
         ]);
     }
 
