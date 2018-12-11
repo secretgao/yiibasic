@@ -31,6 +31,7 @@ final class Constants
     const NOT_SYS_POSITION          = 1015;
     const PROJECT_MANAGE_EXITS      = 1016;
     const PROJECT_FINANCIAL_EXITS   = 1017;
+    const PROJECT_MODEL_SON         = 1018;
 
     const REQUSET_NO_POST           = 2000;
     const REQUSET_NO_GET            = 2001;
@@ -57,6 +58,7 @@ final class Constants
         self::NOT_SYS_POSITION =>'不是系统职位',
         self::PROJECT_MANAGE_EXITS =>'项目负责人不存在',
         self::PROJECT_FINANCIAL_EXITS=>'项目财政编号已经存在',
+        self::PROJECT_MODEL_SON=>'请先删除该模板下的模板',
     ];
 
     //操作日志相关

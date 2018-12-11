@@ -248,19 +248,39 @@ class ModelsController extends BasicController
             ->where(['id'=>$projectId])
             ->andwhere(['<>','status',4])
             ->one();
+        //判断项目 状态是否正常
         if (!$project) {
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
         }
 
+        // 模板是否存在
         $Obj = AProjectModel::findOne(['project_id'=>$projectId,'model_id'=>$id,'status'=>0]);
-
-
         if (!$Obj) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
         $type = $Obj->type;
+        $directory = 0;
+        if ($type == 0){
+            // 判断是否有子模板
+            $sonModel = AProjectModel::findOne(['project_id'=>$projectId,'model_pid'=>$id,'status'=>0]);
+            if ($sonModel) {
+                $this->Error(Constants::PROJECT_MODEL_SON,Constants::$error_message[Constants::PROJECT_MODEL_SON]);
+            }
+            $directory = AProjectModel::find()->where(['project_id'=>$projectId,'model_pid'=>$id,'status'=>0,'type'=>1])->count();
+        } else {
+            // 判断是否有子模板
+            $sonModel = AProjectModel::findOne(['project_id'=>$projectId,'model_id'=>$id,'status'=>0,'type'=>1]);
+            if ($sonModel) {
+                $directory = AProjectModel::find()->where(['project_id'=>$projectId,'model_pid'=>$id,'status'=>0,'type'=>1])->count();
+            } else {
+                $directory = AProjectModel::find()->where(['project_id'=>$projectId,'model_id'=>$id,'status'=>0,'type'=>1])->count();
+            }
+        }
+        $fileNum = $project->file_num;
         $Obj->status = -1;
         if ($Obj->save(false)) {
+            $project->file_num = $fileNum + $directory;
+            $project->save(false);
             if ($type == 0) { // 模板
                 $res = AModel::find()->where(['pid'=>$id])->asArray()->all();
                 helps::CreateProjectRecursion($res);
@@ -269,8 +289,6 @@ class ModelsController extends BasicController
                     $modelId[]= $item['id'];
                 }
                 AProjectModel::updateAll(['status'=>-1],['project_id'=>$projectId,'model_id'=>$modelId]);
-            } else {
-                 // 目录
             }
             $this->Success();
         }
