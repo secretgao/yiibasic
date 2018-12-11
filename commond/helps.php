@@ -579,4 +579,22 @@ class helps {
         return true;
 
     }
+
+
+    /**
+     * 更新项目模板数量
+     * @param $projectId
+     */
+    public static function UpdateProjectModelNum($projectId){
+
+        if (empty($projectId)){
+            return false;
+        }
+
+        $num = self::getProjectModelBottomNum($projectId);
+        $project = AProject::findOne($projectId);
+        $project->model_num = $num;
+        $project->save(false);
+        return true;
+    }
 }

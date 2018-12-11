@@ -243,7 +243,17 @@ class ModelsController extends BasicController
         $this->isPost();
         $id  = $this->getParam('id',true);
         $projectId  = $this->getParam('projectId',true);
+
+        $project = AProject::find()
+            ->where(['id'=>$projectId])
+            ->andwhere(['<>','status',4])
+            ->one();
+        if (!$project) {
+            $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
         $Obj = AProjectModel::findOne(['project_id'=>$projectId,'model_id'=>$id,'status'=>0]);
+
 
         if (!$Obj) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
@@ -251,7 +261,7 @@ class ModelsController extends BasicController
         $type = $Obj->type;
         $Obj->status = -1;
         if ($Obj->save(false)) {
-            if ($type == 0) {
+            if ($type == 0) { // 模板
                 $res = AModel::find()->where(['pid'=>$id])->asArray()->all();
                 helps::CreateProjectRecursion($res);
                 $modelId = [];
@@ -259,6 +269,8 @@ class ModelsController extends BasicController
                     $modelId[]= $item['id'];
                 }
                 AProjectModel::updateAll(['status'=>-1],['project_id'=>$projectId,'model_id'=>$modelId]);
+            } else {
+                 // 目录
             }
             $this->Success();
         }

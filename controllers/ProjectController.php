@@ -403,6 +403,8 @@ class ProjectController extends BasicController
               //添加项目模版
               helps::CreateProjectModel($selectModuleIds,$projectObjId);
 
+              //更新项目表模板数量
+              helps::UpdateProjectModelNum($projectObjId);
               $transaction->commit();
 
               $result = [
