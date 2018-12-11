@@ -26,7 +26,7 @@ use Yii;
  * @property int $secretary_tag_id 项目书记标签id
  * @property string $financial_number 项目财政编号
  * @property int $model_num 项目模板数量/分母
- * @property int $file_num 文件通过数量/分子
+ * @property int $file_agree_num 文件通过数量/分子
  */
 class AProject extends \yii\db\ActiveRecord
 {
@@ -44,7 +44,7 @@ class AProject extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['start_time', 'end_time', 'create_time', 'update_time', 'members', 'create_uid', 'finish_time', 'position_id', 'secretary_tag_id', 'model_num', 'file_num'], 'integer'],
+            [['start_time', 'end_time', 'create_time', 'update_time', 'members', 'create_uid', 'finish_time', 'position_id', 'secretary_tag_id', 'model_num', 'file_agree_num'], 'integer'],
             [['description'], 'string'],
             [['name'], 'string', 'max' => 50],
             [['allow_add'], 'string', 'max' => 2],
@@ -79,7 +79,7 @@ class AProject extends \yii\db\ActiveRecord
             'secretary_tag_id' => Yii::t('app', '项目书记标签id'),
             'financial_number' => Yii::t('app', '项目财政编号'),
             'model_num' => Yii::t('app', '项目模板数量/分母'),
-            'file_num' => Yii::t('app', '文件通过数量/分子'),
+            'file_agree_num' => Yii::t('app', '文件通过数量/分子'),
         ];
     }
 }

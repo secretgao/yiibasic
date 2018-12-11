@@ -21,6 +21,10 @@ class ProjectController extends BasicController
 {
     public function init()
     {
+
+
+
+
        parent::init();
     }
 
@@ -96,7 +100,23 @@ class ProjectController extends BasicController
             $newData = [];
 
             foreach ($data as $key=>&$item) {
+                //项目所选模板数量
+                $finish_progress = 0;
+                $item['file_agree_num'] = intval($item['file_agree_num']);
+                $item['model_num'] = intval($item['model_num']);
+                //项目进度
+                if ($item['file_agree_num'] > 0) {
+                    $finish_progress = intval($item['file_agree_num']) /
+                        intval($item['model_num']) * 100;
+                }
 
+                if ($finish_progress >= 0 && $finish_progress<20){
+                    $low++;
+                } else if($finish_progress >= 20 && $finish_progress<80){
+                    $middle++;
+                } else if ($finish_progress >= 80 ){
+                    $high++;
+                }
                 if (!empty($page) && !empty($size)){
 
                     if ( (($page-1)*$size) <= $key && $key <= ($size*$page-1) ){
@@ -106,31 +126,6 @@ class ProjectController extends BasicController
                         }
                         $manage_uid = AProjectExt::find()->select('uid')
                             ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
-
-
-                        //项目所选模板数量
-                        $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
-                        $file_agree_num = 0;
-                        $finish_progress = 0;
-                        $model_num = count($catalog_id_arr);
-                        if ($model_num) {
-                            //项目通过文件数量
-                            $file_agree_num = (int)helps::getProjectAgreeFileNum
-                            ($item['id'],$catalog_id_arr);
-                            //项目进度
-                            if ($file_agree_num > 0) {
-                                $finish_progress = intval($file_agree_num) / intval($model_num) * 100;
-                            }
-                        }
-
-                        if ($finish_progress >= 0 && $finish_progress<20){
-                            $low++;
-                        } else if($finish_progress >= 20 && $finish_progress<80){
-                            $middle++;
-                        } else if ($finish_progress >= 80 ){
-                            $high++;
-                        }
-
                         $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                         $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                         $item['status'] = intval($item['status']);
@@ -138,8 +133,6 @@ class ProjectController extends BasicController
                         $item['describe'] = $item['description'];
                         $item['used_time']  = $usedTime;
                         $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
-                        $item['model_num'] = $model_num;
-                        $item['file_agree_num'] = $file_agree_num;
                         $item['finish_progress'] = $finish_progress;
                         $newData[] = $item;
                         $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
@@ -166,29 +159,6 @@ class ProjectController extends BasicController
                     $manage_uid = AProjectExt::find()->select('uid')
                         ->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
 
-
-                    //项目所选模板数量
-                    $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
-                    $file_agree_num = 0;
-                    $finish_progress = 0;
-                    $model_num = count($catalog_id_arr);
-                    if ($model_num) {
-                        //项目通过文件数量
-                        $file_agree_num = (int)helps::getProjectAgreeFileNum
-                        ($item['id'],$catalog_id_arr);
-                        //项目进度
-                        if ($file_agree_num > 0) {
-                            $finish_progress = intval($file_agree_num) / intval($model_num) * 100;
-                        }
-                    }
-
-                    if ($finish_progress >= 0 && $finish_progress<20){
-                        $low++;
-                    } else if($finish_progress >= 20 && $finish_progress<80){
-                        $middle++;
-                    } else if ($finish_progress >= 80 ){
-                        $high++;
-                    }
                     $data[$key]['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                     $data[$key]['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                     $data[$key]['status'] = intval($item['status']);
@@ -196,8 +166,6 @@ class ProjectController extends BasicController
                     $data[$key]['describe'] = $item['description'];
                     $data[$key]['used_time']  = $usedTime;
                     $data[$key]['manage_uid']  = $manage_uid ? $manage_uid : 0;
-                    $data[$key]['model_num'] = $model_num;
-                    $data[$key]['file_agree_num'] = $file_agree_num;
                     $data[$key]['finish_progress'] = $finish_progress;
                     $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
                     $remark = [];

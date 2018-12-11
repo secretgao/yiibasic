@@ -276,10 +276,10 @@ class ModelsController extends BasicController
                 $directory = AProjectModel::find()->where(['project_id'=>$projectId,'model_id'=>$id,'status'=>0,'type'=>1])->count();
             }
         }
-        $fileNum = $project->file_num;
+        $fileNum = $project->file_agree_num;
         $Obj->status = -1;
         if ($Obj->save(false)) {
-            $project->file_num = $fileNum + $directory;
+            $project->file_agree_num = $fileNum + $directory;
             $project->save(false);
             if ($type == 0) { // 模板
                 $res = AModel::find()->where(['pid'=>$id])->asArray()->all();

@@ -336,12 +336,12 @@ class FileController extends BasicController
         }
         $catalog_id = $file->catalog_id;
         $file->status= $status;
-        $fileNum = intval($project->file_num);
+        $fileNum = intval($project->file_agree_num);
         if ($file->save(false)) {
             $arr = [];
             helps::uploadFileUpdateProjectModel($projectId,$catalog_id,$arr);
 
-            $project->file_num = $fileNum + 1;
+            $project->file_agree_num = $fileNum + 1;
             $project->save(false);
             $this->Success();
         } else {
