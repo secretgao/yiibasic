@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\commond\Constants;
 use app\commond\helps;
 use app\models\ALog;
+use app\models\AProject;
 use app\models\AUser;
 use Yii;
 use yii\db\Query;
@@ -80,6 +81,53 @@ class IndexController extends BasicController
         }
         foreach ($data as $item) {
             $re = helps::uploadFileUpdateProjectModel($item['project_id'], $item['catalog_id']);
+        }
+        //  echo '<pre>';print_r($data);
+    }
+
+
+    /**
+     * 修复数据
+     */
+    public function actionProject()
+    {
+
+        $pages = $this->getParam('p');
+        $pageSize = 20;
+        $page = $pageSize * ($pages - 1);
+        $data = (new Query())->select('*')
+            ->from('a_project')//->where(['status' => 1])
+            ->offset($page)->limit($pageSize)->all();
+        if (empty($data)) {
+            $this->Success(['data' => 'empty']);
+        }
+        foreach ($data as $item) {
+            //$re = helps::uploadFileUpdateProjectModel($item['project_id'],
+              //  $item['catalog_id']);
+
+            //更新项目表模板数量
+            helps::UpdateProjectModelNum($item['id']);
+
+            $file_agree_num = 0;
+
+            //项目所选模板数量
+            $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
+            $file_agree_num = (int)helps::getProjectAgreeFileNum
+            ($item['id'],$catalog_id_arr);
+            $finish_progress = 0;
+            $model_num = count($catalog_id_arr);
+
+
+            $num = helps::getProjectModelBottomNum($item['id']);
+            $project = AProject::findOne($item['id']);
+            $project->model_num = count($num);
+            $project->file_agree_num = $file_agree_num;
+            $project->save(false);
+
+
+            $item['file_agree_num'] = intval($item['file_agree_num']);
+            $item['model_num'] = intval($item['model_num']);
+
         }
         //  echo '<pre>';print_r($data);
     }

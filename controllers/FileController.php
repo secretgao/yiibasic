@@ -317,7 +317,7 @@ class FileController extends BasicController
         $project = AProject::find()
             ->where(['id'=>$projectId])
             ->andwhere(['<>','status',4])
-            ->exists();
+            ->one();
         if (!$project) {
             $this->Error(Constants::PROJECT_NOT_FOUND,Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
         }
@@ -336,9 +336,13 @@ class FileController extends BasicController
         }
         $catalog_id = $file->catalog_id;
         $file->status= $status;
+        $fileNum = intval($project->file_agree_num);
         if ($file->save(false)) {
             $arr = [];
             helps::uploadFileUpdateProjectModel($projectId,$catalog_id,$arr);
+
+            $project->file_agree_num = $fileNum + 1;
+            $project->save(false);
             $this->Success();
         } else {
             $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
