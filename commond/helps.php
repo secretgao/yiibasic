@@ -593,7 +593,7 @@ class helps {
 
         $num = self::getProjectModelBottomNum($projectId);
         $project = AProject::findOne($projectId);
-        $project->model_num = $num;
+        $project->model_num = count($num);
         $project->save(false);
         return true;
     }

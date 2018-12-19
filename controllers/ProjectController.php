@@ -21,10 +21,6 @@ class ProjectController extends BasicController
 {
     public function init()
     {
-
-
-
-
        parent::init();
     }
 
@@ -91,7 +87,7 @@ class ProjectController extends BasicController
                 ->orderBy('sort ASC,id DESC')
                 ->asArray()->all();
         }
-        
+
         $data = array_merge($createProject,$joinProject);
         $projects = 0;
         $low = $middle = $high = 0;
@@ -207,8 +203,6 @@ class ProjectController extends BasicController
 
     public function actionSearch()
     {
-
-
         $mobile = $this->getParam('mobile',false,0);
 
         if  (isset($mobile) && !empty($mobile)){
