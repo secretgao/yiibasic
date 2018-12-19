@@ -251,7 +251,7 @@ class FileController extends BasicController
         $fileId = $this->getParam('fileId',true);
         $userId = $this->getParam('userId',true);
         $file = AFile::find()->select('*')
-            ->where(['id'=>$fileId,'uid'=>$userId])
+            ->where(['id'=>$fileId,'status'=>[0,1]])
             ->asArray()->one();
 
         if (!$file) {
