@@ -61,7 +61,7 @@ class ProjectController extends BasicController
 
 
         //查询该用户创建的项目
-        $createProejct = AProject::find()
+        $createProject = AProject::find()
             ->where(['create_uid'=>$uid])
             ->andWhere(['!=','status',4])
             ->andFilterWhere(['position_id'=>$postionId])
@@ -91,13 +91,15 @@ class ProjectController extends BasicController
                 ->orderBy('sort ASC,id DESC')
                 ->asArray()->all();
         }
-        $data = array_merge($createProejct,$joinProject);
+        
+        $data = array_merge($createProject,$joinProject);
         $projects = 0;
         $low = $middle = $high = 0;
+        $newData = [];
         if ($data) {
             $projects = count($data);
             $nowTime = time();
-            $newData = [];
+
 
             foreach ($data as $key=>&$item) {
                 //项目所选模板数量
