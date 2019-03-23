@@ -94,12 +94,20 @@ class LogController extends BasicController
         $projectId = $this->getParam('projectId',true);
 
         $data = APersonalLog::find()
-            ->select('id as log_id,content as log_content,status as state')
+            ->select('id as log_id,content as log_content,status as state,create_time,uid')
             ->where(['uid'=>$userId,'project_id'=>$projectId])
             ->andWhere(['<>','status',2])
             ->asArray()->all();
+
+
         if (empty($data)){
             $this->Success(['data'=>[]]);
+        }
+
+        foreach ($data as &$value){
+            $value['create_time'] = date('Y.m.d',$value['create_time']);
+            $value['operator'] = AUser::getName($value['uid']);
+            unset($value['uid']);
         }
         $this->Success(['data'=>$data]);
     }

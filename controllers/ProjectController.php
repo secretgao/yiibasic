@@ -7,6 +7,7 @@ use app\models\AFile;
 use app\models\APersonalLog;
 use app\models\APosition;
 use app\models\AProjectExt;
+use app\models\AProjectFollow;
 use app\models\AProjectModel;
 use app\models\ASecretaryTag;
 use app\models\AUser;
@@ -132,6 +133,11 @@ class ProjectController extends BasicController
                         $item['used_time']  = $usedTime;
                         $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
                         $item['finish_progress'] = $finish_progress;
+                        $item['money'] = empty($item['money']) ? 0 : $item['money'];
+                        $item['concern_num'] = AProjectFollow::getFollowNum
+                        ($item['id']);
+                        $item['concern_state'] = AProjectFollow::getFollowNum
+                        ($item['id'],$uid);
                         $newData[] = $item;
                         $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
                         $remark = [];
@@ -165,6 +171,11 @@ class ProjectController extends BasicController
                     $data[$key]['used_time']  = $usedTime;
                     $data[$key]['manage_uid']  = $manage_uid ? $manage_uid : 0;
                     $data[$key]['finish_progress'] = $finish_progress;
+                    $data[$key]['money'] = empty($item['money']) ? 0 : $item['money'];
+                    $data[$key]['concern_num'] = AProjectFollow::getFollowNum
+                    ($item['id']);
+                    $data[$key]['concern_state'] = AProjectFollow::getFollowNum
+                    ($item['id'],$uid);
                     $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
                     $remark = [];
                     if ($projectAllStep) {
@@ -283,6 +294,11 @@ class ProjectController extends BasicController
                     $item['model_num'] = $model_num;
                     $item['file_agree_num'] = $file_agree_num;
                     $item['finish_progress'] = $finish_progress;
+                    $item['money'] = empty($item['money']) ? 0 : $item['money'];
+                    $item['concern_num'] = AProjectFollow::getFollowNum
+                    ($item['id']);
+                    $item['concern_state'] = AProjectFollow::getFollowNum
+                    ($item['id'],$uid);
                     $newData[] = $item;
                     $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
                     $remark = [];
@@ -327,6 +343,7 @@ class ProjectController extends BasicController
           $finishTime  = $this->getParam('finish_time',true);
           $positionId  = $this->getParam('position_id',true);
           $financial_number = $this->getParam('financial_number',false);
+          $money = $this->getParam('money',false);
 
           $member = (explode(',',$selectUserIds));
 
@@ -350,6 +367,9 @@ class ProjectController extends BasicController
 
               if ($financial_number){
                   $projectObj->financial_number = $financial_number;
+              }
+              if ($money){
+                  $projectObj->money = $money;
               }
               if (!$projectObj->insert()) {
                   $this->Error(Constants::RET_ERROR,$projectObj->getErrors());
@@ -995,32 +1015,6 @@ class ProjectController extends BasicController
         $this->Success(['data'=>$result]);
     }
 
-    public function actionAs()
-    {
-
-
-       // echo '<pre>';var_dump($fil);
-     //   echo '<pre>';var_dump($projectModelId);
-
-        //获取所有模板和目录
-       // $allStep = helps::allStep(171);
-
-      //  $catalog_id_arr = helps::getProjectModelBottomNum(183);
-      //  echo '<pre>';print_r($catalog_id_arr);
-
-        //项目通过文件数量
-     //   $file_agree_num = helps::getProjectAgreeFileNum(183,$catalog_id_arr);
-      //  echo '<pre>';print_r($file_agree_num);
-            //项目进度
-      //  $r = helps::getChildren(17230,[]);
-       // $model = AModel::find()->where(['id'=>17230])->asArray()->all();
-       // $res = helps::recursion($model);
-        //$s = helps::CreateProjectModel(17230,171);
-       // exit();
-        //echo '<pre>';print_r($res);exit();
-       // $a = helps::getProjectModelBottomNum(170);
-       // var_dump($a);
-    }
 
 
     /**
@@ -1085,4 +1079,47 @@ class ProjectController extends BasicController
 
     }
 
+
+    /**
+     * 设置项目关注
+     * @return array
+     */
+    public function actionSettingConcernState()
+    {
+
+        $projectId = $this->getParam('projectId',true);
+        $userId    = $this->getParam('userId',true);
+        $state    = $this->getParam('state');
+
+
+        $where = ['project_id'=>$projectId,'uid'=>$userId];
+        $exists = AProjectFollow::findOne($where);
+        if ($exists){
+            if ($exists->state == $state){
+                $this->Error(Constants::PROJECT_EXISTS_FOLLOW,Constants::$error_message[Constants::PROJECT_EXISTS_FOLLOW]);
+            }
+            $exists->state = $state;
+            $exists->update_time = time();
+            if($exists->save(false)){
+                $this->Success();
+            } else {
+                $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
+            }
+
+        } else {
+
+           $insert = new AProjectFollow();
+           $insert->project_id = $projectId;
+           $insert->uid = $userId;
+           $insert->create_time = time();
+           if($insert->save(false)){
+               $this->Success();
+           } else {
+               $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+
+           }
+        }
+
+    }
 }

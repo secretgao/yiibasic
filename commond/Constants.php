@@ -36,6 +36,8 @@ final class Constants
     const REQUSET_NO_POST           = 2000;
     const REQUSET_NO_GET            = 2001;
 
+    const PROJECT_EXISTS_FOLLOW     = 2002;
+
 
     //-----------相关内容---------
     public static $error_message = [
@@ -59,6 +61,7 @@ final class Constants
         self::PROJECT_MANAGE_EXITS =>'项目负责人不存在',
         self::PROJECT_FINANCIAL_EXITS=>'项目财政编号已经存在',
         self::PROJECT_MODEL_SON=>'请先删除该模板下的模板',
+        self::PROJECT_EXISTS_FOLLOW=>'数据存在',
     ];
 
     //操作日志相关
