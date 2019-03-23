@@ -484,7 +484,7 @@ class ProjectController extends BasicController
                 ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId,'pm.status'=>0,'pm.type'=>1])
                 ->all();
         }
-       
+      
         $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
         $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
         $result1 = (new Query())
