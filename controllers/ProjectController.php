@@ -464,21 +464,37 @@ class ProjectController extends BasicController
         if (!in_array($userId,$allMember)){
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
-
+        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
+        $cateLog = $result1 =  array();
         if ($parentId == 0 ) {
             $parentId = AProjectModel::find()->select('model_id')
-                ->where(['project_id'=>$projectId,'model_pid'=>0,'status'=>0])
+                ->where(['project_id'=>$projectId,'model_pid'=>0,'status'=>0,'type'=>0])
                 ->scalar();
+            $cateLog =  (new Query())
+                ->select($modelColumns)
+                ->from('a_project_model as pm')
+                ->leftJoin('a_model as am','pm.model_id = am.id')
+                ->where(['pm.model_pid'=>0,'pm.project_id'=>$projectId,'pm.status'=>0,'pm.type'=>1])
+                ->all();
+        } else {
+            $cateLog =  (new Query())
+                ->select($modelColumns)
+                ->from('a_project_model as pm')
+                ->leftJoin('a_model as am','pm.model_id = am.id')
+                ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId,'pm.status'=>0,'pm.type'=>1])
+                ->all();
         }
+       
         $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
         $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
-        $result = (new Query())
+        $result1 = (new Query())
             ->select($modelColumns)
             ->from('a_project_model as pm')
             ->leftJoin('a_model as am','pm.model_id = am.id')
-            ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId,'pm.status'=>0])
-            //->andWhere('case pm.is_file when 0 then false when 1 then true end')
+            ->where(['pm.model_pid'=>$parentId,'pm.project_id'=>$projectId,'pm.status'=>0,'pm.type'=>0])
             ->all();
+
+         $result = array_merge($result1,$cateLog);
         //根据最后返回信息 遍历 是否存在文件
 //echo '<pre>';print_r($result);exit();
         $fileId = [];
