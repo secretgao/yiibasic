@@ -484,7 +484,8 @@ class ProjectController extends BasicController
         if (!in_array($userId,$allMember)){
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
-        $modelColumns = 'pm.id as project_model_id,pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
+        $modelColumns = 'pm.id as project_model_id,pm.model_id as id,pm.model_pid as pid,
+        am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile,pm.is_master_look';
         $cateLog = $result1 =  array();
         if ($parentId == 0 ) {
             $parentId = AProjectModel::find()->select('model_id')
@@ -543,6 +544,7 @@ class ProjectController extends BasicController
         foreach ($result as $k=>$cata) {
             $result[$k]['type'] = '0';
             $result[$k]['hasFile'] = $cata['hasFile'] == 1 ? true : false;
+            $result[$k]['isLook'] = $cata['is_master_look'] == 1 ? true : false;
             $son  = AModel::find()->select('remark')->where(['pid'=>$cata['id'],'status'=>0])->andWhere(['<>','remark',''])
                 ->asArray()->column();
             $result[$k]['remark'] = $son;
@@ -1131,13 +1133,13 @@ class ProjectController extends BasicController
     {
 
         $Id    = $this->getParam('project_model_id',true);
-        $hasFile = $this->getParam('is_has',true);
+        $hasFile = $this->getParam('is_look',true);
         $exits = AProjectModel::findOne($Id);
         if (!$exits) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
 
-        $exits->is_file = $hasFile;
+        $exits->is_master_look = $hasFile;
 
         if ($exits->save(false)){
             $this->Success();
