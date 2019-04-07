@@ -484,7 +484,7 @@ class ProjectController extends BasicController
         if (!in_array($userId,$allMember)){
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
-        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
+        $modelColumns = 'pm.id as project_model_id,pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
         $cateLog = $result1 =  array();
         if ($parentId == 0 ) {
             $parentId = AProjectModel::find()->select('model_id')
@@ -506,7 +506,7 @@ class ProjectController extends BasicController
         }
       
         $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
-        $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
+      //  $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
         $result1 = (new Query())
             ->select($modelColumns)
             ->from('a_project_model as pm')
