@@ -1117,12 +1117,33 @@ class ProjectController extends BasicController
                $this->Success();
            } else {
                $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-
            }
         }
 
     }
 
 
+    /***
+     * 设置项目模版是否有文件
+     * @return array
+     */
+    public function actionSettingProjectModelFile()
+    {
+
+        $Id    = $this->getParam('project_model_id',true);
+        $hasFile = $this->getParam('is_has',true);
+        $exits = AProjectModel::findOne($Id);
+        if (!$exits) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $exits->is_file = $hasFile;
+
+        if ($exits->save(false)){
+            $this->Success();
+        } else {
+            $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+        }
+    }
 
 }
