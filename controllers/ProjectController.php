@@ -1141,6 +1141,9 @@ class ProjectController extends BasicController
 
         $exits->is_master_look = $hasFile;
 
+        $project = AProject::findOne($exits->project_id);
+        $project->model_num = intval($project->model_num) -1;
+        $project->save(false);
         if ($exits->save(false)){
             $this->Success();
         } else {
