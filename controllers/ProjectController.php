@@ -485,7 +485,7 @@ class ProjectController extends BasicController
            $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
         }
         $modelColumns = 'pm.id as project_model_id,pm.model_id as id,pm.model_pid as pid,
-        am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile,pm.is_master_look';
+        am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile,pm.is_master_look as isLook';
         $cateLog = $result1 =  array();
         if ($parentId == 0 ) {
             $parentId = AProjectModel::find()->select('model_id')
@@ -544,7 +544,7 @@ class ProjectController extends BasicController
         foreach ($result as $k=>$cata) {
             $result[$k]['type'] = '0';
             $result[$k]['hasFile'] = $cata['hasFile'] == 1 ? true : false;
-            $result[$k]['isLook'] = $cata['is_master_look'] == 1 ? true : false;
+            $result[$k]['isLook'] = $cata['isLook'] == 1 ? true : false;
             $son  = AModel::find()->select('remark')->where(['pid'=>$cata['id'],'status'=>0])->andWhere(['<>','remark',''])
                 ->asArray()->column();
             $result[$k]['remark'] = $son;
