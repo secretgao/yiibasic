@@ -1145,9 +1145,8 @@ class ProjectController extends BasicController
         $arr = [];
         $model =  [0=>['id'=>$Id,'model_id'=>$exits->model_id,'model_pid'=>$exits->model_pid]];
         $model_num = count(helps::recursionIsLook($model,$arr));
-        var_dump($model_num);
-        exit();
-        $project->model_num = intval($project->model_num) - $model_num;
+
+        $project->model_num = intval($project->model_num) - $model_num -1 ;
         $project->save(false);
         if ($exits->save(false)){
             $this->Success();
