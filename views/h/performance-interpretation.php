@@ -46,7 +46,7 @@
         .hide {display:none}
         html,body{
             font-size: 16px;
-            background-color: #2558C1;
+            background-color: #2B66B8;
             min-width: 100%;height: 100%;
 
         }

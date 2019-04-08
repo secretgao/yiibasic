@@ -1142,7 +1142,10 @@ class ProjectController extends BasicController
         $exits->is_master_look = $hasFile;
 
         $project = AProject::findOne($exits->project_id);
-        $project->model_num = intval($project->model_num) -1;
+        $arr = [];
+        $model = ['id'=>$Id,'model_id'=>$exits->model_id,'model_pid'=>$exits->model_pid];
+        $model_num = count(helps::recursionIsLook($model,$arr));
+        $project->model_num = intval($project->model_num) - $model_num;
         $project->save(false);
         if ($exits->save(false)){
             $this->Success();

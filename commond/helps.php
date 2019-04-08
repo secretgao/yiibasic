@@ -597,4 +597,27 @@ class helps {
         $project->save(false);
         return true;
     }
+
+
+    /**
+     * @param $res
+     * @return array
+     */
+    public static function recursionIsLook($res,$projectId)
+    {
+        $output = array();
+        foreach ($res as $k => $v)
+        {
+            $tmpRes = AProjectModel::find()->select('id,model_id,model_pid')
+                ->where(['model_id'=>$v['model_pid'],'project_id'=>$projectId,'status'=>0])
+                ->asArray()->all();
+            $output []= $v;
+            if (!empty($tmpRes))
+            {
+                $output = array_merge($output, self::recursionIsLook($tmpRes,$projectId));
+            }
+        }
+        return $output;
+    }
+
 }
