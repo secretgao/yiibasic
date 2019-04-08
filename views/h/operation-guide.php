@@ -72,9 +72,20 @@
 <body>
 <img src="../img/banner1.png" alt="" class="banner">
 <img src="../img/text1.png" alt="" class="text-img">
-<div class="text">
-    XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-</div>
+<ul class="list">
+    <li class="item">
+        创建项目流程：首页点击项目管理，添加项目。创建需要填写项目类型，名称，描述以及批复金额、部门、开始时间、选择项目参与人员等。
+    </li>
+    <li class="item">
+        首页项目：首页项目列表可以查看项目备注，转发邮件，项目对应搜索新闻，设置关注，以及点击查看项目问卷调查。
+    </li>
+    <li class="item">
+        项目详情：根据创建项目时填写类型创建对应目录，目录下均可添加文件，选择右上角加号。
+        右上角省略号弹窗可以查看本项目上传记录，传输列表，以及管理设置。管理界面可以设置项目开始完成状态以及分管领导，还可以对人员进行增减，设置项目负责人。
+    </li>
+    <li class="item">
+        项目负责人:可以审核当前项目所上传文件。文件经过审核之后才会显示至项目目录。
+    </li>
+</ul>
 </body>
 </html>
