@@ -1143,7 +1143,7 @@ class ProjectController extends BasicController
 
         $project = AProject::findOne($exits->project_id);
         $arr = [];
-        $model = ['id'=>$Id,'model_id'=>$exits->model_id,'model_pid'=>$exits->model_pid];
+        $model =  [0=>['id'=>$Id,'model_id'=>$exits->model_id,'model_pid'=>$exits->model_pid]];
         $model_num = count(helps::recursionIsLook($model,$arr));
         var_dump($model_num);
         exit();
