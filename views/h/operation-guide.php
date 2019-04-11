@@ -59,13 +59,16 @@
             width: 55%;
             margin: 0.5rem auto;
         }
-        .text{
+        .list{
             width: 	88%;
             margin: 0.3rem auto;
             color: #fff;
             word-break: break-all;
             line-height: 1.5;
-            color: rgba(255,255,255,0.8);
+        }
+        .item{
+            margin: 0.4rem 0;
+            color: rgba(255,255,255,0.7);
         }
     </style>
 </head>
