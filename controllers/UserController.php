@@ -39,7 +39,7 @@ class UserController extends BasicController
         if ($username == Constants::ADMIN_USER) {
             if (md5($password) == md5(Constants::ADMIN_USER)) {
                 $user = AUser::find()
-                    ->select( $columns)
+                    ->select($columns)
                     ->where(['status'=>0,'group'=>1])->asArray()->one();
                 $this->Success($user);
             } else {
@@ -56,6 +56,12 @@ class UserController extends BasicController
                 $this->Error(Constants::PASSWORD_ERROR,Constants::$error_message[Constants::PASSWORD_ERROR]);
 
             }
+        }else if (is_numeric($username)){
+            $user = AUser::find()
+                ->select($columns)
+                ->where(['status'=>0,'phone'=>$username,'password'=>md5($password)])->asArray()->one();
+            $this->Success($user);
+
         } else {
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
         }
