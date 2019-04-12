@@ -76,7 +76,7 @@ class RegisterController extends BasicController
      */
     public function actionRestPassword()
     {
-        $phone   = $this->getParam('mobile',ture);
+        $phone   = $this->getParam('mobile',true);
         $oldPass = $this->getParam('old_pass',true);
         $newPass = $this->getParam('new_pass',true);
         $newPass1= $this->getParam('new_pass1',true);
