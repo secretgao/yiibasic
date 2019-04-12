@@ -68,7 +68,37 @@ class RegisterController extends BasicController
             $this->Success($result);
         }
         $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
+    }
 
+
+    /**
+     * 重置密码
+     */
+    public function actionRestPassword()
+    {
+        $phone   = $this->getParam('mobile',ture);
+        $oldPass = $this->getParam('old_pass',true);
+        $newPass = $this->getParam('new_pass',true);
+        $newPass1= $this->getParam('new_pass1',true);
+
+        $user = AUser::findOne(['phone'=>$phone,'status'=>0]);
+
+        if (!$user) {
+            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
+        }
+
+        if ($user->password != md5($oldPass)){
+           $this->Error(Constants::USER_PASSWORD_ERROR,Constants::$error_message[Constants::USER_PASSWORD_ERROR]);
+        }
+        if ($newPass != $newPass1){
+            $this->Error(Constants::INPUT_PASSWORD_ATYPISM,Constants::$error_message[Constants::INPUT_PASSWORD_ATYPISM]);
+        }
+
+        $user->password = md5($newPass);
+        if ($user->save(false)){
+            $this->Success();
+        }
+        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
     }
 }
 

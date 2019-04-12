@@ -38,6 +38,8 @@ final class Constants
 
     const PROJECT_EXISTS_FOLLOW     = 2002;
 
+    const USER_PASSWORD_ERROR       = 3000;
+    const INPUT_PASSWORD_ATYPISM    = 3001;
 
     //-----------相关内容---------
     public static $error_message = [
@@ -62,6 +64,8 @@ final class Constants
         self::PROJECT_FINANCIAL_EXITS=>'项目财政编号已经存在',
         self::PROJECT_MODEL_SON=>'请先删除该模板下的模板',
         self::PROJECT_EXISTS_FOLLOW=>'数据存在',
+        self::USER_PASSWORD_ERROR=>'密码错误',
+        self::INPUT_PASSWORD_ATYPISM=>'两次密码不一致',
     ];
 
     //操作日志相关
