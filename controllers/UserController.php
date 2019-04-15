@@ -59,7 +59,7 @@ class UserController extends BasicController
         }else if ($username != Constants::ADMIN_USER || $username != Constants::TEST_USER){
             $user = AUser::find()
                 ->select($columns)
-                ->where(['status'=>0,'true_name'=>$username])->asArray()->one();
+                ->where(['status'=>0,'true_name'=>$username])->one();
             if (!$user && $user->password == md5($password)){
                 $this->Success($user);
             } else {
