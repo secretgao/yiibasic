@@ -477,6 +477,11 @@ class ProjectController extends BasicController
         if (!$project) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
+
+        $lastLevel = AProjectModel::find()->select('level')
+            ->where(['status'=>0,'project_id'=>$projectId])
+            ->orderBy('level desc')
+            ->scalar();
         //获取项目参与人员
         $member = AProjectExt::find()->select('uid')->where(['project_id'=>$projectId])->asArray()->column();
         $allMember = array_merge($member,$project);
@@ -597,7 +602,7 @@ class ProjectController extends BasicController
             $data = array_merge($chapter,$files);
         }
 
-        $this->Success(['data'=>$data]);
+        $this->Success(['data'=>$data,'lastLevel'=>$lastLevel]);
 
     }
     /**
@@ -1142,11 +1147,16 @@ class ProjectController extends BasicController
         $exits->is_master_look = $hasFile;
 
         $project = AProject::findOne($exits->project_id);
-        $arr = [];
-        $model =  [0=>['id'=>$Id,'model_id'=>$exits->model_id,'model_pid'=>$exits->model_pid]];
-        $model_num = count(helps::recursionIsLook($model,$arr));
-
-        $project->model_num = intval($project->model_num) - $model_num -1 ;
+       // $arr = [];
+       // $model =  [0=>['id'=>$Id,'model_id'=>$exits->model_id,'model_pid'=>$exits->model_pid]];
+       // $model_num = count(helps::recursionIsLook($model,$arr));
+        $model_num = 0;
+        if ($hasFile == 1 || $hasFile == true){
+            $model_num = intval($project->model_num) - 1;
+        } else {
+            $model_num = intval($project->model_num) + 1;
+        }
+        $project->model_num = $model_num;
         $project->save(false);
         if ($exits->save(false)){
             $this->Success();

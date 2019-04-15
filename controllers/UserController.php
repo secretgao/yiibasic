@@ -56,10 +56,10 @@ class UserController extends BasicController
                 $this->Error(Constants::PASSWORD_ERROR,Constants::$error_message[Constants::PASSWORD_ERROR]);
 
             }
-        }else if (is_numeric($username)){
+        }else if ($username != Constants::ADMIN_USER || $username != Constants::TEST_USER){
             $user = AUser::find()
                 ->select($columns)
-                ->where(['status'=>0,'phone'=>$username,'password'=>md5($password)])->asArray()->one();
+                ->where(['status'=>0,'true_name'=>$username,'password'=>md5($password)])->asArray()->one();
             $this->Success($user);
 
         } else {

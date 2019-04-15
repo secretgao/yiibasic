@@ -76,12 +76,12 @@ class RegisterController extends BasicController
      */
     public function actionRestPassword()
     {
-        $phone   = $this->getParam('mobile',true);
+        $Id   = $this->getParam('id',true);
         $oldPass = $this->getParam('old_pass',true);
         $newPass = $this->getParam('new_pass',true);
         $newPass1= $this->getParam('new_pass1',true);
 
-        $user = AUser::findOne(['phone'=>$phone,'status'=>0]);
+        $user = AUser::findOne(['id'=>$Id,'status'=>0]);
 
         if (!$user) {
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
