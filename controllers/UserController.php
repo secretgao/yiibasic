@@ -60,14 +60,17 @@ class UserController extends BasicController
             $user = AUser::find()
                 ->select($columns)
                 ->where(['status'=>0,'true_name'=>$username])->one();
-            echo '<pre>';print_r($user);exit();
-            if (!$user && $user->password == md5($password)){
-                unset($user['password']);
-                $this->Success($user);
-            } else {
-                $this->Error(Constants::USER_PASSWORD_ERROR,Constants::$error_message[Constants::USER_PASSWORD_ERROR]);
-            }
+            if ($user){
+                if ($user->password == md5($password)){
+                    unset($user['password']);
+                    $this->Success($user);
+                }  else {
+                    $this->Error(Constants::USER_PASSWORD_ERROR,Constants::$error_message[Constants::USER_PASSWORD_ERROR]);
 
+                }
+
+            }
+            $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
 
         } else {
             $this->Error(Constants::USER_NOT_FOUND,Constants::$error_message[Constants::USER_NOT_FOUND]);
