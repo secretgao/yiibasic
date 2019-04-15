@@ -35,7 +35,7 @@ class UserController extends BasicController
     {
         $username = $this->getParam('username',true);
         $password = $this->getParam('password',true);
-        $columns = 'id as userId,avatar,phone,nick_name as nickName,true_name as realName,group,email';
+        $columns = 'id as userId,avatar,phone,nick_name as nickName,true_name as realName,group,email,password';
         if ($username == Constants::ADMIN_USER) {
             if (md5($password) == md5(Constants::ADMIN_USER)) {
                 $user = AUser::find()
@@ -61,6 +61,7 @@ class UserController extends BasicController
                 ->select($columns)
                 ->where(['status'=>0,'true_name'=>$username])->one();
             if (!$user && $user->password == md5($password)){
+                unset($user['password']);
                 $this->Success($user);
             } else {
                 $this->Error(Constants::USER_PASSWORD_ERROR,Constants::$error_message[Constants::USER_PASSWORD_ERROR]);
