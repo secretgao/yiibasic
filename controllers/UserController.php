@@ -60,6 +60,7 @@ class UserController extends BasicController
             $user = AUser::find()
                 ->select($columns)
                 ->where(['status'=>0,'true_name'=>$username])->one();
+            echo '<pre>';print_r($user);exit();
             if (!$user && $user->password == md5($password)){
                 unset($user['password']);
                 $this->Success($user);
