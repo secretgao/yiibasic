@@ -79,7 +79,6 @@ class RegisterController extends BasicController
         $Id   = $this->getParam('id',true);
         $oldPass = $this->getParam('old_pass',true);
         $newPass = $this->getParam('new_pass',true);
-        $newPass1= $this->getParam('new_pass1',true);
 
         $user = AUser::findOne(['id'=>$Id,'status'=>0]);
 
@@ -90,9 +89,7 @@ class RegisterController extends BasicController
         if ($user->password != md5($oldPass)){
            $this->Error(Constants::USER_PASSWORD_ERROR,Constants::$error_message[Constants::USER_PASSWORD_ERROR]);
         }
-        if ($newPass != $newPass1){
-            $this->Error(Constants::INPUT_PASSWORD_ATYPISM,Constants::$error_message[Constants::INPUT_PASSWORD_ATYPISM]);
-        }
+        
 
         $user->password = md5($newPass);
         if ($user->save(false)){
