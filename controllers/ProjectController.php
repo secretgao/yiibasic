@@ -587,13 +587,16 @@ class ProjectController extends BasicController
         //首先显示目录 然后显示文件
         $data = [];
         if ($result) {
-          //  echo '<pre>';print_r($result);
+           // echo '<pre>';print_r($result);exit();
             $files = $chapter = [];
             foreach ($result as &$item) {
                 if ($item['type'] == 0) {
                    // $item['hasFile'] = helps::getHasFile($projectId,$item['id']);
-                    $chapter[] = $item;
 
+                    $isLastLevel = AProjectModel::find()
+                        ->where(['project_id'=>$projectId,'model_pid'=>$item['id']])->exists();
+                    $item['isLastLevel'] = $isLastLevel;
+                    $chapter[] = $item;
                 } else {
                     $files[]=$item;
                 }
@@ -1021,8 +1024,6 @@ class ProjectController extends BasicController
         }
         $this->Success(['data'=>$result]);
     }
-
-
 
     /**
      * 设置项目 书记标签
