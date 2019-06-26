@@ -126,7 +126,7 @@ class FileController extends BasicController
         $comments = $this->getParam('comments',true);
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId,$projectId);
-
+        $commond = '';
         if (isset($fileInfo['status'])) {
             $small_img = '';
             $compress_img = '';
