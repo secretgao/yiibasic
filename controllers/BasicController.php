@@ -11,16 +11,13 @@ use app\commond\helps;
 
 class BasicController extends Controller
 {
-    
     public static $request;
     
     public function init(){
         $this->enableCsrfValidation = false;
         parent::init();
         //   self::$request = \Yii::$app->request;
-        
     }
-    
     public function beforeAction($action)
     {
         self::$request = \Yii::$app->request;
@@ -34,7 +31,6 @@ class BasicController extends Controller
         $result = parent::afterAction($action, $result);
         return $result;
     }
- 
     /**
      * 获取页面传参
      * @param type $key
@@ -58,18 +54,15 @@ class BasicController extends Controller
             } else {
                 $val = self::replace_specialChar(self::$request->post($key));
             }
-
         }
 
         if ( ($is_need && $val === NULL) || ($is_need && $val === '') )
         {
             $this->Error(Constants::GLOBAL_INVALID_PARAM, 'required param: ' . $key);
         }
-      
         return $val!== NULL ? $val : $default_value;
     }
-    
-    
+
     /**
      * 成功返回
      * @param array $_data
@@ -112,8 +105,6 @@ class BasicController extends Controller
         echo(json_encode($_arr));exit();
         \Yii::$app->end();
     }
-
-
     /**
      *判断是否为POST 请求
      */
@@ -122,20 +113,16 @@ class BasicController extends Controller
         if ( !self::$request->isPost ) {
             $this->Error(Constants::REQUSET_NO_POST, Constants::$error_message[Constants::REQUSET_NO_POST]);
         }
-
-
     }
 
     /**
      * 判断是否为GET 请求
      */
     public function isGet() {
-
         if ( !self::$request->isGet ) {
             $this->Error(Constants::REQUSET_NO_GET, Constants::$error_message[Constants::REQUSET_NO_GET]);
         }
     }
-
     /**
      * @param $strParam
      * @return mixed

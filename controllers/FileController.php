@@ -19,15 +19,12 @@ use yii\db\Query;
  * @author Administrator
  *
  */
-
 class FileController extends BasicController
 {
-
     public function init()
     {
        parent::init();
     }
-
     /**
      * 上传
      * /usr/local/var/www/basic/README.md
@@ -108,7 +105,7 @@ class FileController extends BasicController
 
     public function actionTest()
     {
-        return $this->render('test');
+       return $this->render('test');
     }
 
     public function actionUploads()
@@ -130,11 +127,33 @@ class FileController extends BasicController
         if (isset($fileInfo['status'])) {
             $small_img = '';
             $compress_img = '';
+            if ($type == 3){
+                $houzhui = $fileInfo['fileInfo']['ext'];
+                $tupian = ['jpg','png','gif','jpeg','bmp'];
+                $shipin = ['wmv','asf','asx','rm','rmvb','mpg','mpeg','mpe','3gp','mov','mp4','m4v','avi','dat','mkv','flv','vob'];
+                $yinpin = ['wav',  'mp3', 'cda', 'wma', 'ra'];
+                $biji = ['txt'];
+                if(in_array($houzhui,$tupian))
+                {
+                    $type = 1;
+                }
+                if(in_array($houzhui,$shipin))
+                {
+                    $type = 2;
+                }
+                if(in_array($houzhui,$yinpin))
+                {
+                    $type = 5;
+                }
+                if(in_array($houzhui,$biji))
+                {
+                    $type = 4;
+                }
+            }
             //生成图片缩略图
             if ($type == 1) {
                 $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.'.$fileInfo['fileInfo']['ext'];
-                helps::img_create_small($fileInfo['fileInfo']['path'],150,120,
-                    $small_img);
+                helps::img_create_small($fileInfo['fileInfo']['path'],150,120, $small_img);
 
                 //生成压缩图
                 $compress_img =  $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$userId.'.'.$fileInfo['fileInfo']['ext'];;
@@ -204,12 +223,10 @@ class FileController extends BasicController
             }
             $project = AProject::find()->select('name')->where(['id'=>$item['projectId']])->scalar();
             $file[$key]['projectName'] = empty($project) ? '' : $project;
-
         }
 
         $this->Success(['data'=>$file]);
     }
-
 
     /**
      * 用户上传过的列表
@@ -217,14 +234,12 @@ class FileController extends BasicController
      */
     public function actionFileList()
     {
-
         $uid = $this->getParam('userId',true);
 
         $column = 'id,type,name,create_time,size,project_id as projectId';
         $file = AFile::find()->select($column)
             ->where(['uid'=>$uid,'status'=>0])
             ->asArray()->all();
-
         if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
@@ -241,19 +256,31 @@ class FileController extends BasicController
     }
 
     /**
+     * 获取政策制度列表
+     */
+    public function actionPolicySystemFileList(){
+        $column = 'id,name,ext,create_time,path,type';
+        $file = AFile::find()->select($column)
+            ->where(['type'=>[8,9]])
+            ->asArray()->all();
+
+        if (!$file) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $this->Success(['data'=>$file]);
+    }
+
+    /**
      * 文件下载
      */
-
     public function actionDownload()
     {
-
         ob_clean();
         $fileId = $this->getParam('fileId',true);
         $userId = $this->getParam('userId',true);
         $file = AFile::find()->select('*')
             ->where(['id'=>$fileId,'status'=>[0,1]])
             ->asArray()->one();
-
         if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
@@ -262,7 +289,6 @@ class FileController extends BasicController
         //用以解决中文不能显示出来的问题
         $path = iconv("utf-8","gb2312",$file['path']);
         $file_path = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$path;
-
         //首先要判断给定的文件存在与否
         if(!file_exists($file_path)) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
@@ -273,9 +299,7 @@ class FileController extends BasicController
         header("content-length:".filesize($file_path));
         readfile($file_path);
         exit();
-
     }
-
 
     /**
      * 删除文件
@@ -291,7 +315,6 @@ class FileController extends BasicController
         if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
-
         $file->status = '3';
         if ($file->save(false)) {
             $this->Success();
@@ -354,12 +377,10 @@ class FileController extends BasicController
      */
     public function actionSf()
     {
-
-
         $pages = $this->getParam('p',1);
         $page = ($pages- 1) * 20;
 
-       $sql = "SELECT id,uid,name,path,ext,compress_path FROM a_file WHERE  `type`=1  limit {$page},20";
+        $sql = "SELECT id,uid,name,path,ext,compress_path FROM a_file WHERE  `type`=1  limit {$page},20";
         echo $sql;
         $file = Yii::$app->db->createCommand($sql)->queryAll();
        /* $file = (new Query())->select('id,uid,name,path,ext,compress_path')

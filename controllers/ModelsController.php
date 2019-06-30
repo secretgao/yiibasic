@@ -35,8 +35,14 @@ class ModelsController extends BasicController
         }     
        
         $new = Helps::getson($data,0,1);             
-        $result = Helps::make_tree($new);   
-        $this->Success(['data'=>$result]);
+        $result = Helps::make_tree($new);
+        foreach ($result as $key =>$value){
+            if($value['name'] != '通用模板'){
+                unset($result[$key]);
+            }
+            $data = $value;
+        }
+        $this->Success(['data'=>$data]);
     }
 
     /**

@@ -17,6 +17,7 @@
     <input type="hidden" name="exif_latitude" value="11" />
     <input type="hidden" name="exif_longitude" value="11" />
     <input type="hidden" name="gps_latitude" value="11" />
+<input type="hidden" name="comments" value="11" />
     <input type="hidden" name="gps_longitude" value="11" />
     <input type="hidden" name="type" value="1" />
 
