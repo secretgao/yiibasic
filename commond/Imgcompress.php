@@ -19,7 +19,7 @@ class Imgcompress{
      */
     public function __construct($src, $percent=1)
     {
-        $this->src = $src;
+        $this->src =  iconv("UTF-8", "GBK", $src);;
         $this->percent = $percent;
     }
 
@@ -39,6 +39,8 @@ class Imgcompress{
      */
     private function _openImage()
     {
+
+
         list($width, $height, $type, $attr) = getimagesize($this->src);
         $this->imageinfo = array(
             'width'=>$width,
@@ -101,7 +103,11 @@ class Imgcompress{
      * 销毁图片
      */
     public function __destruct(){
-        imagedestroy($this->image);
+
+        if ($this->image !== null){
+            imagedestroy($this->image);
+        }
+
     }
 
 }

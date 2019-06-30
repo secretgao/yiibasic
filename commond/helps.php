@@ -515,6 +515,7 @@ class helps {
      *
      */
     public  static function img_create_small($big_img, $width, $height, $small_img) {//原始大图地址，缩略图宽度，高度，缩略图地址
+        $big_img = iconv("UTF-8", "GBK", $big_img);   //先转换名字为GBK编码
         $imgage = getimagesize($big_img); //得到原始大图片
         switch ($imgage[2]) { // 图像类型判断
             case 1:
