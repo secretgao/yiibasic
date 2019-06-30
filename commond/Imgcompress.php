@@ -19,7 +19,7 @@ class Imgcompress{
      */
     public function __construct($src, $percent=1)
     {
-        $this->src =  iconv("UTF-8", "GBK", $src);;
+        $this->src =  $src;//iconv("UTF-8", "GBK//TRANSLIT//IGNORE", $src);
         $this->percent = $percent;
     }
 
@@ -40,7 +40,7 @@ class Imgcompress{
     private function _openImage()
     {
 
-
+//var_dump($this->src);exit();
         list($width, $height, $type, $attr) = getimagesize($this->src);
         $this->imageinfo = array(
             'width'=>$width,
