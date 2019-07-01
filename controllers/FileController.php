@@ -19,6 +19,9 @@ use yii\db\Query;
  * @author Administrator
  *
  */
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET,POST,OPTIONS");
+header('Access-Control-Allow-Headers: X-Requested-With,X_Requested_With');
 class FileController extends BasicController
 {
     public function init()
