@@ -264,7 +264,7 @@ class FileController extends BasicController
     public function actionPolicySystemFileList(){
         $column = 'id,name,ext,create_time,path,type';
         $file = AFile::find()->select($column)
-            ->where(['type'=>[8,9]])
+            ->where(['type'=>[8,9,10]])
             ->asArray()->all();
 
         if (!$file) {
