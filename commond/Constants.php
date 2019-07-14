@@ -122,9 +122,9 @@ final class Constants
     //项目决策、项目管理、项目绩效
 
     public static $projectpolicy=[
-        '20166'=>'policy_number',
-        '20167'=>'administration_number',
-        '20168'=>'achievements_number',
+        '20166'=>'policy_number', //项目决策
+        '20167'=>'administration_number',//项目管理
+        '20168'=>'achievements_number',//项目绩效
     ];
 
 }
