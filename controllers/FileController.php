@@ -32,79 +32,7 @@ class FileController extends BasicController
      * 上传
      * /usr/local/var/www/basic/README.md
      */
-    /*
-    public function actionUpload(){
-//`type` tinyint(3) DEFAULT NULL COMMENT '文件类型 1图片 2视频 3附件 4 笔记'
-        $uid = $this->getParam('userId',true);
-        $type = $this->getParam('type',true);
-        $filePath = $this->getParam('filePath',true);
-        $catalogId = $this->getParam('catalogId',true);
-        $projectId = $this->getParam('projectId',true);
-        $ext = $this->getParam('ext',true);
-        $fileName = $this->getParam('fileName',true);
-        $mainPath  = md5($uid);
-        $typePath = '/'.md5($uid.$type);
-        $fileNameExist = AFile::find()->select('id')->where(['name'=>$fileName,'status'=>0])->scalar();
 
-        if ($fileNameExist){
-          $this->Error(Constants::FILES_ALREADY_EXIST,Constants::$error_message[Constants::FILES_ALREADY_EXIST]);
-        }
-
-        $uploadRes = \YII::$app->Aliyunoss->upload($fileName.$ext,$filePath);
-
-        if ($uploadRes['info'] && $uploadRes['info']['http_code'] == 200) {
-            $file = new AFile();
-            $file->uid = $uid;
-            $file->type = $type;
-            $file->name = $fileName;
-            $file->ext = $ext;
-            $file->path = $filePath;
-            $file->create_time = time();
-            $file->project_id = $projectId;
-            $file->catalog_id = $catalogId;
-
-            if ($file->insert()) {
-                $this->Success();
-            }
-        }
-
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-    }
-
-    
-    public function actionFileList(){
-        $uid = $this->getParam('userId',true);
-
-        $columns = '*';
-        $file = AFile::find()->select($columns)->where(['uid'=>$uid])->asArray()->all();
-
-        if (!$file){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-        }
-        $this->Success(['data'=>$file]);
-
-    }
-
-    public function actionDelFile()
-    {
-        $uid = $this->getParam('userId',true);
-        $fileId = $this->getParam('fileId',true);
-
-        $file = AFile::findOne(['id'=>$fileId,'uid'=>$uid,'status'=>0]);
-
-        if (!$file){
-            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
-        }
-        $delRes = \YII::$app->Aliyunoss->delete($file->name.$file->ext);
-
-        $file->status = 1;
-        if ($file->save(false)){
-            $this->Success();
-        }
-        $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
-
-    }
-*/
 
     public function actionTest()
     {
@@ -127,15 +55,16 @@ class FileController extends BasicController
         $fileUpload = new fileupload();
         $fileInfo = $fileUpload->getFileInfo($userId,$projectId);
         $commond = '';
+
         if (isset($fileInfo['status'])) {
             $small_img = '';
             $compress_img = '';
             if ($type == 3){
                 $houzhui = $fileInfo['fileInfo']['ext'];
-                $tupian = ['jpg','png','gif','jpeg','bmp'];
+                $tupian = ['jpg','png','gif','jpeg'];
                 $shipin = ['wmv','asf','asx','rm','rmvb','mpg','mpeg','mpe','3gp','mov','mp4','m4v','avi','dat','mkv','flv','vob'];
                 $yinpin = ['wav',  'mp3', 'cda', 'wma', 'ra'];
-                $biji = ['txt'];
+                $biji = ['txt','bmp'];
                 if(in_array($houzhui,$tupian))
                 {
                     $type = 1;

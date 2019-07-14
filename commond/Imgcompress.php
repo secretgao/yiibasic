@@ -57,7 +57,8 @@ class Imgcompress{
      */
     private function _thumpImage()
     {
-        ini_set('memory_limit','256M');
+      //  ini_set('memory_limit','256M');
+        ini_set('memory_limit','512M');
         $new_width = $this->imageinfo['width'] * $this->percent;
         $new_height = $this->imageinfo['height'] * $this->percent;
         $image_thump = imagecreatetruecolor($new_width,$new_height);
