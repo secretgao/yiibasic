@@ -300,9 +300,11 @@ class UserController extends BasicController
         }
 
         if($where){
-            $data=$ASecretaryTagModel->where($where)->asArray()->all();
+            $ASecretaryTagModel=$ASecretaryTagModel->where($where);
         }
-        
+
+        $data=$ASecretaryTagModel->asArray()->all();
+
 //        if(empty($userId)){
 //            //获取所有书记信息
 //            $data = ASecretaryTag::find()->select('id,name,position_ids')->asArray()->all();
