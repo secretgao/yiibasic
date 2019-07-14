@@ -219,7 +219,7 @@ class IndexController extends BasicController
         $page = $pageSize * ($pages - 1);
         $data = (new Query())->select('id')
             ->from('a_project')
-            ->offset($page)->limit($pageSize)->AsArray()->all();
+            ->offset($page)->limit($pageSize)->all();
 
 
         if (empty($data)) {
