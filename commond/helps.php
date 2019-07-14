@@ -628,14 +628,35 @@ class helps {
      */
     public static function projectFile($projectId)
     {
-        //项目决策资料
-        $data['policy_number']=self::projectFilePolicy($projectId,20166);
 
-        //项目管理资料
-        $data['administration_number']=self::projectFilePolicy($projectId,20167);
+        $data=['policy_number'=>0,'administration_number'=>0,'achievements_number'=>0];
 
-        //项目绩效资料
-        $data['achievements_number']=self::projectFilePolicy($projectId,20168);
+        $projectList=AProjectModel::find()->select('project_id,model_id')
+            ->where(['project_id'=>$projectId,'level'=>2])
+            ->asArray()->all();
+
+        if(!$projectList){
+            return $data;
+        }
+
+        $projectPolicy=Constants::$projectpolicy;
+
+        $policyIdArray=[];
+
+        foreach ($projectPolicy as$key=> $value){
+            $policyIdArray[]=$key;
+        }
+
+        foreach ($projectList as $item){
+
+            if (in_array($item['model_id'],$policyIdArray)){
+
+                //项目决策资料
+                $data[$projectPolicy[$item['model_id']]]=self::projectFilePolicy($projectId,$item['model_id']);
+
+            }
+
+        }
 
         return $data;
     }
@@ -644,22 +665,25 @@ class helps {
     //项目决策资料
     public static function projectFilePolicy($projectId,$model_id){
 
-        $ids=[];
+//        echo '<pre/>';
 
+        $ids=[];
         if($model_id){
             //三级
-            $childModelIds=AProjectModel::find()->select('project_id,model_id')
+            $childModelIds=AProjectModel::find()->select('id,project_id,model_id')
                 ->where(['model_pid'=>$model_id,'project_id'=>$projectId])
                 ->asArray()->all();
 
             if($childModelIds){
                 $ids=array_column($childModelIds, 'model_id');
                 if($childModelIds){
+
                     //四级
                     foreach ($childModelIds as $vo){
-                        $childModelIdsFour=AProjectModel::find()->select('project_id,model_id')
-                            ->where(['model_pid'=>$vo['model_id']])
+                        $childModelIdsFour=AProjectModel::find()->select('id,project_id,model_id')
+                            ->where(['model_pid'=>$vo['model_id'],'project_id'=>$projectId])
                             ->asArray()->all();
+//                        print_r($childModelIdsFour);exit;
                         if($childModelIdsFour){
                             $idsFour=array_column($childModelIdsFour, 'model_id');
                             $ids=array_merge($ids,$idsFour);
@@ -677,7 +701,7 @@ class helps {
         //查询已审核的文件数
         $fileCount=AFile::find()
             ->where(['in', 'catalog_id', $ids] )
-            ->andWhere(['status'=>1])
+            ->andWhere(['status'=>1,'project_id'=>$projectId])
             ->count('id');
 
 

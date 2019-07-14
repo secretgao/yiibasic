@@ -210,9 +210,9 @@ class IndexController extends BasicController
 
         set_time_limit(0);
 
-//        $update_data=Helps::projectFile(1677);
+//        $update_data=Helps::projectFile(1591);
 //        var_dump($update_data);exit;
-//        AProject::updateAll($update_data, ['id'=> 1677]);
+//        AProject::updateAll($update_data, ['id'=> 1591]);
 
         $pages = $this->getParam('p',false,1);
         $pageSize = 20;
