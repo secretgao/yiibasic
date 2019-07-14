@@ -168,7 +168,7 @@ class ProjectController extends BasicController
                         }
                         $manage_uid = AProjectExt::find()->select('uid')->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
                         $do_money = AProjectMoney::find()->select('money')->where(['project_id'=>$item['id']])->orderBy('create_time DESC')->asArray()->scalar();
-                        $completion_rate = empty($item[$do_money]) || empty($item['money']) ? 0 :round(($do_money ? $do_money : 0)/empty($item['money']) ? 0 : trim($item['money']),2)*100;
+                        $completion_rate = empty($do_money) || empty($item['money'] || ！($item['money'])) ? 0 :round(($do_money ? $do_money : 0)/ trim($item['money']),2)*100;
                         $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                         $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                         $item['status'] = intval($item['status']);
