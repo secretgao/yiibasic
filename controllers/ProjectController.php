@@ -173,6 +173,9 @@ class ProjectController extends BasicController
                         $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                         $item['status'] = intval($item['status']);
                         $item['members'] = intval($item['members']);
+                        $item['policy_number'] = intval($item['policy_number']);
+                        $item['administration_number'] = intval($item['administration_number']);
+                        $item['achievements_number'] = intval($item['achievements_number']);
                         $item['describe'] = $item['description'];
                         $item['used_time']  = $usedTime;
                         $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
@@ -211,6 +214,9 @@ class ProjectController extends BasicController
                     $data[$key]['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                     $data[$key]['status'] = intval($item['status']);
                     $data[$key]['members'] = intval($item['members']);
+                    $item['policy_number'] = intval($item['policy_number']);
+                    $item['administration_number'] = intval($item['administration_number']);
+                    $item['achievements_number'] = intval($item['achievements_number']);
                     $data[$key]['describe'] = $item['description'];
                     $data[$key]['used_time']  = $usedTime;
                     $data[$key]['manage_uid']  = $manage_uid ? $manage_uid : 0;
@@ -442,6 +448,9 @@ class ProjectController extends BasicController
                     $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                     $item['status'] = intval($item['status']);
                     $item['members'] = intval($item['members']);
+                    $item['policy_number'] = intval($item['policy_number']);
+                    $item['administration_number'] = intval($item['administration_number']);
+                    $item['achievements_number'] = intval($item['achievements_number']);
                     $item['describe'] = $item['description'];
                     $item['used_time']  = $usedTime;
                     $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
