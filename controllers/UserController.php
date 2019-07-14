@@ -285,12 +285,32 @@ class UserController extends BasicController
         if(empty($time)){//获取当前年份
             $time = date('Y',time());
         }
-        if(empty($userId)){
-            //获取所有书记信息
-            $data = ASecretaryTag::find()->select('id,name,position_ids')->asArray()->all();
-        }else{
-            $data = ASecretaryTag::find()->where(['user_id'=>$userId])->select('id,name,position_ids')->asArray()->all();
+
+        $where=[]; //条件查询
+        $ASecretaryTagModel=ASecretaryTag::find()->select('id,name,position_ids');
+
+        //user_id查询
+        if(!empty($userId)&&$userId>0){
+            $where['user_id']=$userId;
         }
+
+        //年份查询
+        if(!empty($time)&&$time>0){
+            $where['year']=$time;
+        }
+
+        if($where){
+            $data=$ASecretaryTagModel->where($where)->asArray()->all();
+        }
+        
+//        if(empty($userId)){
+//            //获取所有书记信息
+//            $data = ASecretaryTag::find()->select('id,name,position_ids')->asArray()->all();
+//        }else{
+//            $data = ASecretaryTag::find()->where(['user_id'=>$userId])->select('id,name,position_ids')->asArray()->all();
+//        }
+
+
         if (empty($data)) {
             $this->Success(['data'=>[]]);
         }
