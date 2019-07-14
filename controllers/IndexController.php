@@ -217,9 +217,9 @@ class IndexController extends BasicController
         $pages = $this->getParam('p',false,1);
         $pageSize = 20;
         $page = $pageSize * ($pages - 1);
-        $data = (new Query())->select('*')
-            ->from('a_project')//->where(['status' => 1])
-            ->offset($page)->limit($pageSize)->all();
+        $data = (new Query())->select('id')
+            ->from('a_project')
+            ->offset($page)->limit($pageSize)->AsArray()->all();
 
 
         if (empty($data)) {
@@ -233,6 +233,15 @@ class IndexController extends BasicController
 
         }
 
+        $this->Success(['data' => 'sucess']);
+    }
+
+
+    public function actionUpdateProjectFileById()
+    {
+        $projectId = $this->getParam('id',true);
+        $update_data=Helps::projectFile($projectId);
+        AProject::updateAll($update_data, ['id'=> $projectId]);
         $this->Success(['data' => 'sucess']);
 
     }
