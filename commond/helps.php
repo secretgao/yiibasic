@@ -687,6 +687,19 @@ class helps {
                         if($childModelIdsFour){
                             $idsFour=array_column($childModelIdsFour, 'model_id');
                             $ids=array_merge($ids,$idsFour);
+                            //五级
+                                 if($childModelIdsFour) {
+                                     foreach ($childModelIdsFour as $voo) {
+                                         $childModelIdsFive = AProjectModel::find()->select('id,project_id,model_id')
+                                             ->where(['model_pid' => $voo['model_id'], 'project_id' => $projectId])
+                                             ->asArray()->all();
+                                         if($childModelIdsFive) {
+                                             $idsFive = array_column($childModelIdsFive, 'model_id');
+                                             $ids = array_merge($ids, $idsFive);
+                                         }
+
+                                     }
+                                 }
                         }
                     }
                 }
@@ -699,14 +712,18 @@ class helps {
 //        print_r($ids);
 
         //查询已审核的文件数
-        $fileCount=AFile::find()
-            ->where(['in', 'catalog_id', $ids] )
-            ->andWhere(['status'=>1,'project_id'=>$projectId])
-            ->count('id');
+//        $fileCount=AFile::find()
+//            ->where(['in', 'catalog_id', $ids] )
+//            ->andWhere(['status'=>1,'project_id'=>$projectId])
+//            ->exists();
+        $fileCount=0;
+        foreach ($ids as $id) {
+            if(AFile::find()->where(['status'=>1,'project_id'=>$projectId,'catalog_id'=>$id])->exists()){
+                $fileCount++;
+            }
+        }
 
-
-        return $fileCount;
-
+        return !$fileCount?0:round($fileCount/sizeof($ids),4)*100;
     }
 
 }

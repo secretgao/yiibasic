@@ -168,21 +168,21 @@ class ProjectController extends BasicController
                         }
                         $manage_uid = AProjectExt::find()->select('uid')->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
                         $do_money = AProjectMoney::find()->select('money')->where(['project_id'=>$item['id']])->orderBy('create_time DESC')->asArray()->scalar();
-                        $completion_rate = empty($do_money) || empty($item['money'] || ！($item['money'])) ? 0 :round(($do_money ? $do_money : 0)/ trim($item['money']),2)*100;
+                        $completion_rate = empty($do_money) || empty($item['money'] || !($item['money'])) ? 0 :round(($do_money ? $do_money : 0)/ trim($item['money']),4)*100;
                         $item['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                         $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                         $item['status'] = intval($item['status']);
                         $item['members'] = intval($item['members']);
-                        $item['policy_number'] = intval($item['policy_number']);
-                        $item['administration_number'] = intval($item['administration_number']);
-                        $item['achievements_number'] = intval($item['achievements_number']);
+                        $item['policy_number'] = empty($item['policy_number']) || !$item['policy_number'] ? 0 : trim($item['policy_number']);
+                        $item['administration_number'] = empty($item['administration_number'] || !$item['administration_number']) ? 0 : trim($item['administration_number']);
+                        $item['achievements_number'] = empty($item['achievements_number']) || !$item['achievements_number']? 0 : trim($item['achievements_number']);
                         $item['describe'] = $item['description'];
                         $item['used_time']  = $usedTime;
                         $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
-                        $item['do_money']  = $do_money ? $do_money : 0;
+                        $item['do_money']  = $do_money ? round($do_money ,2): 0;
                         $item['completion_rate']  = $completion_rate;
-                        $item['finish_progress'] = $finish_progress;
-                        $item['money'] = empty($item['money']) ? 0 : trim($item['money']);
+                        $item['finish_progress'] = !$finish_progress?0:round($finish_progress,2);
+                        $item['money'] = empty($item['money']) ? 0 : round(trim($item['money']),2);
                         $item['concern_num'] = AProjectFollow::getFollowNum($item['id']);
                         $item['concern_state'] = AProjectFollow::getFollowNum($item['id'],$uid);
                         $newData[] = $item;
@@ -209,21 +209,21 @@ class ProjectController extends BasicController
                     }
                     $manage_uid = AProjectExt::find()->select('uid')->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
                     $do_money = AProjectMoney::find()->select('money')->where(['project_id'=>$item['id']])->orderBy('create_time DESC')->asArray()->scalar();
-                    $completion_rate = !$do_money || empty($item['money']) ? 0 :round(($do_money ? $do_money : 0)/empty($item['money']) ? 0 : trim($item['money']),2)*100;
+                    $completion_rate = !$do_money || empty($item['money']) ? 0 :round(($do_money ? $do_money : 0)/empty($item['money']) ? 0 : trim($item['money']),4)*100;
                     $data[$key]['start_time'] = date('Y-m-d H:i:s',$item['start_time']);
                     $data[$key]['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                     $data[$key]['status'] = intval($item['status']);
                     $data[$key]['members'] = intval($item['members']);
-                    $item['policy_number'] = intval($item['policy_number']);
-                    $item['administration_number'] = intval($item['administration_number']);
-                    $item['achievements_number'] = intval($item['achievements_number']);
+                    $item['policy_number'] = empty($item['policy_number']) || !$item['policy_number'] ? 0 : trim($item['policy_number']);
+                    $item['administration_number'] = empty($item['administration_number'] || !$item['administration_number']) ? 0 : trim($item['administration_number']);
+                    $item['achievements_number'] = empty($item['achievements_number']) || !$item['achievements_number']? 0 : trim($item['achievements_number']);
                     $data[$key]['describe'] = $item['description'];
                     $data[$key]['used_time']  = $usedTime;
                     $data[$key]['manage_uid']  = $manage_uid ? $manage_uid : 0;
-                    $data[$key]['do_money']  = $do_money ? $do_money : 0;
+                    $data[$key]['do_money']  = $do_money ? round($do_money,2) : 0;
                     $data[$key]['completion_rate']  = $completion_rate.'%';
-                    $data[$key]['finish_progress'] = $finish_progress;
-                    $data[$key]['money'] = empty($item['money']) ? 0 : trim($item['money']);
+                    $data[$key]['finish_progress'] = !$finish_progress?0:round($finish_progress,2);
+                    $data[$key]['money'] = empty($item['money']) ? 0 : round(trim($item['money']),2);
                     $data[$key]['concern_num'] = AProjectFollow::getFollowNum($item['id']);
                     $data[$key]['concern_state'] = AProjectFollow::getFollowNum($item['id'],$uid);
                     $projectAllStep = helps::getProjectModelAndCateLog($item['id']);
@@ -258,6 +258,7 @@ class ProjectController extends BasicController
         }
         foreach ($newData as $k=>$val){
             $total_achievements = 0;
+            $total_finish_progress = 0;
             $total_satisfaction_num = 0;
             $total_average = 0;
             $total_do_money = 0;
@@ -265,6 +266,7 @@ class ProjectController extends BasicController
             $group_money = 0;
             foreach ($val as $v){
                 $total_achievements += $v['achievements'];
+                $total_finish_progress += $v['finish_progress'];
                 $total_satisfaction_num += $v['satisfaction_num'];
                 $total_average += $v['average'];
                 $total_do_money += $v['do_money'];
@@ -284,13 +286,15 @@ class ProjectController extends BasicController
                 $newData1[] =[
                     'id'=>$groupInfo->id,
                     'name'=>$groupInfo->group_name,
-                    'money'=>$group_money,
-                    'achievements'=>$total_achievements,
+                    'money'=>round($group_money,2),
+                    'achievements'=>!sizeof($val)?0:round($total_achievements/sizeof($val),2),
                     'satisfaction_num'=>$total_satisfaction_num,
                     'average'=>$total_average,
-                    'do_money'=>$total_do_money,
-                    'completion_rate'=>$total_completion_rate,
-                    'projectList'=>$newData[$k],
+                    'do_money'=>round($total_do_money,2),
+                    'finish_progress'=>!sizeof($val)?0:round($total_finish_progress/sizeof($val),2),
+                    'completion_rate'=>empty($total_do_money) || empty($group_money || !($group_money)) ? 0: round($total_do_money/$group_money,4)*100,
+
+                'projectList'=>$newData[$k],
                 ];
             }
         }
@@ -308,22 +312,23 @@ class ProjectController extends BasicController
         $satisfaction_num = 0;
         $average = 0;
         $do_money = 0;
-        $completion_rate = 0;
+        $finish_progress = 0;
         foreach ($newData1 as $kk =>$vv){
             $achievements += $vv['achievements'];
             $satisfaction_num += $vv['satisfaction_num'];
+            $finish_progress += $vv['finish_progress'];
             $average += $vv['average'];
             $do_money += $vv['do_money'];
-            $completion_rate += $vv['completion_rate'];
             $money += $vv['money'];
         }
         $this->Success([
-            'money'=>$money,
-            'achievements'=>$achievements,
+            'money'=>round($money,2),
+            'achievements'=>!$projects?0:round($achievements/$projects,2),
             'satisfaction_num'=>$satisfaction_num,
-            'average'=>$average,
-            'do_money'=>$do_money,
-            'completion_rate'=>$completion_rate,
+            'average'=>!$projects?0:round($average/$projects,2),
+            'do_money'=>round($do_money,2),
+            'completion_rate'=>empty($do_money) || empty($money || !($money)) ? 0: round($do_money/$money,4)*100,
+            'finish_progress'=>!$projects?0:round($finish_progress/$projects,2),
             'data'=>$newData1,
             'isCertified'=>$isPosition,
             'totalSize'=>$projects,
@@ -430,7 +435,7 @@ class ProjectController extends BasicController
                     }
                     $manage_uid = AProjectExt::find()->select('uid')->where(['project_id'=>$item['id'],'is_manage'=>1])->asArray()->scalar();
                     $do_money = AProjectMoney::find()->select('money')->where(['project_id'=>$item['id']])->orderBy('create_time DESC')->asArray()->scalar();
-                    $completion_rate = !$do_money || empty($item['money']) ? 0 :round(($do_money ? $do_money : 0)/empty($item['money']) ? 0 : trim($item['money']),2)*100;
+                    $completion_rate = !$do_money || empty($item['money'] || empty($item['$do_money']) ? 0 :round($do_money /($item['money']),4))*100;
                     //项目所选模板数量
                     $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
                     $file_agree_num = 0;
@@ -448,9 +453,9 @@ class ProjectController extends BasicController
                     $item['allow_add'] = $item['allow_add'] == 1 ?  true : false;
                     $item['status'] = intval($item['status']);
                     $item['members'] = intval($item['members']);
-                    $item['policy_number'] = intval($item['policy_number']);
-                    $item['administration_number'] = intval($item['administration_number']);
-                    $item['achievements_number'] = intval($item['achievements_number']);
+                    $item['policy_number'] = empty($item['policy_number']) || !$item['policy_number'] ? 0 : trim($item['policy_number']);
+                    $item['administration_number'] = empty($item['administration_number'] || !$item['administration_number']) ? 0 : trim($item['administration_number']);
+                    $item['achievements_number'] = empty($item['achievements_number']) || !$item['achievements_number']? 0 : trim($item['achievements_number']);
                     $item['describe'] = $item['description'];
                     $item['used_time']  = $usedTime;
                     $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
@@ -697,6 +702,7 @@ class ProjectController extends BasicController
                     $fileId[] = $item['id'];
                     $item['path'] = trim($item['path'],'.');
                     $item['small_path'] = trim($item['small_path'],'.');
+                    $item['compress_path'] = trim($item['compress_path'],'.');
                     $item['creater'] = AUser::getName($item['uid']);
                     $item['time'] = date('Y-m-d',$item['create_time']);
 

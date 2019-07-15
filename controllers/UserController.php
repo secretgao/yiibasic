@@ -255,7 +255,7 @@ class UserController extends BasicController
 
         $data = AMessage::find()->select('*,FROM_UNIXTIME(create_time) as create_time')->orderBy('id desc')
             ->asArray()->all();
-        $this->Success(['data'=>$data]);
+        $this->Success(['data' => $data]);
     }
 
     /**
@@ -314,52 +314,116 @@ class UserController extends BasicController
 
 
         if (empty($data)) {
-            $this->Success(['data'=>[]]);
+            $this->Success(['data' => []]);
         }
-        foreach ($data as $key=>$item) {
-            $money = AProject::find()->where(['secretary_tag_id'=>$item['id']])->andWhere(['year'=>$time])->andWhere(['!=','status',4])->sum('money');
-            $money_year = AProject::find()->where(['year'=>$time])->andWhere(['!=','status',4])->sum('money');
+        //合计信息
+        $total_moneys_all = 0;
+        $total_finish_progress_all = 0;
+        $total_achievements_all = 0;
+        $do_money_all = 0;
+        $satisfaction_num_all = 0;
+        $average_all = 0;
+        foreach ($data as $key => $item) {
+            $money = AProject::find()->where(['secretary_tag_id' => $item['id']])->andWhere(['year' => $time])->andWhere(['!=', 'status', 4])->sum('money');
+            $money_year = AProject::find()->where(['year' => $time])->andWhere(['!=', 'status', 4])->sum('money');
             $ratio_total_money = 0;
-            if((int)$money_year != 0){
-                $ratio_total_money = round($money/$money_year,2)*100;
+            if ((int)$money_year != 0) {
+                $ratio_total_money = round($money / $money_year, 2) * 100;
             }
-            $num = AProject::find()->where(['secretary_tag_id'=>$item['id']])->andWhere(['year'=>$time])->andWhere(['=','status',2])->count();
-            $num_year = AProject::find()->where(['year'=>$time])->andWhere(['!=','status',4])->count();
+            $num = AProject::find()->where(['secretary_tag_id' => $item['id']])->andWhere(['year' => $time])->andWhere(['=', 'status', 2])->count();
+            $num_year = AProject::find()->where(['year' => $time])->andWhere(['!=', 'status', 4])->count();
             $ratio_projects_progress = 0;
-            if((int)$num_year != 0){
-                $ratio_projects_progress = round($num/$num_year,2)*100;
+            if ((int)$num_year != 0) {
+                $ratio_projects_progress = round($num / $num_year, 2) * 100;
             }
-            $positionArr = explode(',',$item['position_ids']);
-            $data[$key]['ratio_total_money'] = $ratio_total_money.'%';//该领导负责部门项目金额占总年度项目金额比例
-            $data[$key]['ratio_projects_progress'] = $ratio_projects_progress.'%';//该领导负责部门项目完成度占总年度项目比例
+            $positionArr = explode(',', $item['position_ids']);
+            $data[$key]['ratio_total_money'] = $ratio_total_money . '%';//该领导负责部门项目金额占总年度项目金额比例
+            $data[$key]['ratio_projects_progress'] = $ratio_projects_progress . '%';//该领导负责部门项目完成度占总年度项目比例
             $postionInfo = array();
             $projects = 0;
             $total_moneys = 0;
+            $total_finish_progress_s = 0;
+            $total_finish_progress = 0;
+            $total_achievements_s = 0;
+            $total_do_moneys = 0;
+            $total_do_money = 0;
+            $total_satisfaction_num = 0;
+            $total_average = 0;
             $order = array();
-            foreach ($positionArr as $k=>$v){
+            foreach ($positionArr as $k => $v) {
                 $position = APosition::findOne($v);
-                $project = AProject::find()->where(['position_id'=>$v])->andWhere(['year'=>$time])->andWhere(['!=','status',4])->count();
-                $total_money = AProject::find()->where(['position_id'=>$v])->andWhere(['year'=>$time])->andWhere(['!=','status',4])->sum('money');
+                $projectArry = AProject::find()->where(['position_id' => $v])->andWhere(['year' => $time])->andWhere(['!=', 'status', 4])->all();
+                $total_money = AProject::find()->where(['position_id' => $v])->andWhere(['year' => $time])->andWhere(['!=', 'status', 4])->sum('money');
+                $total_achievements = AProject::find()->where(['position_id' => $v])->andWhere(['year' => $time])->andWhere(['!=', 'status', 4])->sum('achievements');
+
+
+                foreach ($projectArry as $project) {
+                    $do_money = AProjectMoney::find()->select('money')->where(['project_id' => $project['id']])->orderBy('create_time DESC')->asArray()->scalar();
+                    $total_do_money += $do_money;
+
+                    $file_agree_num = AProject::find()->select('file_agree_num')->where(['id' => $project['id']])->asArray()->scalar();
+                    $model_num = AProject::find()->select('model_num')->where(['id' => $project['id']])->asArray()->scalar();
+                    //项目进度
+                    $finish_progress =round($file_agree_num / $model_num,4)*100 ;
+                    $total_finish_progress += $finish_progress;
+
+                }
                 $dt = [
-                    "id"=> $position->id,
-                    "name"=> $position->name,
-                    "projects"=>$project,
-                    "total_money"=>round($total_money,2),
-                    "sort_id"=>$position->sort_id,
+                    "id" => $position->id,
+                    "name" => $position->name,
+                    "projects" => sizeof($projectArry),
+                    "total_money" => round($total_money, 2),
+                    "satisfaction_num" => round($total_satisfaction_num, 2),
+                    "average" => round($total_average, 2),
+                    "total_do_money" => empty($total_do_money) ? 0 : round($total_do_money, 2),
+                    "completion_rate" => empty($total_do_money) || empty($total_money) || !($total_money) ? 0 : round($total_do_money / $total_money, 4) * 100,
+                    "sort_id" => $position->sort_id,
+
+                    "finish_progress" =>!sizeof($projectArry)?0:round($total_finish_progress/sizeof($projectArry),2),
+                    "achievements" =>!sizeof($projectArry)?0:round($total_achievements/sizeof($projectArry),2),
+
                 ];
-                array_push($postionInfo,$dt);
-                array_push($order,$position->sort_id);
-                $projects += $project;
+                array_push($postionInfo, $dt);
+                array_push($order, $position->sort_id);
+                $projects += sizeof($projectArry);
                 $total_moneys += $total_money;
+                $total_do_moneys += $total_do_money;
+                $total_finish_progress_s+=!sizeof($projectArry)?0:round($total_finish_progress/sizeof($projectArry),2);
+                $total_achievements_s+=!sizeof($projectArry)?0:round($total_achievements/sizeof($projectArry),2);
+                $total_do_money = 0;
+                $total_achievements = 0;
+                $total_finish_progress = 0;
 
             }
-            array_multisort($order,SORT_ASC,$postionInfo);
+            $total_moneys_all+=$total_moneys;
+            $total_finish_progress_all+=!sizeof($positionArr)?0:round($total_finish_progress_s/sizeof($positionArr),2);
+            $total_achievements_all+=!sizeof($positionArr)?0:round($total_achievements_s/sizeof($positionArr),2);
+            $do_money_all+=$total_do_moneys;
+            array_multisort($order, SORT_ASC, $postionInfo);
             $data[$key]['projects'] = $projects;
-            $data[$key]['total_money'] = round($total_moneys,2);
+            $data[$key]['satisfaction_num'] = $total_satisfaction_num;
+            $data[$key]['average'] = $total_average;
+            $data[$key]['total_money'] = round($total_moneys, 2);
+            $data[$key]['total_do_money'] = round($total_do_moneys, 2);
+            $data[$key]['finish_progress'] = !sizeof($positionArr)?0:round($total_finish_progress_s/sizeof($positionArr),2);
+            $data[$key]['achievements'] = !sizeof($positionArr)?0:round($total_achievements_s/sizeof($positionArr),2);
             $data[$key]['departments'] = $postionInfo;
+            $data[$key]['completion_rate'] = empty($total_do_moneys) || empty($total_moneys) || !($total_moneys) ? 0 : round($total_do_moneys / $total_moneys, 4) * 100;
             unset($data[$key]['position_ids']);
+
         }
-        $this->Success(['data'=>$data]);
+        $this->Success(['data' => $data,
+                //        'achievements'=>$achievements,
+                'satisfaction_num'=>$satisfaction_num_all,
+                'average'=>$average_all,
+                'total_money' =>round($total_moneys_all,2) ,
+                'projects' => sizeof($data),
+                'total_do_money' => round($do_money_all,2),
+
+                'finish_progress' => !sizeof($data)?0:round($total_finish_progress_all/sizeof($data),2),
+                'achievements' => !sizeof($data)?0:round($total_achievements_all/sizeof($data),2),
+                'completion_rate' => empty($total_moneys_all) || empty($do_money_all || !($total_moneys_all)) ? 0 : round($do_money_all / $total_moneys_all, 4) * 100,]
+        );
     }
 
 }
