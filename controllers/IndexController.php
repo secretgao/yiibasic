@@ -183,7 +183,7 @@ class IndexController extends BasicController
             helps::img_create_small($item['path'],150,120, $small_img);
 
             //生成压缩图
-            $compress_img =  $fileUploadDir.DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$item['uid'].'.'.$item['ext'];
+            $compress_img =  $fileUploadDir.DIRECTORY_SEPARATOR.uniqid().'ys'.$item['uid'].'.'.$item['ext'];
             $source = iconv("UTF-8", "GBK", $item['path']);
             $dst_img = $compress_img;//压缩后图片的名称
             $percent = 1;  #原图压缩，不缩放，但体积大大降低
