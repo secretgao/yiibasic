@@ -88,7 +88,7 @@ class FileController extends BasicController
                 helps::img_create_small($fileInfo['fileInfo']['path'],150,120, $small_img);
 
                 //生成压缩图
-                $compress_img =  $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').'ys'.$userId.'.'.$fileInfo['fileInfo']['ext'];
+                $compress_img =  $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.uniqid().'ys'.$userId.'.'.$fileInfo['fileInfo']['ext'];
                 $source = iconv("UTF-8", "GBK", $fileInfo['fileInfo']['path']);
                 $dst_img = $compress_img;//压缩后图片的名称
                 $percent = 1;  #原图压缩，不缩放，但体积大大降低
