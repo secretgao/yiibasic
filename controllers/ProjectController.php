@@ -177,6 +177,9 @@ class ProjectController extends BasicController
                         $item['administration_number'] = empty($item['administration_number'] || !$item['administration_number']) ? 0 : trim($item['administration_number']);
                         $item['achievements_number'] = empty($item['achievements_number']) || !$item['achievements_number']? 0 : trim($item['achievements_number']);
                         $item['describe'] = $item['description'];
+                        $item['achievements'] = !intval($item['achievements'])?"":$item['achievements'];
+                        $item['satisfaction_num'] = !$item['satisfaction_num']?0:$item['satisfaction_num'];
+                        $item['average'] = !intval($item['average'])?0:$item['average'];
                         $item['used_time']  = $usedTime;
                         $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
                         $item['do_money']  = $do_money ? round($do_money ,2): 0;
@@ -219,6 +222,10 @@ class ProjectController extends BasicController
                     $item['achievements_number'] = empty($item['achievements_number']) || !$item['achievements_number']? 0 : trim($item['achievements_number']);
                     $data[$key]['describe'] = $item['description'];
                     $data[$key]['used_time']  = $usedTime;
+                    $data[$key]['achievements']  = !intval($item['achievements'])?"":$item['achievements'];
+                    $data[$key]['satisfaction_num'] = !$item['satisfaction_num']?0:$item['satisfaction_num'];
+                    $data[$key]['average'] = !$item['average']?0:$item['average'];
+
                     $data[$key]['manage_uid']  = $manage_uid ? $manage_uid : 0;
                     $data[$key]['do_money']  = $do_money ? round($do_money,2) : 0;
                     $data[$key]['completion_rate']  = $completion_rate.'%';
@@ -256,6 +263,10 @@ class ProjectController extends BasicController
         foreach ($data as $key => $value){
             $newData[$value['group']][] = $value;
         }
+        //绩效考核评分不为0的项目数量
+        $projects_achievement_no_0=0;
+        //满意度人数不为0的项目数量
+        $projects_satisfaction_num_no_0=0;
         foreach ($newData as $k=>$val){
             $total_achievements = 0;
             $total_finish_progress = 0;
@@ -263,8 +274,15 @@ class ProjectController extends BasicController
             $total_average = 0;
             $total_do_money = 0;
             $total_completion_rate = 0;
+            //绩效考核评分不为0的组内项目数量
+            $projects_achievement_no_0_group=0;
+            //满意度问卷人数不为0的项目数量
+            $projects_satisfaction_num_no_0_group=0;
             $group_money = 0;
             foreach ($val as $v){
+                $projects_achievement_no_0_group+=(empty($v['achievements']) || (!intval($v['achievements'])?0:1));
+                $projects_satisfaction_num_no_0_group+=(intval($v['average'])?0:1);
+
                 $total_achievements += $v['achievements'];
                 $total_finish_progress += $v['finish_progress'];
                 $total_satisfaction_num += $v['satisfaction_num'];
@@ -287,15 +305,21 @@ class ProjectController extends BasicController
                     'id'=>$groupInfo->id,
                     'name'=>$groupInfo->group_name,
                     'money'=>round($group_money,2),
-                    'achievements'=>!sizeof($val)?0:round($total_achievements/sizeof($val),2),
+                    'projects_achievement_no_0'=>$projects_achievement_no_0_group,
+                    'achievements'=> (!intval($total_achievements) || !$projects_achievement_no_0_group)?0:round($total_achievements/$projects_achievement_no_0_group,2),
                     'satisfaction_num'=>$total_satisfaction_num,
-                    'average'=>$total_average,
+                    'average'=> (!intval($total_average) || !$total_average)?0:round($total_average/sizeof($newData[$k]),2),
                     'do_money'=>round($total_do_money,2),
                     'finish_progress'=>!sizeof($val)?0:round($total_finish_progress/sizeof($val),2),
                     'completion_rate'=>empty($total_do_money) || empty($group_money || !($group_money)) ? 0: round($total_do_money/$group_money,4)*100,
 
-                'projectList'=>$newData[$k],
+                    'projectList'=>$newData[$k],
                 ];
+                $projects_achievement_no_0+=$projects_achievement_no_0_group;
+//                $projects_satisfaction_num_no_0+=$projects_satisfaction_num_no_0_group;
+                $projects_achievement_no_0_group=0;
+                $projects_satisfaction_num_no_0_group=0;
+                $total_achievements=0;
             }
         }
         foreach ($newData1 as $value){
@@ -313,19 +337,31 @@ class ProjectController extends BasicController
         $average = 0;
         $do_money = 0;
         $finish_progress = 0;
+
         foreach ($newData1 as $kk =>$vv){
             $achievements += $vv['achievements'];
             $satisfaction_num += $vv['satisfaction_num'];
             $finish_progress += $vv['finish_progress'];
             $average += $vv['average'];
+
+            $projects_achievement_no_0+=(!intval($vv['achievements'])?0:1);
+            $projects_satisfaction_num_no_0+=(!intval($vv['average'])?0:1);
+            if(!empty($vv['projectList']) && sizeof($vv['projectList'])){
+                //去掉分组数量（只保留具体项目数量）
+                $projects_achievement_no_0-=1;
+//                $projects_satisfaction_num_no_0-=1;
+            }
             $do_money += $vv['do_money'];
             $money += $vv['money'];
         }
         $this->Success([
             'money'=>round($money,2),
-            'achievements'=>!$projects?0:round($achievements/$projects,2),
+            'achievements'=>!intval($projects_achievement_no_0) || !$projects?0:round($achievements/$projects_achievement_no_0,2),
             'satisfaction_num'=>$satisfaction_num,
-            'average'=>!$projects?0:round($average/$projects,2),
+            'projects_achievement_no_0'=>$projects_achievement_no_0,
+            '$projects_satisfaction_num_no_0'=>$projects_satisfaction_num_no_0,
+            '$average'=>$average,
+            'average'=>!$projects_satisfaction_num_no_0?0:round($average/$projects_satisfaction_num_no_0,2),
             'do_money'=>round($do_money,2),
             'completion_rate'=>empty($do_money) || empty($money || !($money)) ? 0: round($do_money/$money,4)*100,
             'finish_progress'=>!$projects?0:round($finish_progress/$projects,2),
@@ -457,6 +493,8 @@ class ProjectController extends BasicController
                     $item['administration_number'] = empty($item['administration_number'] || !$item['administration_number']) ? 0 : trim($item['administration_number']);
                     $item['achievements_number'] = empty($item['achievements_number']) || !$item['achievements_number']? 0 : trim($item['achievements_number']);
                     $item['describe'] = $item['description'];
+                    $item['achievements'] = !intval($item['achievements'])?0:$item['achievements'];
+                    $item['satisfaction_num'] = !$item['satisfaction_num']?0:$item['satisfaction_num'];
                     $item['used_time']  = $usedTime;
                     $item['manage_uid']  = $manage_uid ? $manage_uid : 0;
                     $item['model_num'] = $model_num;
@@ -1172,12 +1210,15 @@ class ProjectController extends BasicController
                 //查出所属目录的所有直属上级
                 $title = helps::getParents($key);
                 $tmp = [];
-                foreach ($title as $v){
-                    $tmp[$v['id']]=$v['name'];
+                if(is_array($title)){
+                    foreach ($title as $v){
+                        $tmp[$v['id']]=$v['name'];
+                    }
+                    sort($tmp);
+                    //把数组上级 分隔成字符串
+                    $foler = implode('/',$tmp);
                 }
-                sort($tmp);
-                //把数组上级 分隔成字符串
-                $foler = implode('/',$tmp);
+
             }
 
             $result[]=[

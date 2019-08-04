@@ -31,7 +31,25 @@ class helps {
         }
         return $tree;
    }
-    
+    static function makeProjecttree($arr)
+    {
+        $refer = array();
+        $tree = array();
+        foreach($arr as $k => $v){
+            $refer[$v['model_id']] = & $arr[$k]; //创建主键的数组引用
+        }
+        foreach($arr as $k => $v){
+            $pid = $v['model_pid'];  //获取当前分类的父级id
+            if($pid == 0){
+                $tree[] = & $arr[$k];  //顶级栏目
+            }else{
+                if(isset($refer[$pid])){
+                    $refer[$pid]['nodeList'][] = & $arr[$k]; //如果存在父级栏目，则添加进父级栏目的子栏目数组中
+                }
+            }
+        }
+        return $tree;
+    }
    static function getson($arr,$pid=0,$level)
    {
         static $res;//静态变量 只会被初始化一次
@@ -48,7 +66,22 @@ class helps {
         }
         return $res;
    }
-    
+    static function getProjectSon($arr,$model_pid=0,$level)
+    {
+        static $res;//静态变量 只会被初始化一次
+        foreach($arr as $k=>$v){
+            $ctid = intval($v['model_pid']);
+            $cid = intval($v['model_id']);
+            if($ctid === $model_pid){
+                $tmp = $v;
+                $tmp['level'] = $level;
+                $tmp['type']  = 0;
+                $res[] = $tmp;
+                self::getProjectSon($arr,$cid,$level+1);
+            }
+        }
+        return $res;
+    }
     /**
      * 根据子目录查找 父级
      * @param unknown $id

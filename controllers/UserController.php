@@ -323,6 +323,7 @@ class UserController extends BasicController
         $do_money_all = 0;
         $satisfaction_num_all = 0;
         $average_all = 0;
+        $projects_all = 0;
         foreach ($data as $key => $item) {
             $money = AProject::find()->where(['secretary_tag_id' => $item['id']])->andWhere(['year' => $time])->andWhere(['!=', 'status', 4])->sum('money');
             $money_year = AProject::find()->where(['year' => $time])->andWhere(['!=', 'status', 4])->sum('money');
@@ -373,14 +374,14 @@ class UserController extends BasicController
                     "name" => $position->name,
                     "projects" => sizeof($projectArry),
                     "total_money" => round($total_money, 2),
-                    "satisfaction_num" => round($total_satisfaction_num, 2),
-                    "average" => round($total_average, 2),
+                    "satisfaction_num" => !intval($total_satisfaction_num)?0:$total_satisfaction_num,
+                    "average" => !intval($total_average)?0:$total_average,
                     "total_do_money" => empty($total_do_money) ? 0 : round($total_do_money, 2),
                     "completion_rate" => empty($total_do_money) || empty($total_money) || !($total_money) ? 0 : round($total_do_money / $total_money, 4) * 100,
                     "sort_id" => $position->sort_id,
 
-                    "finish_progress" =>!sizeof($projectArry)?0:round($total_finish_progress/sizeof($projectArry),2),
-                    "achievements" =>!sizeof($projectArry)?0:round($total_achievements/sizeof($projectArry),2),
+                    "finish_progress" =>!intval($total_finish_progress) || !sizeof($projectArry)?0:round($total_finish_progress/sizeof($projectArry),2),
+                    "achievements" =>!intval($total_achievements) ||!sizeof($projectArry)?0:round($total_achievements/sizeof($projectArry),2),
 
                 ];
                 array_push($postionInfo, $dt);
@@ -399,30 +400,31 @@ class UserController extends BasicController
             $total_finish_progress_all+=!sizeof($positionArr)?0:round($total_finish_progress_s/sizeof($positionArr),2);
             $total_achievements_all+=!sizeof($positionArr)?0:round($total_achievements_s/sizeof($positionArr),2);
             $do_money_all+=$total_do_moneys;
+            $projects_all+=$projects;
             array_multisort($order, SORT_ASC, $postionInfo);
             $data[$key]['projects'] = $projects;
-            $data[$key]['satisfaction_num'] = $total_satisfaction_num;
-            $data[$key]['average'] = $total_average;
+            $data[$key]['satisfaction_num'] = !intval($total_satisfaction_num)?0:$total_satisfaction_num;
+            $data[$key]['average'] = !intval($total_average)?0:$total_average;
             $data[$key]['total_money'] = round($total_moneys, 2);
             $data[$key]['total_do_money'] = round($total_do_moneys, 2);
             $data[$key]['finish_progress'] = !sizeof($positionArr)?0:round($total_finish_progress_s/sizeof($positionArr),2);
-            $data[$key]['achievements'] = !sizeof($positionArr)?0:round($total_achievements_s/sizeof($positionArr),2);
+            $data[$key]['achievements'] =!intval($total_achievements_s) || !sizeof($positionArr)?0:round($total_achievements_s/sizeof($positionArr),2);
             $data[$key]['departments'] = $postionInfo;
-            $data[$key]['completion_rate'] = empty($total_do_moneys) || empty($total_moneys) || !($total_moneys) ? 0 : round($total_do_moneys / $total_moneys, 4) * 100;
+            $data[$key]['completion_rate'] = empty($total_do_moneys) || empty($total_moneys) || !intval($total_moneys) ? 0 : round($total_do_moneys / $total_moneys, 4) * 100;
             unset($data[$key]['position_ids']);
 
         }
         $this->Success(['data' => $data,
                 //        'achievements'=>$achievements,
-                'satisfaction_num'=>$satisfaction_num_all,
-                'average'=>$average_all,
+                'satisfaction_num'=>!intval($satisfaction_num_all)?0:$satisfaction_num_all,
+                'average'=>!intval($average_all)?0:$average_all,
                 'total_money' =>round($total_moneys_all,2) ,
-                'projects' => sizeof($data),
+                'projects' => $projects_all,
                 'total_do_money' => round($do_money_all,2),
 
                 'finish_progress' => !sizeof($data)?0:round($total_finish_progress_all/sizeof($data),2),
-                'achievements' => !sizeof($data)?0:round($total_achievements_all/sizeof($data),2),
-                'completion_rate' => empty($total_moneys_all) || empty($do_money_all || !($total_moneys_all)) ? 0 : round($do_money_all / $total_moneys_all, 4) * 100,]
+                'achievements' => !intval($total_achievements_all) || !sizeof($data)?0:round($total_achievements_all/sizeof($data),2),
+                'completion_rate' => empty($total_moneys_all) || empty($do_money_all || !intval($total_moneys_all)) ? 0 : round($do_money_all / $total_moneys_all, 4) * 100,]
         );
     }
 

@@ -118,21 +118,22 @@ class FileController extends BasicController
             $file->exif_longitude = $exifLongitude;
             $file->gps_latitude = $gpsLatitude;
             $file->gps_longitude = $gpsLongitude;
+            $file->status = 1;
             $file->remark = $comments;
             if ($file->save(false)) {
                 $arr = [];
-                helps::uploadFileUpdateProjectModel($projectId,$catalogId,$arr);
-                $msg = '上传文件:'.$fileInfo['fileInfo']['name'];
-                helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
-                $this->Success(array_merge($fileInfo,array('project_id'=>$projectId),array('catalog_id'=>$catalogId),array('commond'=>$commond)));
+                helps::uploadFileUpdateProjectModel($projectId, $catalogId, $arr);
+                $msg = '上传文件:' . $fileInfo['fileInfo']['name'];
+                helps::writeLog(Constants::OPERATION_FILE, $msg, $userId);
+//              $this->Success(array_merge($fileInfo, array('project_id' => $projectId), array('catalog_id' => $catalogId), array('commond' => $commond)));
+                $this->Success(array_merge($fileInfo, array('project_id' => $projectId), array('catalog_id' => $catalogId), array('commond' => $commond)));
+                $this->checkFileAdopt($projectId,$catalogId);
             } else {
-                $this->Error(Constants::RET_ERROR,$file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
+                $this->Error(Constants::RET_ERROR, $file->getErrors());//Constants::$error_message[Constants::RET_ERROR]
             }
         }
-        $this->Error($fileInfo['errorId'],$fileInfo['errorMsg']);
+        $this->Error($fileInfo['errorId'], $fileInfo['errorMsg']);
     }
-
-
 
     /**
      * 用户上传过的列表
@@ -302,6 +303,28 @@ class FileController extends BasicController
         } else {
             $this->Error(Constants::RET_ERROR,Constants::$error_message[Constants::RET_ERROR]);
         }
+    }
+
+    /**
+     * 默认审核文件通过
+     * @return array
+     */
+    public function checkFileAdopt($projectId, $catalog_id)
+    {
+        $project = AProject::find()
+            ->where(['id' => $projectId])
+            ->andwhere(['<>', 'status', 4])
+            ->one();
+        if (!$project) {
+            $this->Error(Constants::PROJECT_NOT_FOUND, Constants::$error_message[Constants::PROJECT_NOT_FOUND]);
+        }
+
+        $fileNum = intval($project->file_agree_num);
+        $arr = [];
+        helps::uploadFileUpdateProjectModel($projectId, $catalog_id, $arr);
+
+        $project->file_agree_num = $fileNum + 1;
+        $project->save(false);
     }
 
     /**

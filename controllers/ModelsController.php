@@ -44,7 +44,33 @@ class ModelsController extends BasicController
         }
         $this->Success(['data'=>$data]);
     }
+    /**
+     * http://www.api.com/position/project-index
+     * 获取
+     */
+    public function actionProjectIndex(){
+        // $this->isPost();
 
+        $uid = $this->getParam('userId',true);
+        $project_id = $this->getParam('project_id',true);
+
+
+        $data = AProjectModel::find()
+            ->where(['project_id'=>$project_id])->asArray()->all();
+//        var_dump($data);
+//        exit();
+        if (empty($data)){
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        $new = Helps::getProjectSon($data,0,1);
+        $result = Helps::makeProjecttree($new);
+        foreach ($result as $key =>$value){
+            unset($result[$key]);
+            $data = $value;
+        }
+        $this->Success(['data'=>$data]);
+    }
     /**
      *  添加
      * http://www.api.com/models/add
