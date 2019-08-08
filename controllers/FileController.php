@@ -84,7 +84,7 @@ class FileController extends BasicController
             }
             //生成图片缩略图
             if ($type == 1) {
-                $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.'.$fileInfo['fileInfo']['ext'];
+                $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.uniqid().'sg'.$userId.'.'.$fileInfo['fileInfo']['ext'];
                 helps::img_create_small($fileInfo['fileInfo']['path'],150,120, $small_img);
 
                 //生成压缩图
@@ -96,7 +96,7 @@ class FileController extends BasicController
 
             } elseif ($type == 2) {
                //生成视频 缩略图
-                $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.date('YmdHis').$userId.'.jpg';
+                $small_img = $fileInfo['fileInfo']['uploadDir'].DIRECTORY_SEPARATOR.uniqid().'sg'.$userId.'.jpg';
                 $commond = "/usr/local/ffmpeg/bin/ffmpeg -i {$fileInfo['fileInfo']['path']} -y -f mjpeg -ss 2 -t 0.001 -s 150*120 {$small_img}";
                 shell_exec($commond);
             }

@@ -45,14 +45,14 @@ class ModelsController extends BasicController
         $this->Success(['data'=>$data]);
     }
     /**
-     * http://www.api.com/position/project-index
+     * http://www.api.com/models/project-index
      * 获取
      */
     public function actionProjectIndex(){
         // $this->isPost();
 
         $uid = $this->getParam('userId',true);
-        $project_id = $this->getParam('project_id',true);
+        $project_id = $this->getParam('projectId',true);
 
 
         $data = AProjectModel::find()

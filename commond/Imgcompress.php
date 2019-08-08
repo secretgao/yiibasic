@@ -39,6 +39,7 @@ class Imgcompress{
      */
     private function _openImage()
     {
+//        ini_set("gd.jpeg_ignore_warning", 1);
 
 //var_dump($this->src);exit();
         list($width, $height, $type, $attr) = getimagesize($this->src);
@@ -58,7 +59,7 @@ class Imgcompress{
     private function _thumpImage()
     {
       //  ini_set('memory_limit','256M');
-        ini_set('memory_limit','512M');
+        ini_set('memory_limit','1024M');
         $new_width = $this->imageinfo['width'] * $this->percent;
         $new_height = $this->imageinfo['height'] * $this->percent;
         $image_thump = imagecreatetruecolor($new_width,$new_height);

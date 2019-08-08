@@ -13,9 +13,9 @@ return [
     'version' =>[
         1=>'1.6.1',   //ios
         2=>[
-            'num'=> '2.2.2',   //安卓
-            'url'=> 'http://www.sycalc.com.cn/uploads/install/app-sign-222.apk',
-            'message'=>"显示优化，bug处理",
+            'num'=> '2.3.1',   //安卓
+            'url'=> 'http://www.sycalc.com.cn/uploads/install/app-sign-231.apk',
+            'message'=>"项目首页显示模板结构，可直接查询相应目录",
         ]
     ],
 

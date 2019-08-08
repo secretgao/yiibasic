@@ -72,6 +72,10 @@ class helps {
         foreach($arr as $k=>$v){
             $ctid = intval($v['model_pid']);
             $cid = intval($v['model_id']);
+            $model = AModel::find()->select('name,remark')
+                ->where(['id'=>$cid,'status'=>0])->asArray()->one();
+            $v['name']=$model['name'];
+            $v['remark']=$model['remark'];
             if($ctid === $model_pid){
                 $tmp = $v;
                 $tmp['level'] = $level;
@@ -548,8 +552,13 @@ class helps {
      *
      */
     public  static function img_create_small($big_img, $width, $height, $small_img) {//原始大图地址，缩略图宽度，高度，缩略图地址
+//        ini_set("gd.jpeg_ignore_warning", 1);
+//        ini_set('gd.jpeg_ignore_warning', 1);
+
+        ini_set("memory_limit", "1024M");
         $big_img = iconv("UTF-8", "GBK", $big_img);   //先转换名字为GBK编码
         $imgage = getimagesize($big_img); //得到原始大图片
+
         switch ($imgage[2]) { // 图像类型判断
             case 1:
                 $im = imagecreatefromgif($big_img);

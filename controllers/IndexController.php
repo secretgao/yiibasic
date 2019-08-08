@@ -158,10 +158,10 @@ class IndexController extends BasicController
         ini_set("gd.jpeg_ignore_warning", 1);
         $file = AFile::find()
             ->select('id,uid,path,compress_path,ext')
-            ->where(['type'=>1,'compress_path'=>''])
+            ->where(['type'=>1])
             ->offset($page)->limit($pageSize)
             ->asArray()->all();
-        var_dump($file);
+//        var_dump($file);
 //exit();
         if (empty($file)) {
             $this->Success(['data' => '0']);
@@ -179,7 +179,7 @@ class IndexController extends BasicController
             if (!file_exists($fileUploadDir)){
                 mkdir($fileUploadDir,0777,true);
             }
-            $small_img = $fileUploadDir.DIRECTORY_SEPARATOR.date('YmdHis').$item['uid'].'.'.$item['ext'];
+            $small_img = $fileUploadDir.DIRECTORY_SEPARATOR.uniqid().'sg'.$item['uid'].'.'.$item['ext'];
             helps::img_create_small($item['path'],150,120, $small_img);
 
             //生成压缩图
