@@ -33,18 +33,40 @@ class helps {
    }
     static function makeProjecttree($arr)
     {
+//
+//        var_dump("<pre>");
+//
+//        var_dump($arr);
+//
+//        exit();
+        //存储不排序的模板
         $refer = array();
+        //存储需要排序的模板
+        $tempSort=array();
+        //合并数组
+        $tempMerge=array();
+        //返回数据
         $tree = array();
         foreach($arr as $k => $v){
-            $refer[$v['model_id']] = & $arr[$k]; //创建主键的数组引用
+            if($v['sort_id']){
+                $tempSort[$v['model_id']] = & $arr[$k];
+            }else{
+                $refer[$v['model_id']] = & $arr[$k]; //创建主键的数组引用
+            }
         }
-        foreach($arr as $k => $v){
+        if($tempSort){
+            usort($tempSort, function($a, $b) {
+                return bccomp($a['sort_id'],$b['sort_id']);});
+            $tempMerge=array_merge($refer,$tempSort);
+        }
+
+        foreach($tempMerge as $k => $v){
             $pid = $v['model_pid'];  //获取当前分类的父级id
             if($pid == 0){
-                $tree[] = & $arr[$k];  //顶级栏目
+                $tree[] = & $tempMerge[$k];  //顶级栏目
             }else{
                 if(isset($refer[$pid])){
-                    $refer[$pid]['nodeList'][] = & $arr[$k]; //如果存在父级栏目，则添加进父级栏目的子栏目数组中
+                    $refer[$pid]['nodeList'][] = & $tempMerge[$k]; //如果存在父级栏目，则添加进父级栏目的子栏目数组中
                 }
             }
         }
@@ -72,10 +94,11 @@ class helps {
         foreach($arr as $k=>$v){
             $ctid = intval($v['model_pid']);
             $cid = intval($v['model_id']);
-            $model = AModel::find()->select('name,remark')
+            $model = AModel::find()->select('name,remark,sort_id')
                 ->where(['id'=>$cid,'status'=>0])->asArray()->one();
             $v['name']=$model['name'];
             $v['remark']=$model['remark'];
+            $v['sort_id']=$model['sort_id'];
             if($ctid === $model_pid){
                 $tmp = $v;
                 $tmp['level'] = $level;
@@ -408,6 +431,7 @@ class helps {
 
     /**
      * 获取项目最底层模版所属文件已通过的数量
+     * 去除已设置不计入完成度模板
      * @param $projectId
      * @param $catalog_id_arr
      * @return int|string
@@ -470,6 +494,8 @@ class helps {
 
     /**
      * 根据项目id获取项目最底层模版数量
+     * 去除已设置不计入完成度模板
+
      * @param $projectId
      */
     public static function getProjectModelBottomNum($projectId){
@@ -482,7 +508,7 @@ class helps {
         //获取这个项目的所有模版
         $all = AProjectModel::find()
             ->select('model_id,model_pid,level')
-            ->where(['project_id'=>$projectId,'type'=>0,'status'=>0])
+            ->where(['project_id'=>$projectId,'type'=>0,'status'=>0,'is_master_look'=>0])
             ->asArray()->all();
 
         $result = [];

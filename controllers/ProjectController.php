@@ -476,7 +476,7 @@ class ProjectController extends BasicController
                     $catalog_id_arr = helps::getProjectModelBottomNum($item['id']);
                     $file_agree_num = 0;
                     $finish_progress = 0;
-                    $model_num = count($catalog_id_arr);
+                    $model_num = intval($item['model_num']);
                     if ($model_num) {
                         //项目通过文件数量
                         $file_agree_num = (int)helps::getProjectAgreeFileNum($item['id'],$catalog_id_arr);
@@ -673,7 +673,7 @@ class ProjectController extends BasicController
         $parentId = $this->getParam('parentId',true);
 
         //获取项目创建人员
-        $project = AProject::find()->select('create_uid,model_id')
+        $project = AProject::find()->select('create_uid,model_id,short_name')
             ->where(['id'=>$projectId])
             ->andWhere(['<>','status',4])
             ->asArray()->one();
@@ -734,10 +734,12 @@ class ProjectController extends BasicController
                     'project_id'=>$projectId,
                     'catalog_id'=>$parentId
                 ])->andWhere(['<>','status',3])
+                ->orderBy('sort')
                 ->asArray()->all();
             if ($file) {
                 foreach ($file as &$item) {
                     $fileId[] = $item['id'];
+                    $item['name'] = $project['short_name'].'-'.trim($item['name']);
                     $item['path'] = trim($item['path'],'.');
                     $item['small_path'] = trim($item['small_path'],'.');
                     $item['compress_path'] = trim($item['compress_path'],'.');
@@ -762,6 +764,7 @@ class ProjectController extends BasicController
                         'project_id'=>$projectId,
                         'catalog_id'=>0
                     ])->andWhere(['<>','status',3])
+                    ->orderBy('sort')
                     ->asArray()->all();
             } else {
                 $file = AFile::find()->select($fileColumns)
@@ -769,12 +772,14 @@ class ProjectController extends BasicController
                         'project_id'=>$projectId,
                         'catalog_id'=>$cata['pid']
                     ])->andWhere(['<>','status',3])
+                    ->orderBy('sort')
                     ->asArray()->all();
             }
             if ($file) {
                 foreach ($file as $item) {
                     if (!in_array($item['id'],$fileId)) {
                         $fileId[] = $item['id'];
+                        $item['name'] = $project['short_name'].'-'.trim($item['name']);
                         $item['path'] = trim($item['path'],'.');
                         $item['small_path'] = trim($item['small_path'],'.');
                         $item['compress_path'] = trim($item['compress_path'],'.');

@@ -220,7 +220,7 @@ class FileController extends BasicController
         $msg = '下载文件:'.$file['name'];
         helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
         //用以解决中文不能显示出来的问题
-        $path = iconv("utf-8","gb2312",$file['path']);
+        $path = iconv("utf-8","gb2312//TRANSLIT//IGNORE",$file['path']);
         $file_path = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$path;
         //首先要判断给定的文件存在与否
         if(!file_exists($file_path)) {
@@ -228,8 +228,8 @@ class FileController extends BasicController
         }
 
         // 使用basename函数可以获得文件的名称而不是路径信息，保护了服务器的目录安全性
-        header("content-disposition:attachment;filename=".basename($file_path));
         header("content-length:".filesize($file_path));
+        header("content-disposition:attachment;filename=".urlencode(basename($file_path)));
         readfile($file_path);
         exit();
     }
@@ -404,5 +404,60 @@ class FileController extends BasicController
         }
        var_dump($file);
     }
+    /**
+     * 设置项目内文件排序
+     */
+    public function actionSettingSort()
+    {
+//        $this->ispost();
+        $uid = $this->getParam('userId',true);
+        $ids = $this->getParam('ids',true);
 
+        $idArr = explode(',', $ids);
+        $trans = Yii::$app->db->beginTransaction();
+        try {
+            $msg = '文件排序:';
+            foreach ($idArr as $key=>$fileId){
+                $data = AFile::findOne($fileId);
+                if ($data){
+                    $data->sort = $key+1;
+                    $data->save(false);
+                    $msg .= $data->name.',';
+                }
+            }
+            $trans->commit();
+
+            helps::writeLog(Constants::OPERATION_FILE,$msg,$uid);
+            $this->Success();
+        } catch (\Exception $e){
+            $trans->rollBack();
+            $this->Error($e);
+        }
+    }
+    /**
+     * 设置项目内文件排序
+     */
+    public function actionSettingCatalog()
+    {
+//        $this->ispost();
+        $uid = $this->getParam('userId',true);
+        $fileId = $this->getParam('fileId',true);
+        $catalogId = $this->getParam('catalogId',true);
+
+        $trans = Yii::$app->db->beginTransaction();
+        try {
+            $msg = '文件重新设置位置:';
+
+            $data = AFile::findOne($fileId);
+            $data->catalog_id =$catalogId;
+            $data->save(false);
+            $msg .= $data->name;
+            $trans->commit();
+            helps::writeLog(Constants::OPERATION_FILE,$msg,$uid);
+            $this->Success();
+        } catch (\Exception $e){
+            $trans->rollBack();
+            $this->Error($e);
+        }
+    }
 }

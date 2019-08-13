@@ -69,6 +69,8 @@ class IndexController extends BasicController
 
     /**
      * 修复数据
+     *
+     * 根据文件状态更新对应项目对应目录id  is_file字段
      */
     public function actionHasFile()
     {
@@ -91,6 +93,8 @@ class IndexController extends BasicController
 
     /**
      * 修复数据
+     *
+     *
      */
     public function actionProject()
     {
@@ -135,9 +139,6 @@ class IndexController extends BasicController
         //  echo '<pre>';print_r($data);
     }
     /**
-     * http://www.bjwxapp.cn
-     * tnes  项目 征文启事
-     * @return array
      *
      */
     public function actionMessage()
