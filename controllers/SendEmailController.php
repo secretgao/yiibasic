@@ -26,8 +26,6 @@ class SendEmailController extends BasicController
     }
 
 
-
-
     /**
      * 打包项目发送邮件
      */
@@ -166,17 +164,20 @@ class SendEmailController extends BasicController
         $config = YII::$app->params;
 
         $sendEmail = ASendEmail::find()
-            ->where(['status'=>1])->orderBy('id ASC')->one();
+            ->where(['status'=>0])->orderBy('id ASC')->one();
 
         if (empty($sendEmail)){
             exit('not found send email ');
         }
-        $projectName =$sendEmail->project_name;
+        $projectName =$sendEmail['project_name'];
 
         $email = $sendEmail->address;
         $zipName = $sendEmail->project_file;
-
-
+        $projectId = $sendEmail->project_id;
+    // echo '<pre>';   var_dump($sendEmail);
+  //   var_dump($_SERVER);
+        $url = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].'/send-email/download?id='.$projectId;
+//exit();
         $mail = new PHPMailer(true);
         try {
 
@@ -212,12 +213,12 @@ class SendEmailController extends BasicController
             // 添加该邮件的主题
             $mail->Subject = $projectName;
             // 添加邮件正文
-            $mail->Body = 'hello';
+            $mail->Body = '您好 请点击下载连接下载文件：'.$url;
             // 为该邮件添加附件
-            $mail->addAttachment($zipName,$projectName.'.zip');
+          //  $mail->addAttachment($zipName,$projectName.'.zip');
             // 发送邮件 返回状态
             $status = $mail->send();
-            @unlink($zipName);
+           // @unlink($zipName);
 
             $sendEmail->status = 2;
             $sendEmail->send_time = time();
@@ -233,6 +234,81 @@ class SendEmailController extends BasicController
             $this->Error(Constants::RET_ERROR, 'Message could not be sent. Mailer Error: '.$mail->ErrorInfo);
             // echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
         }
+    }
+
+
+
+    public function actionDownload()
+    {
+
+        $projectId = $this->getParam('id',true);
+        $project = AProject::find()->select('name,create_time')
+            ->where(['id'=>$projectId])->asArray()->one();
+
+        $projectName = $project['name'].'-'.date('YmdHis',$project['create_time']);
+
+        //  $projectName = iconv("UTF-8", "GBK", $projectName);   //汉字转码 防止乱码
+        //$projectPath = $dir.DIRECTORY_SEPARATOR.$projectName;
+        $projectPath = '.'.DIRECTORY_SEPARATOR.$projectName;
+
+        //创建项目根目录
+        if (!is_dir($projectPath)) {
+            mkdir($projectPath,0777,true);
+        }
+
+        //获取项目所有的模板和目录
+        $allStep = helps::getProjectModelAndCateLog($projectId);
+        //获取所有文件
+        $allfile = helps::getProjectAllFile($projectId,1);
+        //echo '<pre>';print_r($allfile);exit();
+        //项目预览 复制到打包文件中
+        $preview = '.'.DIRECTORY_SEPARATOR.'uploads'.DIRECTORY_SEPARATOR.'tree';
+        helps::xCopy($preview, $projectPath);
+        //生成预览数据格式
+        $jsonData = json_encode(array_merge($allStep,$allfile));
+        $json = " var json = ".$jsonData;
+        file_put_contents($projectPath.DIRECTORY_SEPARATOR.'js'.DIRECTORY_SEPARATOR.'data.js',
+            $json);
+        //生成个人工作日志
+        helps::createUserDiary($projectPath,$projectId);
+        //创建文件夹 把文件复制到指定目录下
+        helps::createDirectory($projectPath,$allStep,$allfile,0);
+
+        //打包
+        $zip = new \ZipArchive();
+        $zipName = $projectName.'.zip';
+        $rec = fopen($zipName,'wb');
+        fclose($rec);
+
+        if($zip->open($zipName, \ZipArchive::OVERWRITE)=== TRUE){
+            $this->addFileToZip($projectPath, $zip);
+            //调用方法，对要打包的根目录进行操作，并将ZipArchive的对象传递给方法
+            $zip->close(); //关闭处理的zip文件
+        }
+
+        if (!file_exists($zipName)){
+            $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
+        }
+
+        $href =  $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].'/'.$zipName;
+
+        echo "<a href=".$href.">文件下载</a>";
+        exit();
+        /*
+        $sendEmail->status = 1;
+        $sendEmail->pack_time = time();
+        $sendEmail->project_file = $zipName;
+        if($sendEmail->save(false)) {
+            error_log('pack_file'.date('Y-m-d H:i:s').'#####'.$zipName
+                .PHP_EOL,3,'/tmp/packfile.log');
+            //@unlink($projectPath);
+            $this->Success();
+        } else {
+            $this->Error(Constants::PROJECT_PACK_FAIL,Constants::$error_message[Constants::PROJECT_PACK_FAIL]);
+        }
+
+        */
+
     }
 
 }
