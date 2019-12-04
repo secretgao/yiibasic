@@ -36,12 +36,10 @@ class helps {
 //
 //        var_dump("<pre>");
 //
-//        var_dump($arr);
-//
-//        exit();
+
         //存储不排序的模板
         $refer = array();
-        //存储需要排序的模板
+        //需要合并排序的模板
         $tempSort=array();
         //合并数组
         $tempMerge=array();
@@ -53,15 +51,24 @@ class helps {
             }else{
                 $refer[$v['model_id']] = & $arr[$k]; //创建主键的数组引用
             }
+
         }
+
         if($tempSort){
             usort($tempSort, function($a, $b) {
                 return bccomp($a['sort_id'],$b['sort_id']);});
-            $tempMerge=array_merge($refer,$tempSort);
+
+            $tempMerge = & array_merge_recursive($refer,$tempSort);
+
+            foreach($tempSort as $k => $v){
+                $refer[$v['model_id']] = & $tempSort[$k];
+            }
+
         }
 
         foreach($tempMerge as $k => $v){
             $pid = $v['model_pid'];  //获取当前分类的父级id
+
             if($pid == 0){
                 $tree[] = & $tempMerge[$k];  //顶级栏目
             }else{
@@ -793,5 +800,68 @@ class helps {
 
         return !$fileCount?0:round($fileCount/sizeof($ids),4)*100;
     }
+    public static function delFileUpdateProjectModel($fileId,$projectId,$catalogId){
+        if (!$fileId ||!$projectId || !$catalogId){
+            return false;
+        }
+        $data = AFile::find()->select('id')
+            ->where([
+                'project_id'=>$projectId,
+                'catalog_id'=>$catalogId,
+                'status'=>1,
+            ])->asArray()->all();
+
+//        var_dump($data);
+//        exit();
+
+        //如果删除完此数据  当前目录内还存在另外的数据  不用更新has_file字段  直接返回
+        //        var_dump($data);
+        if(!$data || (sizeof($data)==1 && $data[0]['id']==$fileId)){
+//            var_dump("aaaaa");
+//            exit();
+
+            AProjectModel::updateAll(['is_file'=>0],['project_id'=>$projectId,'model_id'=>$catalogId]);
+
+            //如果当前目录为空 判断model_pid下是否存在has_file=1的数据
+            $arr = [];
+            $parentsId = helps::getParentsId($projectId,$catalogId,$arr);
+
+            if (empty($parentsId)){
+                return false;
+            }
+
+            $projectModelId = [];
+            foreach ($parentsId as $item){
+                $projectModelId[]=$item['id'];
+
+                $parentModelData = AProjectModel::find()->select('id,model_pid')
+                    ->where(['project_id'=>$projectId,'model_pid'=>$item['model_pid'],'is_file'=>1])->asArray()->one();
+
+
+
+                if($parentModelData){
+//                    AProjectModel::updateAll(['is_file'=>0],['id'=>$item['id']]);
+                    var_dump("xxxxxxxxxxxxxxxxxx");
+                    exit();
+                    return true;
+//                    AProjectModel::update(['is_file'=>1],['id'=>$item['id']]);
+                }
+            }
+            var_dump($projectModelId);
+            exit();
+            AProjectModel::updateAll(['is_file'=>0],['id'=>$projectModelId['id']]);
+
+            //  echo '<pre>';print_r($projectModelId);
+
+            return true;
+
+        }else{
+            var_dump("xxxxxx");
+            exit();
+
+        }
+        return false;
+    }
+
 
 }

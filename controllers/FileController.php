@@ -61,7 +61,7 @@ class FileController extends BasicController
             $compress_img = '';
             if ($type == 3){
                 $houzhui = $fileInfo['fileInfo']['ext'];
-                $tupian = ['jpg','png','gif','jpeg'];
+                $tupian = ['jpg','png','gif','jpeg','JPG'];
                 $shipin = ['wmv','asf','asx','rm','rmvb','mpg','mpeg','mpe','3gp','mov','mp4','m4v','avi','dat','mkv','flv','vob'];
                 $yinpin = ['wav',  'mp3', 'cda', 'wma', 'ra'];
                 $biji = ['txt','bmp'];
@@ -144,8 +144,8 @@ class FileController extends BasicController
         $this->isPost();
         $uid = $this->getParam('userId',true);
 
-        $file = AFile::find()->select('id,type,name,create_time,size,project_id as projectId')->where(['uid'=>$uid,'status'=>0])
-            ->asArray()->all();
+        $file = AFile::find()->select('id,type,name,create_time,size,project_id as projectId')->where(['uid'=>$uid,'status'=>1])->orderBy('create_time DESC')
+            ->asArray()->limit(20)->all();
 
         if (!$file){
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
@@ -192,7 +192,7 @@ class FileController extends BasicController
      * 获取政策制度列表
      */
     public function actionPolicySystemFileList(){
-        $column = 'id,name,ext,create_time,path,type';
+        $column = 'id,name,ext,create_time,path,type,size';
         $file = AFile::find()->select($column)
             ->where(['type'=>[8,9,10]])
             ->asArray()->all();
@@ -202,7 +202,21 @@ class FileController extends BasicController
         }
         $this->Success(['data'=>$file]);
     }
+    /**
+     * 获取批复下达列表
+     */
+    public function actionApprovalIssuedList(){
+        $column = 'id,name,ext,create_time,path,type,size';
+        $year = $this->getParam('year',true);
+        $file = AFile::find()->select($column)
+            ->where(['type'=>7,'create_time'=>$year])
+            ->asArray()->all();
 
+        if (!$file) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $this->Success(['data'=>$file]);
+    }
     /**
      * 文件下载
      */
@@ -214,6 +228,7 @@ class FileController extends BasicController
         $file = AFile::find()->select('*')
             ->where(['id'=>$fileId,'status'=>[0,1]])
             ->asArray()->one();
+
         if (!$file) {
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
@@ -249,6 +264,9 @@ class FileController extends BasicController
             $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
         }
         $file->status = '3';
+//        $arr = [];
+
+//        helps::delFileUpdateProjectModel($fileId,$file['project_id'], $file['catalog_id'], $arr);
         if ($file->save(false)) {
             $this->Success();
         } else {
@@ -435,7 +453,7 @@ class FileController extends BasicController
         }
     }
     /**
-     * 设置项目内文件排序
+     * 设置项目目录id
      */
     public function actionSettingCatalog()
     {
@@ -459,5 +477,70 @@ class FileController extends BasicController
             $trans->rollBack();
             $this->Error($e);
         }
+
+//        helps::uploadFileUpdateProjectModel($projectId, $catalogId);
+//
+//        $project->file_agree_num = $fileNum + 1;
+//        $project->save(false);
+    }
+    /**
+     * 设置项目目录id
+     */
+    public function actionSettingName()
+    {
+//        $this->ispost();
+        $uid = $this->getParam('userId',true);
+        $fileId = $this->getParam('fileId',true);
+        $name = $this->getParam('name',true);
+//        var_dump($name);
+//        exit();
+        $trans = Yii::$app->db->beginTransaction();
+        try {
+            $msg = '文件修改名称:';
+
+            $data = AFile::findOne($fileId);
+            $data->name =$name;
+            $data->save(false);
+            $msg .= $data->name;
+            $trans->commit();
+            helps::writeLog(Constants::OPERATION_FILE,$msg,$uid);
+            $this->Success();
+        } catch (\Exception $e){
+            $trans->rollBack();
+            $this->Error($e);
+        }
+    }
+    /**
+     * 获取项目批复文件下载地址#
+     * 目前是项目-下载地址
+     */
+
+    public function actionGetApprovalIssuedPath()
+    {
+        ob_clean();
+
+        $projectId = $this->getParam('projectId',true);
+        $userId = $this->getParam('userId',true);
+        $file = AFile::find()->select('*')
+            ->where(['project_id'=>$projectId,'catalog_id'=>'20214','status'=>[0,1]])
+            ->asArray()->one();
+        if (!$file) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+        $msg = '下载文件:'.$file['name'];
+        helps::writeLog(Constants::OPERATION_FILE,$msg,$userId);
+        //用以解决中文不能显示出来的问题
+        $path = iconv("utf-8","gb2312//TRANSLIT//IGNORE",$file['path']);
+        $file_path = $_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.$path;
+        //首先要判断给定的文件存在与否
+        if(!file_exists($file_path)) {
+            $this->Error(Constants::DATA_NOT_FOUND,Constants::$error_message[Constants::DATA_NOT_FOUND]);
+        }
+
+        // 使用basename函数可以获得文件的名称而不是路径信息，保护了服务器的目录安全性
+        header("content-length:".filesize($file_path));
+        header("content-disposition:attachment;filename=".urlencode(basename($file_path)));
+        readfile($file_path);
+        exit();
     }
 }

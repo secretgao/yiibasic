@@ -278,35 +278,51 @@ class PositionController extends BasicController
     public function actionProjectIndex()
     {
         $userId = $this->getParam('userId',true);
+        $time = $this->getParam('time',false);
         $sys_position = AUser::find()->where(['id'=>$userId])->select('sys_position')->asArray()->scalar();
-        if($sys_position == 1){
-            //获取所有部门
-            $data = APosition::getAllPosition();
-        }
-        if($sys_position == 2){
-            //返回绑定多个的部门项目
-            $postionidstr = ASecretaryTag::find()->where(['user_id'=>$userId])->select('position_ids')->scalar();
-            $arr = explode(',',$postionidstr);
-            $data = APosition::find()->select('id,name')->where(['status'=>0,'pid'=>0])->andWhere(['in','id',$arr])->orderBy('sort_id ASC')->asArray()->all();
+        //判断time为0 测试版
+        if($time==0){
+            $data = APosition::find()->select('id,name')->where(['status'=>2,'pid'=>0])->asArray()->all();
+        }else{
+            if($sys_position == 1 || !strlen($time)){
+                //获取所有部门
+//            $data = APosition::getAllPosition();
+                $data = APosition::find()->select('id,name')->where(['status'=>0,'pid'=>0])->asArray()->all();
+            }
+            if($sys_position == 2 && $time){
+                //返回绑定多个的部门项目
+                $postionidstr = ASecretaryTag::find()->where(['user_id'=>$userId,'year'=>$time])->select('position_ids')->scalar();
+                $arr = explode(',',$postionidstr);
+                $data = APosition::find()->select('id,name')->where(['status'=>0,'pid'=>0])->andWhere(['in','id',$arr])->orderBy('sort_id ASC')->asArray()->all();
 
-        }
-        if($sys_position == 3){
-            //返回绑定部门项目
-            $userPositonId = AUser::find()->select('position_id')->where(['id'=>$userId,'status'=>0])->scalar();
-            $data = APosition::find()->select('id,name')->where(['status'=>0,'pid'=>0])->andWhere(['id'=>$userPositonId])->asArray()->one();
-        }
-        //根据部门id 查询每个部门下的项目数量
-        foreach ($data as $key=>$item) {
-            $data[$key]['projects'] = 0;
-            $projectNum = AProject::find()
-                ->where(['position_id'=>$item['id'],'create_uid'=>$userId])
-                ->andWhere(['<>','status',4])
-                ->count();
-            if ($projectNum) {
-                $data[$key]['projects'] = intval($projectNum);
+            }
+            if(($sys_position == 3 && $time) || ($sys_position == 0 && $time)){
+                //返回绑定部门项目
+                $userPositonId = AUser::find()->select('position_id')->where(['id'=>$userId,'status'=>0])->scalar();
+                $data = APosition::find()->select('id,name')->where(['status'=>0,'pid'=>0])->andWhere(['id'=>$userPositonId])->asArray()->all();
             }
         }
 
+        if(strlen($time)){
+            //根据部门id 查询每个部门下的项目数量
+            foreach ($data as $key=>$item) {
+                
+                $data[$key]['projects'] = 0;
+//                var_dump($item);
+//                exit();
+                $projectNum = AProject::find()
+                    ->where(['position_id'=>$item['id'],'year'=>$time])
+                    ->andWhere(['<>','status',4])
+                    ->count();
+                if ($projectNum) {
+                    $data[$key]['projects'] = intval($projectNum);
+                }else{
+                    unset($data[$key]);
+                }
+            }
+        }
+
+        $data = array_values($data);
         $this->Success(['data'=>$data]);
     }
 }

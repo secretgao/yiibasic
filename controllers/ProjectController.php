@@ -27,11 +27,12 @@ class ProjectController extends BasicController
        parent::init();
     }
     /**
-     * http://www.api.com/position/index
+     * http://www.api.com/project/getList
      * 获取项目列表
      */
     public function actionGetlist()
     {
+        ini_set("error_reporting","E_ALL & ~E_NOTICE");
         $mobile = $this->getParam('mobile',false,0);
         $time = date('Y');
         if  (isset($mobile) && !empty($mobile)){
@@ -62,38 +63,38 @@ class ProjectController extends BasicController
         }
         $res= explode(',',$str);
         $projectsIdArrs=array_filter($res);
-        if($sys_position == 0){
-            //返回自己参与项目
-            //查询该用户创建的项目
-            $createProject = AProject::find()
-                ->where(['create_uid'=>$uid])
-                ->andWhere(['!=','status',4])
-                ->andFilterWhere(['position_id'=>$postionId])
-                ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
-                ->andFilterWhere(['in','id',$projectId])
-                ->andFilterWhere(['year'=>$time])
-                ->orderBy('money DESC')
-                ->asArray()
-                ->all();
-            //查询用户自己参与的项目id
-            $joinProjectIds = AProjectExt::find()->select('project_id')->where(['uid'=>$uid])->asArray()->column();
-            if($projectId){
-                $joinProjectIds = array_merge($joinProjectIds,$projectId);
-            }
-            if ($joinProjectIds) {
-                $joinProject = AProject::find()
-                    ->where(['in','id',$joinProjectIds])
-                    ->andWhere(['!=','status',4])
-                    ->andWhere(['!=','create_uid',$uid])
-                    ->andFilterWhere(['position_id'=>$postionId])
-                    ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
-                    ->andFilterWhere(['year'=>$time])
-                    ->orderBy('money DESC')
-                    ->asArray()
-                    ->all();
-            }
-            $data = array_merge($createProject,$joinProject);
-        }
+//        if($sys_position == 0){
+//            //返回自己参与项目
+//            //查询该用户创建的项目
+//            $createProject = AProject::find()
+//                ->where(['create_uid'=>$uid])
+//                ->andWhere(['!=','status',4])
+//                ->andFilterWhere(['position_id'=>$postionId])
+//                ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
+//                ->andFilterWhere(['in','id',$projectId])
+//                ->andFilterWhere(['year'=>$time])
+//                ->orderBy('money DESC')
+//                ->asArray()
+//                ->all();
+//            //查询用户自己参与的项目id
+//            $joinProjectIds = AProjectExt::find()->select('project_id')->where(['uid'=>$uid])->asArray()->column();
+//            if($projectId){
+//                $joinProjectIds = array_merge($joinProjectIds,$projectId);
+//            }
+//            if ($joinProjectIds) {
+//                $joinProject = AProject::find()
+//                    ->where(['in','id',$joinProjectIds])
+//                    ->andWhere(['!=','status',4])
+//                    ->andWhere(['!=','create_uid',$uid])
+//                    ->andFilterWhere(['position_id'=>$postionId])
+//                    ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
+//                    ->andFilterWhere(['year'=>$time])
+//                    ->orderBy('money DESC')
+//                    ->asArray()
+//                    ->all();
+//            }
+//            $data = array_merge($createProject,$joinProject);
+//        }
         if($sys_position == 1){
             //查询所有的项目
             $data = AProject::find()
@@ -108,7 +109,7 @@ class ProjectController extends BasicController
         }
         if($sys_position == 2){
             //返回绑定多个的部门项目
-            $postionidstr = ASecretaryTag::find()->where(['user_id'=>$uid])->select('position_ids')->scalar();
+            $postionidstr = ASecretaryTag::find()->where(['user_id'=>$uid,'year'=>$time])->select('position_ids')->scalar();
             $positionIds = explode(',',$postionidstr);
             $data = AProject::find()
                 ->where(['in','position_id',$positionIds])
@@ -121,7 +122,7 @@ class ProjectController extends BasicController
                 ->asArray()
                 ->all();
         }
-        if($sys_position == 3){
+        if($sys_position == 3 || $sys_position == 0){
             //返回绑定部门项目
             $userPositonId = AUser::find()->select('position_id')->where(['id'=>$uid,'status'=>0])->scalar();
             $data = AProject::find()
@@ -129,6 +130,19 @@ class ProjectController extends BasicController
                 ->andWhere(['position_id'=>$userPositonId])
                 ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
                 ->andFilterWhere(['in','id',$projectId])
+                ->andFilterWhere(['year'=>$time])
+                ->orderBy('money DESC')
+                ->asArray()
+                ->all();
+        }
+        //time=0 返回项目年份是0的所有参考项目
+        if($time==0 && !$data){
+            //查询所有的项目
+            $data = AProject::find()
+                ->Where(['!=','status',4])
+                ->andFilterWhere(['or',['position_id'=>$postionId],['in','id',$projectsIdArrs]])
+                ->andFilterWhere(['secretary_tag_id'=>$secretarytagId])
+//                ->andFilterWhere(['in','id',$projectsIdArrs])
                 ->andFilterWhere(['year'=>$time])
                 ->orderBy('money DESC')
                 ->asArray()
@@ -687,12 +701,12 @@ class ProjectController extends BasicController
             ->orderBy('level desc')
             ->scalar();
         //获取项目参与人员
-        $member = AProjectExt::find()->select('uid')->where(['project_id'=>$projectId])->asArray()->column();
-        $allMember = array_merge($member,$project);
-        //判断uid 在不在 创建人和参与人的集合里
-        if (!in_array($userId,$allMember)){
-           $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
-        }
+//        $member = AProjectExt::find()->select('uid')->where(['project_id'=>$projectId])->asArray()->column();
+//        $allMember = array_merge($member,$project);
+//        //判断uid 在不在 创建人和参与人的集合里
+//        if (!in_array($userId,$allMember)){
+//           $this->Error(Constants::MEMBER_NO_EXITS,Constants::$error_message[Constants::MEMBER_NO_EXITS]);
+//        }
         $modelColumns = 'pm.id as project_model_id,pm.model_id as id,pm.model_pid as pid,
         am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile,pm.is_master_look as isLook';
         $cateLog = $result1 =  array();
@@ -715,7 +729,7 @@ class ProjectController extends BasicController
                 ->all();
         }
       
-        $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path';
+        $fileColumns = 'id,name,path,type,uid,create_time,size,status,small_path,compress_path,ext';
       //  $modelColumns = 'pm.model_id as id,pm.model_pid as pid,am.name,am.remark as describe,pm.level,am.type, pm.is_file as hasFile';
         $result1 = (new Query())
             ->select($modelColumns)
@@ -739,10 +753,22 @@ class ProjectController extends BasicController
             if ($file) {
                 foreach ($file as &$item) {
                     $fileId[] = $item['id'];
-                    $item['name'] = $project['short_name'].'-'.trim($item['name']);
+                    if($parentId==20172){
+                        $item['name'] = trim($item['name']);
+                    }else{
+                        if(strpos($item['name'],'.')){
+                            $content=explode('.',$item['name']);
+//                            $item['name'] = $project['short_name'].'-'.trim($content[0]);
+                            $item['name'] = trim($content[0]);
+                        }else{
+//                            $item['name'] = $project['short_name'].'-'.trim($item['name']);
+                            $item['name'] = trim($item['name']);
+                        }
+                    }
                     $item['path'] = trim($item['path'],'.');
                     $item['small_path'] = trim($item['small_path'],'.');
                     $item['compress_path'] = trim($item['compress_path'],'.');
+                    $item['ext'] = $item['ext'];
                     $item['creater'] = AUser::getName($item['uid']);
                     $item['time'] = date('Y-m-d',$item['create_time']);
 
@@ -779,8 +805,21 @@ class ProjectController extends BasicController
                 foreach ($file as $item) {
                     if (!in_array($item['id'],$fileId)) {
                         $fileId[] = $item['id'];
-                        $item['name'] = $project['short_name'].'-'.trim($item['name']);
+                        //文联职能文件和部门职能文件不加项目简称
+                        if($parentId==20172){
+                            $item['name'] = trim($item['name']);
+                        }else{
+                            if(strpos($item['name'],'.')){
+                                $content=explode('.',$item['name']);
+//                                $item['name'] = $project['short_name'].'-'.trim($content[0]);
+                                $item['name'] =trim($content[0]);
+                            }else{
+//                                $item['name'] = $project['short_name'].'-'.trim($item['name']);
+                                $item['name'] =trim($item['name']);
+                            }
+                        }
                         $item['path'] = trim($item['path'],'.');
+                        $item['ext'] = $item['ext'];
                         $item['small_path'] = trim($item['small_path'],'.');
                         $item['compress_path'] = trim($item['compress_path'],'.');
                         $item['creater'] = AUser::getName($item['uid']);
@@ -1186,7 +1225,7 @@ class ProjectController extends BasicController
         }
         $columns = 'id,type,uid,name,catalog_id,create_time,size,status as auditState,compress_path,path,small_path';
         $fileData = AFile::find()->select($columns)
-            ->where(['project_id'=>$projectId,'uid'=>$userId])->asArray()->all();
+            ->where(['project_id'=>$projectId,'uid'=>$userId,'status'=>'1'])->asArray()->all();
 
         if (empty($fileData)){
             $this->Success(['data'=>[]]);
