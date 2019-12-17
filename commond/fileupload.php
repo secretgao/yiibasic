@@ -108,7 +108,7 @@ class fileupload
             $uploadFail = 0;
             $chinese = array();
             //判断指定上传文件存储目录是否存在  /uploads/用户id/年/月/日/时
-            $fileUploadDir = $this->uploadDir.DIRECTORY_SEPARATOR.$userId.DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H');
+            $fileUploadDir = $this->uploadDir.DIRECTORY_SEPARATOR.$userId.DIRECTORY_SEPARATOR.date('Y').DIRECTORY_SEPARATOR.date('m').DIRECTORY_SEPARATOR.date('d').DIRECTORY_SEPARATOR.date('H').DIRECTORY_SEPARATOR.date('i').DIRECTORY_SEPARATOR.date('s');
 
             if (!empty($_FILES)) {
                 foreach ($_FILES as $key => $val) {
